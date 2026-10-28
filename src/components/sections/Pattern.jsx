@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { pattern } from "../../data/automationContent"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import { gsap, ScrollTrigger, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
@@ -60,7 +60,7 @@ export default function Pattern() {
   return (
     <SectionShell id="pattern" theme="paper" labelledBy="pattern-title" className="pattern">
       <div ref={ref}>
-        <header className="section-head section-head--split">
+        <header className="section-head section-head--center">
           <h2 id="pattern-title" className="t-h2" data-reveal>
             {pattern.headline}
           </h2>
@@ -75,7 +75,6 @@ export default function Pattern() {
         </header>
 
         <div className="pattern__paths">
-          <Eyebrow className="pattern__label">{pattern.label}</Eyebrow>
           {pattern.lines.map((line, i) => (
             <div key={line} className="path-row" data-reveal style={{ "--at": STALLS[i].at }}>
               <p className="path-row__text">{line}</p>

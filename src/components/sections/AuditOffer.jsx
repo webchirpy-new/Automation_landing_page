@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { audit } from "../../data/automationContent"
-import { SectionShell, Eyebrow, CTAButton } from "../ui/primitives"
+import { SectionShell, CTAButton } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import { goToBooking } from "../../lib/scroll"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -30,7 +30,6 @@ export default function AuditOffer() {
     <SectionShell id="audit" theme="paper" labelledBy="audit-title" className="audit">
       <div ref={ref}>
         <header className="section-head section-head--center">
-          <Eyebrow>{audit.label}</Eyebrow>
           <h2 id="audit-title" className="t-h2" data-reveal>
             {audit.headline}
           </h2>

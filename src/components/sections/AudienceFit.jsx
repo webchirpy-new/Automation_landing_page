@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { fit } from "../../data/automationContent"
-import { SectionShell, Eyebrow, CTAButton } from "../ui/primitives"
+import { SectionShell, CTAButton } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import { goToBooking } from "../../lib/scroll"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -27,7 +27,6 @@ export default function AudienceFit() {
     <SectionShell id="fit" theme="light" labelledBy="fit-title" className="fit">
       <div ref={ref}>
         <header className="section-head section-head--center">
-          <Eyebrow>{fit.label}</Eyebrow>
           <h2 id="fit-title" className="t-h2" data-reveal>
             {fit.headline}
           </h2>

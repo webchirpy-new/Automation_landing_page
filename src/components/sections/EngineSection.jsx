@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { engine } from "../../data/automationContent"
 import { moduleByName } from "../../data/serviceModules"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import AutomationEngine from "../interactions/AutomationEngine"
 import PixelIcon from "../visuals/PixelIcon"
 import { gsap, ScrollTrigger, useGSAP } from "../../lib/gsap"
@@ -43,13 +43,10 @@ export default function EngineSection() {
 
   return (
     <SectionShell id="engine" theme="night" labelledBy="engine-title" className="engine-section">
-      <header className="section-head section-head--split">
-        <div>
-          <Eyebrow>{engine.label}</Eyebrow>
-          <h2 id="engine-title" className="t-h2" data-reveal>
-            {engine.headline}
-          </h2>
-        </div>
+      <header className="section-head section-head--center">
+        <h2 id="engine-title" className="t-h2" data-reveal>
+          {engine.headline}
+        </h2>
         <p className="t-lead" data-reveal>
           {engine.sub}
         </p>
