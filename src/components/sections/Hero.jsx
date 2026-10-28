@@ -237,12 +237,12 @@ export default function Hero() {
           </p>
           <ul>
             {hero.leaks.map((l, i) => (
-              <li key={l} className="px-host">
+              <li key={l} className="px-host" style={{ "--i": i }}>
                 <span className="hero__leak-icon">
                   <PixelIcon name={LEAK_ICONS[i]} size={20} />
                 </span>
                 <span>{l}</span>
-                <span className="hero__leak-gap" aria-hidden="true" />
+                <span className="hero__leak-drip" aria-hidden="true" />
               </li>
             ))}
           </ul>
@@ -252,11 +252,18 @@ export default function Hero() {
           <p id="logo-strip-title" className="t-mono logo-strip__title">
             {hero.logoStripHeading}
           </p>
-          <ul className="logo-strip__list">
-            {trusted.clients.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
+          {/* Marquee: the second list is a visual duplicate for a seamless loop */}
+          <div className="logo-strip__viewport">
+            <div className="logo-strip__track">
+              {[false, true].map((dup) => (
+                <ul key={String(dup)} className="logo-strip__list" aria-hidden={dup || undefined}>
+                  {trusted.clients.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
           <p className="logo-strip__note">{uiCopy.logosPending}</p>
         </div>
 

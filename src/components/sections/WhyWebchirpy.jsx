@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { why, uiCopy } from "../../data/automationContent"
-import { SectionShell, Eyebrow, CTAButton } from "../ui/primitives"
+import { SectionShell, CTAButton } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -36,8 +36,7 @@ export default function WhyWebchirpy() {
   return (
     <SectionShell id="why" theme="light" labelledBy="why-title" className="why">
       <div ref={ref}>
-        <header className="section-head">
-          <Eyebrow>{why.label}</Eyebrow>
+        <header className="section-head section-head--center">
           <h2 id="why-title" className="t-h2 why__title" data-reveal>
             {why.headline}
           </h2>

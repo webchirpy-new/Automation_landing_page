@@ -1,6 +1,6 @@
 import React from "react"
 import { walk } from "../../data/automationContent"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import LeadForm from "../interactions/LeadForm"
 
@@ -8,7 +8,6 @@ export default function WalkIn() {
   return (
     <SectionShell id="decide" theme="light" labelledBy="walk-title" className="walk">
       <header className="section-head section-head--center">
-        <Eyebrow>{walk.label}</Eyebrow>
         <h2 id="walk-title" className="t-h2" data-reveal>
           {walk.headline}
         </h2>

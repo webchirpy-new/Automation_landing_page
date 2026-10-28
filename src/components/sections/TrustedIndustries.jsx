@@ -1,6 +1,6 @@
 import React from "react"
 import { trusted, hero, uiCopy } from "../../data/automationContent"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import { useSite } from "../../context/SiteContext"
 import { siteConfig } from "../../config/site"
@@ -26,13 +26,10 @@ export default function TrustedIndustries() {
   const { openModal } = useSite()
   return (
     <SectionShell id="trusted" theme="paper" labelledBy="trusted-title" className="trusted">
-      <header className="section-head section-head--split">
-        <div>
-          <Eyebrow>{trusted.label}</Eyebrow>
-          <h2 id="trusted-title" className="t-h2" data-reveal>
-            {trusted.headline}
-          </h2>
-        </div>
+      <header className="section-head section-head--center">
+        <h2 id="trusted-title" className="t-h2" data-reveal>
+          {trusted.headline}
+        </h2>
         <p className="t-lead" data-reveal>
           {trusted.sub}
         </p>

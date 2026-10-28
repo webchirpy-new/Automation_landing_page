@@ -45,10 +45,10 @@
   --fs-mono: 0.75rem;
 
   /* Space & layout */
-  --content-max: 1280px;
+  --content-max: 1240px;
   --gutter: clamp(16px, 2.4vw, 32px);
-  --section-y: clamp(80px, 9vw, 152px);
-  --section-y-tight: clamp(56px, 6vw, 96px);
+  --section-y: clamp(64px, 2.5rem + 4.4vw, 104px); /* 64 → 104px */
+  --section-y-tight: clamp(48px, 5vw, 72px);
   --header-h: 64px;
 
   /* Radius */

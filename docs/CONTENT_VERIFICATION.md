@@ -33,6 +33,7 @@ Source: `3-1_AI Automation Engine – Landing Page 1 Content.docx` (Oct 23, 2026
 6. **Hero source line** describes the YRE portal, not the 7x / 60x / 23% figures. It is hidden (`VITE_SHOW_HERO_SOURCE_LINE=false`) and replaced by "citation pending confirmation". The YRE project text appears in the work gallery, where it describes built work.
 7. **Consent checkbox** ("I agree to be contacted about my free audit call.") is new and required.
 8. The **Engine and dashboard mini-workflows** use example strings such as "Is the 6pm slot free tomorrow?" inside panels labelled "Example workflow".
+9. **Section labels (02–14)** such as "The pattern" or "Common questions" are kept in `automationContent.js` (`label` fields) but are no longer rendered, so each section opens on its approved headline. Only the hero eyebrow ("AI Automation for lead conversion") is shown.
 
 ## Approvals / verification required before launch
 

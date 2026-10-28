@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from "react"
 import { finalCta, footer } from "../../data/automationContent"
 import { serviceModules } from "../../data/serviceModules"
 import { siteConfig, phoneHref, whatsappHref } from "../../config/site"
-import { Eyebrow, CTAButton } from "../ui/primitives"
+import { CTAButton } from "../ui/primitives"
 import { Wordmark } from "../layout/Header"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -85,7 +85,6 @@ export default function FinalCTA() {
     <footer id="final" ref={ref} className={`final ${resolved ? "is-resolved" : ""}`} aria-labelledby="final-title">
       <div className="container final__hero">
         <div className="final__copy">
-          <Eyebrow>{finalCta.label}</Eyebrow>
           <h2 id="final-title" className="t-h2">
             {finalCta.headline}
           </h2>

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
 import { proof, uiCopy } from "../../data/automationContent"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 
 // UI microcopy: the 3-step process each book reveals, restating the source "What changes".
@@ -78,13 +78,10 @@ function Book({ c, i }) {
 export default function Proof() {
   return (
     <SectionShell id="proof" theme="light" labelledBy="proof-title" className="proof">
-      <header className="section-head section-head--split">
-        <div>
-          <Eyebrow>{proof.label}</Eyebrow>
-          <h2 id="proof-title" className="t-h2" data-reveal>
-            {proof.headline}
-          </h2>
-        </div>
+      <header className="section-head section-head--center">
+        <h2 id="proof-title" className="t-h2" data-reveal>
+          {proof.headline}
+        </h2>
         <p className="t-lead" data-reveal>
           {proof.sub}
         </p>

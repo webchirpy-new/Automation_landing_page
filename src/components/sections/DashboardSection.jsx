@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { dashboard } from "../../data/automationContent"
-import { SectionShell, Eyebrow } from "../ui/primitives"
+import { SectionShell } from "../ui/primitives"
 import DashboardDemo from "../interactions/DashboardDemo"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
@@ -42,7 +42,6 @@ export default function DashboardSection() {
   return (
     <SectionShell id="dashboard" theme="night" labelledBy="dashboard-title" className="dashboard-section">
       <header className="section-head section-head--center">
-        <Eyebrow>{dashboard.label}</Eyebrow>
         <h2 id="dashboard-title" className="t-h2" data-reveal>
           {dashboard.headline}
         </h2>

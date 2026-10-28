@@ -831,7 +831,7 @@
 .why__split {
   display: grid;
   gap: 48px;
-  margin-top: clamp(56px, 7vw, 96px);
+  margin-top: clamp(48px, 5vw, 72px);
 }
 @media (min-width: 1024px) {
   .why__split {
@@ -1247,23 +1247,8 @@
    11 FAQ
    ========================================================= */
 .faq__layout {
-  display: grid;
-  gap: 40px;
-}
-@media (min-width: 1024px) {
-  .faq__layout {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-    gap: 72px;
-  }
-  .faq__head {
-    position: sticky;
-    top: calc(var(--header-h) + 32px);
-    align-self: start;
-  }
-}
-.faq__head {
-  display: grid;
-  gap: 16px;
+  max-width: 920px;
+  margin-inline: auto;
 }
 .faq-list {
   border-top: 1px solid var(--line);
