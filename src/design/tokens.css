@@ -1,0 +1,81 @@
+/* Webchirpy master-frame tokens. The only place colours are defined. */
+:root {
+  /* Colour */
+  --background: #ffffff;
+  --paper: #f8f8fa;
+  --ink: #111111;
+  --ink-2: #2a2a31;
+  --muted: #5c5c66; /* 6.4:1 on white — AA for body text */
+  --muted-2: #8a8a94; /* decorative/large text only */
+  --violet: #7c3aed;
+  --violet-ink: #6d28d9; /* violet text on white, 7:1 */
+  --lavender: #a78bfa;
+  --violet-wash: #f3edff;
+  --night: #101017;
+  --night-surface: #1a1924;
+  --night-raised: #22212e;
+  --night-text: #f5f4fa;
+  --night-muted: #b4b1c2; /* 8.7:1 on --night */
+  --line: #e7e5ee;
+  --line-dark: #393441;
+  --danger: #da5d67;
+  --danger-ink: #b23a45;
+  --danger-wash: #fdf0f1;
+  --success: #20a985;
+  --success-ink: #137a5f;
+  --grid-dot: #dcd9e4;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-dark-bg: rgba(26, 25, 36, 0.66);
+  --glass-blur: 16px;
+
+  /* Type */
+  /* One family for the whole landing page. --font-sans / --font-mono are kept as
+     aliases so existing rules (incl. uppercase utility labels) keep working. */
+  --font-primary: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-primary);
+  --font-mono: var(--font-primary);
+  --fs-display: clamp(2.35rem, 1.2rem + 5.1vw, 5.5rem); /* 38 → 88px */
+  --fs-h2: clamp(2rem, 1.25rem + 3.2vw, 4rem); /* 32 → 64px */
+  --fs-h3: clamp(1.35rem, 1.1rem + 1vw, 1.875rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --fs-body: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --fs-small: 0.875rem;
+  --fs-mono: 0.75rem;
+
+  /* Space & layout */
+  --content-max: 1280px;
+  --gutter: clamp(16px, 2.4vw, 32px);
+  --section-y: clamp(80px, 9vw, 152px);
+  --section-y-tight: clamp(56px, 6vw, 96px);
+  --header-h: 64px;
+
+  /* Radius */
+  --r-12: 12px;
+  --r-18: 18px;
+  --r-24: 24px;
+  --r-32: 32px;
+  --r-pill: 999px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 2px rgba(17, 17, 17, 0.04), 0 2px 8px rgba(17, 17, 17, 0.04);
+  --shadow-2: 0 2px 6px rgba(17, 17, 17, 0.05), 0 12px 32px rgba(17, 17, 17, 0.07);
+  --shadow-3: 0 8px 24px rgba(17, 17, 17, 0.08), 0 32px 64px rgba(17, 17, 17, 0.1);
+  --shadow-violet: 0 8px 28px rgba(124, 58, 237, 0.28);
+
+  /* Motion (mirrors src/lib/motionTokens.js) */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-hover: 220ms;
+  --dur-micro: 420ms;
+  --dur-reveal: 700ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-hover: 1ms;
+    --dur-micro: 1ms;
+    --dur-reveal: 1ms;
+  }
+}
