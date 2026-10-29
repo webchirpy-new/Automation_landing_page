@@ -3,6 +3,8 @@ import { hero, uiCopy, trusted } from "../../data/automationContent"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
 import PixelField from "../visuals/PixelField"
+import SectionAmbient from "../visuals/SectionAmbient"
+import { ambient } from "../../config/ambient"
 import PixelIcon from "../visuals/PixelIcon"
 import AppTile from "../visuals/AppTile"
 import CountUp from "../visuals/CountUp"
@@ -12,6 +14,7 @@ import { MOTION_OK } from "../../lib/motionTokens"
 import { goTo } from "../../lib/scroll"
 import { useSite } from "../../context/SiteContext"
 import { useCoarsePointer } from "../../hooks/useMediaQuery"
+import { Marked } from "../ui/Highlight"
 
 /**
  * Floating tile field around the centred copy (storyboard frames 02–06).
@@ -157,6 +160,7 @@ export default function Hero() {
       {/* First fold: centred copy, floating tiles, reactive pixel grid */}
       <div ref={foldRef} className="hero__fold">
         <PixelField intensity={0.7} />
+        <SectionAmbient blooms={ambient.top} fadeTop="0%" fadeBottom="20%" className="ambient--hero" />
 
         <div className="hero__tiles" role="group" aria-label={uiCopy.toolsDisclaimer}>
           {TILES.map((t) => {
@@ -209,7 +213,7 @@ export default function Hero() {
           <h1 id="hero-title" className="hero__title">
             {hero.headline}
           </h1>
-          <p className="hero__punch">{hero.punchLine}</p>
+          <p className="hero__punch"><Marked text={hero.punchLine} phrase="Find the leaks." tone="light" /></p>
           <p className="hero__body">{hero.body}</p>
           <div className="hero__cta">
             <CTAButton id="hero-cta" href="#scorecard" size="lg" onClick={() => goTo("#scorecard", { focusSelector: ".score-area__toggle, input" })}>
@@ -228,7 +232,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Remaining hero content — unchanged order: leaks → logos → video + results */}
+      {/* Remaining hero content: leaks → video + results, then the trust band */}
       <div className="container hero__below">
         <aside className="hero__leaks" aria-labelledby="leaks-title">
           <p id="leaks-title" className="t-mono hero__leaks-title">
@@ -247,25 +251,6 @@ export default function Hero() {
             ))}
           </ul>
         </aside>
-
-        <div className="logo-strip" aria-labelledby="logo-strip-title">
-          <p id="logo-strip-title" className="t-mono logo-strip__title">
-            {hero.logoStripHeading}
-          </p>
-          {/* Marquee: the second list is a visual duplicate for a seamless loop */}
-          <div className="logo-strip__viewport">
-            <div className="logo-strip__track">
-              {[false, true].map((dup) => (
-                <ul key={String(dup)} className="logo-strip__list" aria-hidden={dup || undefined}>
-                  {trusted.clients.map((c) => (
-                    <li key={c}>{c}</li>
-                  ))}
-                </ul>
-              ))}
-            </div>
-          </div>
-          <p className="logo-strip__note">{uiCopy.logosPending}</p>
-        </div>
 
         <div className="hero__proof-grid">
           <button type="button" className="video-card" onClick={() => openModal("video:founder")}>
@@ -303,6 +288,27 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      {/* Businesses that trust Webchirpy — its own light band, the bridge into the first dark chapter */}
+      {/* <div className="logo-strip">
+        <SectionAmbient blooms={ambient.trust} fadeTop="10%" fadeBottom="34%" />
+        <h2 id="logo-strip-title" className="logo-strip__title">
+          <Marked text={hero.logoStripHeading} phrase="trust Webchirpy" tone="light" />
+        </h2>
+       
+        <div className="logo-strip__viewport" tabIndex={0} role="region" aria-labelledby="logo-strip-title">
+          <div className="logo-strip__track">
+            {[false, true].map((dup) => (
+              <ul key={String(dup)} className="logo-strip__list" aria-hidden={dup || undefined}>
+                {trusted.clients.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+        <p className="logo-strip__note">{uiCopy.logosPending}</p>
+      </div> */}
     </section>
   )
 }

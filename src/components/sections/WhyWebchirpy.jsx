@@ -2,9 +2,11 @@ import React, { useRef } from "react"
 import { why, uiCopy } from "../../data/automationContent"
 import { SectionShell, CTAButton } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
+import CountUp from "../visuals/CountUp"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { Marked } from "../ui/Highlight"
 
 const STORY_ICONS = ["cross", "backOffice", "check"] // problem → build → tested
 const DIFF_ICONS = ["leadCapture", "check", "insights"]
@@ -34,21 +36,23 @@ export default function WhyWebchirpy() {
   )
 
   return (
-    <SectionShell id="why" theme="light" labelledBy="why-title" className="why">
+    <SectionShell id="why" theme="night" labelledBy="why-title" className="why">
       <div ref={ref}>
         <header className="section-head section-head--center">
           <h2 id="why-title" className="t-h2 why__title" data-reveal>
-            {why.headline}
+            <Marked text={why.headline} phrase="Webchirpy." tone="dark" />
           </h2>
           <p className="t-lead" data-reveal>
             {why.sub}
           </p>
         </header>
 
-        <ul className="proof-points" data-reveal>
+        <ul className="proof-points" data-stagger>
           {why.proofPoints.map((p) => (
             <li key={p.value}>
-              <span className="proof-points__value">{p.value}</span>
+              <span className="proof-points__value">
+                {/^\d+\+?$/.test(p.value) ? <CountUp value={parseInt(p.value, 10)} suffix={p.value.endsWith("+") ? "+" : ""} /> : p.value}
+              </span>
               <span className="proof-points__label">{p.label}</span>
             </li>
           ))}

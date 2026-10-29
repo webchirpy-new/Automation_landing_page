@@ -2,6 +2,7 @@ import React from "react"
 import { faq } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import FAQAccordion from "../interactions/FAQAccordion"
+import { Marked } from "../ui/Highlight"
 
 export default function FAQ() {
   return (
@@ -9,7 +10,7 @@ export default function FAQ() {
       <div className="faq__layout">
         <header className="section-head section-head--center">
           <h2 id="faq-title" className="t-h2" data-reveal>
-            {faq.headline}
+            <Marked text={faq.headline} phrase="before you book the call." tone="light" />
           </h2>
           <p className="t-lead" data-reveal>
             {faq.sub}

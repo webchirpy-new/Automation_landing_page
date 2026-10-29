@@ -1,9 +1,11 @@
 import React from "react"
-import { trusted, hero, uiCopy } from "../../data/automationContent"
+import { trusted, uiCopy } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
+import BrandCarousel from "../interactions/BrandCarousel"
 import { useSite } from "../../context/SiteContext"
 import { siteConfig } from "../../config/site"
+import { Marked } from "../ui/Highlight"
 
 /**
  * Work gallery. Only the YRE portal is described in the DOCX (the hero "Source"
@@ -25,26 +27,17 @@ const GALLERY = [
 export default function TrustedIndustries() {
   const { openModal } = useSite()
   return (
-    <SectionShell id="trusted" theme="paper" labelledBy="trusted-title" className="trusted">
+    <SectionShell id="trusted" theme="light" labelledBy="trusted-title" className="trusted">
       <header className="section-head section-head--center">
         <h2 id="trusted-title" className="t-h2" data-reveal>
-          {trusted.headline}
+          <Marked text={trusted.headline} phrase="behind the engine." tone="light" />
         </h2>
         <p className="t-lead" data-reveal>
           {trusted.sub}
         </p>
       </header>
 
-      <div className="clients" data-reveal>
-        <ul className="clients__grid" aria-label={hero.logoStripHeading}>
-          {trusted.clients.map((c) => (
-            <li key={c}>
-              <span>{c}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="clients__note t-mono">{uiCopy.logosPending}</p>
-      </div>
+      <BrandCarousel />
 
       <div className="voices" data-reveal>
         <h3 className="t-h3">{trusted.clientVoicesHeading}</h3>

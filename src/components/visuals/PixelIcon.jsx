@@ -5,11 +5,12 @@ import React from "react"
  * rectangles, rendered crisp. Layers:
  *   base   — ink (currentColor)
  *   muted  — 35% ink
- *   accent — violet; carries the 1–3 frame "operation" motion (see components.css)
+ *   accent — warm accent; carries the 1–3 frame "operation" motion (see components.css)
  *
  * Motion plays when an ancestor has `.is-active`, `[aria-expanded=true]`,
  * `[aria-selected=true]` or is hovered/focused (`.px-host`). Rest state is static.
  * Each rect gets `--i` (stagger) and optional `--dx/--dy` (travel) CSS vars.
+ * A layer may use `polys` instead of `rects` for anti-aliased diagonals (status glyphs).
  */
 
 const R = (x, y, w = 1, h = 1, vars) => ({ x, y, w, h, vars })
@@ -100,6 +101,13 @@ export const recipes = {
   },
 
   /* Utility glyphs */
+  /* Branch — one route splits into three (engine workflow, Stage 03) */
+  branch: {
+    layers: [
+      { cls: "base", rects: [R(1, 7, 3, 3), R(4, 8, 4, 1), R(8, 3, 1, 11), R(9, 3, 2, 1), R(9, 8, 2, 1), R(9, 13, 2, 1)] },
+      { cls: "accent", anim: "seq", rects: [R(11, 2, 3, 3), R(11, 7, 3, 3), R(11, 12, 3, 3)] },
+    ],
+  },
   form: {
     layers: [
       { cls: "base", rects: [R(1, 2, 14, 1), R(1, 2, 1, 12), R(14, 2, 1, 12), R(1, 13, 14, 1), R(1, 5, 14, 1)] },
@@ -145,11 +153,17 @@ export const recipes = {
       { cls: "accent", anim: "rise", rects: [R(4, 9, 2, 5), R(8, 6, 2, 8), R(12, 3, 2, 11)] },
     ],
   },
+  /* Status glyphs: meaning wins over pixels — solid 2.4-unit strokes with clean diagonals */
   check: {
-    layers: [{ cls: "accent", anim: "stack", rects: [R(2, 8, 2, 2), R(4, 10, 2, 2), R(6, 8, 2, 2), R(8, 6, 2, 2), R(10, 4, 2, 2), R(12, 2, 2, 2)] }],
+    layers: [{ cls: "accent", polys: ["3.35,7.65 6.39,10.69 12.55,2.76 14.45,4.24 6.61,14.31 1.65,9.35"] }],
   },
   cross: {
-    layers: [{ cls: "base", rects: [R(3, 3, 2, 2), R(5, 5, 2, 2), R(7, 7, 2, 2), R(9, 9, 2, 2), R(11, 11, 2, 2), R(11, 3, 2, 2), R(9, 5, 2, 2), R(5, 9, 2, 2), R(3, 11, 2, 2)] }],
+    layers: [
+      {
+        cls: "base",
+        polys: ["2.65,4.35 4.35,2.65 13.35,11.65 11.65,13.35", "11.65,2.65 13.35,4.35 4.35,13.35 2.65,11.65"],
+      },
+    ],
   },
   help: {
     layers: [
@@ -196,7 +210,8 @@ export default function PixelIcon({ name, size = 24, title, className = "", anim
     >
       {recipe.layers.map((layer, li) => (
         <g key={li} className={`px-${layer.cls} ${layer.anim ? `px-a-${layer.anim}` : ""}`}>
-          {layer.rects.map((r, ri) => (
+          {layer.polys?.map((pts) => <polygon key={pts} points={pts} shapeRendering="geometricPrecision" />)}
+          {layer.rects?.map((r, ri) => (
             <rect
               key={ri}
               x={r.x}

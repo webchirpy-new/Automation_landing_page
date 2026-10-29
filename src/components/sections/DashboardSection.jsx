@@ -4,6 +4,7 @@ import { SectionShell } from "../ui/primitives"
 import DashboardDemo from "../interactions/DashboardDemo"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { Marked } from "../ui/Highlight"
 
 export default function DashboardSection() {
   const flowRef = useRef(null)
@@ -43,7 +44,7 @@ export default function DashboardSection() {
     <SectionShell id="dashboard" theme="night" labelledBy="dashboard-title" className="dashboard-section">
       <header className="section-head section-head--center">
         <h2 id="dashboard-title" className="t-h2" data-reveal>
-          {dashboard.headline}
+          <Marked text={dashboard.headline} phrase="One screen." tone="dark" />
         </h2>
         <p className="t-lead" data-reveal>
           {dashboard.sub}

@@ -39,7 +39,7 @@ function ScoreRing({ summary, compact = false }) {
   )
 }
 
-/** 4×2 automation map; a violet route links every reviewed area in order. */
+/** 4×2 automation map; a warm route links every reviewed area in order. */
 function AutomationMap({ summary }) {
   const pts = summary.areas
     .map((a, i) => (a.reviewed ? `${((i % 4) + 0.5) * 25},${(Math.floor(i / 4) + 0.5) * 50}` : null))
@@ -120,7 +120,7 @@ export default function Scorecard() {
         )}
 
         <div className="scorecard__cta">
-          <button type="button" className="btn btn--primary btn--lg btn--block" onClick={goToBooking}>
+          <button type="button" className="btn btn--primary btn--lg btn--block ember" onClick={goToBooking}>
             <span className="btn__label">{scorecard.button}</span>
           </button>
           <p className="scorecard__under">{scorecard.underButton}</p>

@@ -5,6 +5,7 @@ import PixelIcon from "../visuals/PixelIcon"
 import { goToBooking } from "../../lib/scroll"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { Marked } from "../ui/Highlight"
 
 export default function AudienceFit() {
   const ref = useRef(null)
@@ -24,11 +25,11 @@ export default function AudienceFit() {
   )
 
   return (
-    <SectionShell id="fit" theme="light" labelledBy="fit-title" className="fit">
+    <SectionShell id="fit" theme="night" labelledBy="fit-title" className="fit">
       <div ref={ref}>
         <header className="section-head section-head--center">
           <h2 id="fit-title" className="t-h2" data-reveal>
-            {fit.headline}
+            <Marked text={fit.headline} phrase="smarter, not longer." tone="dark" />
           </h2>
           <p className="t-lead" data-reveal>
             {fit.sub}
@@ -49,7 +50,7 @@ export default function AudienceFit() {
               {fit.good.title}
             </h3>
             <p className="fit__lead">{fit.good.lead}</p>
-            <ul>
+            <ul data-stagger>
               {fit.good.items.map((it) => (
                 <li key={it}>
                   <PixelIcon name="check" size={14} animate={false} />
@@ -66,7 +67,7 @@ export default function AudienceFit() {
               {fit.notFit.title}
             </h3>
             <p className="fit__lead">{fit.notFit.lead}</p>
-            <ul>
+            <ul data-stagger>
               {fit.notFit.items.map((it) => (
                 <li key={it}>
                   <span className="fit__dash" aria-hidden="true" />

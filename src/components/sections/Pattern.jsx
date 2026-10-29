@@ -5,6 +5,7 @@ import PixelIcon from "../visuals/PixelIcon"
 import WorkweekCanvas from "../interactions/WorkweekCanvas"
 import { gsap, ScrollTrigger, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { Marked } from "../ui/Highlight"
 
 const DISCLAIMER = "Illustration · not measured data"
 const NOTE =
@@ -31,6 +32,7 @@ export default function Pattern() {
   const cut = pattern.sameTeam.indexOf("And ")
   const coreLead = cut > 0 ? pattern.sameTeam.slice(0, cut).trim() : pattern.sameTeam
   const coreTail = cut > 0 ? pattern.sameTeam.slice(cut) : ""
+  const coreParts = coreLead.split(/(?<=\.)\s+/) // "Same team." · "Same effort."
 
   useGSAP(
     () => {
@@ -53,21 +55,33 @@ export default function Pattern() {
           onLeaveBack: () => (manual.current = false),
         })
 
-        const core = ref.current.querySelector(".pattern__core")
-        gsap.from(core.children, {
-          yPercent: 35,
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          stagger: 0.15,
-          scrollTrigger: { trigger: core, start: "top 85%", once: true },
-        })
-        const final = ref.current.querySelector(".pattern__final")
-        gsap.fromTo(
-          final.querySelector(".pattern__rule"),
-          { scaleX: 0 },
-          { scaleX: 1, ease: "none", scrollTrigger: { trigger: final, start: "top 95%", end: "top 70%", scrub: 0.6 } }
-        )
+        // Closing: one-time editorial reveal — lead line, masked accent line (shedding a few
+        // pixels as the hours "disappear"), paragraph, final statement, then its underline.
+        const end = ref.current.querySelector(".pattern__end")
+        const q = gsap.utils.selector(end)
+        gsap
+          .timeline({ scrollTrigger: { trigger: end, start: "top 80%", once: true } })
+          .from(q(".pattern__core-lead"), { autoAlpha: 0, y: 18, duration: 0.7, ease: "power3.out" }, 0)
+          .fromTo(
+            q(".pattern__core-accent"),
+            { autoAlpha: 0, y: 14, clipPath: "inset(0% 0% 100% 0%)" },
+            { autoAlpha: 1, y: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: "power3.out", clearProps: "clipPath" },
+            0.2
+          )
+          .fromTo(
+            q(".pattern__px i"),
+            { autoAlpha: 0, y: 0 },
+            { keyframes: { autoAlpha: [0, 0.55, 0], y: [0, 4, 10] }, duration: 0.9, ease: "power1.out", stagger: 0.08 },
+            1.0 // after the mask clears, so the drift isn't clipped
+          )
+          .from(q(".pattern__closing"), { autoAlpha: 0, y: 15, duration: 0.7, ease: "power2.out" }, 0.55)
+          .from(q(".pattern__final"), { autoAlpha: 0, y: 12, duration: 0.7, ease: "power2.out" }, 0.8)
+          .fromTo(
+            q(".pattern__final-text"),
+            { backgroundSize: "0% 2px" },
+            { backgroundSize: "100% 2px", duration: 0.7, ease: "power2.out" },
+            1.1
+          )
       })
       return () => mm.revert()
     },
@@ -75,13 +89,13 @@ export default function Pattern() {
   )
 
   return (
-    <SectionShell id="pattern" theme="paper" labelledBy="pattern-title" className="pattern">
+    <SectionShell id="pattern" theme="night" labelledBy="pattern-title" className="pattern">
       <div ref={ref}>
         <div ref={storyRef} className="pattern__story">
           <div className="pattern__top">
             <div className="pattern__intro">
               <h2 id="pattern-title" className="t-h2" data-reveal>
-                {pattern.headline}
+                <Marked text={pattern.headline} phrase="slipping through?" tone="dark" />
               </h2>
               <ul className="pattern__points" data-reveal aria-label="What you already have">
                 {pattern.chips.map((c) => (
@@ -129,15 +143,30 @@ export default function Pattern() {
 
         <div className="pattern__end">
           <p className="pattern__core">
-            <span>{coreLead}</span> {coreTail && <span className="pattern__core-accent">{coreTail}</span>}
+            <span className="pattern__core-lead">
+              {coreParts.map((part, i) => (
+                <React.Fragment key={part}>
+                  {i > 0 && " "}
+                  <span className="pattern__core-part">{part}</span>
+                </React.Fragment>
+              ))}
+            </span>{" "}
+            {coreTail && (
+              <span className="pattern__core-accent">
+                {coreTail}
+                <span className="pattern__px" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </span>
+            )}
           </p>
           <div className="pattern__end-row">
-            <p className="pattern__closing" data-reveal>
-              {pattern.closingLine}
-            </p>
-            <p className="pattern__final" data-reveal>
-              {pattern.subLine}
-              <span className="pattern__rule" aria-hidden="true" />
+            <p className="pattern__closing">{pattern.closingLine}</p>
+            <p className="pattern__final">
+              <span className="pattern__final-text">{pattern.subLine}</span>
             </p>
           </div>
         </div>

@@ -3,13 +3,14 @@ import { walk } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import LeadForm from "../interactions/LeadForm"
+import { Marked } from "../ui/Highlight"
 
 export default function WalkIn() {
   return (
     <SectionShell id="decide" theme="light" labelledBy="walk-title" className="walk">
       <header className="section-head section-head--center">
         <h2 id="walk-title" className="t-h2" data-reveal>
-          {walk.headline}
+          <Marked text={walk.headline} phrase="Walk in" tone="light" />
         </h2>
         <p className="t-lead" data-reveal>
           {walk.sub}
@@ -26,7 +27,7 @@ export default function WalkIn() {
             {walk.away.title}
           </h3>
           <p className="choice__tag">{walk.away.tagline}</p>
-          <ul className="choice__list">
+          <ul className="choice__list" data-stagger>
             {walk.away.items.map((it) => (
               <li key={it}>
                 <span className="mark mark--x" aria-hidden="true">
@@ -54,7 +55,7 @@ export default function WalkIn() {
           </h3>
           <p className="choice__tag">{walk.in.tagline}</p>
           <p className="choice__line choice__line--top">{walk.in.line}</p>
-          <ul className="choice__list choice__list--in">
+          <ul className="choice__list choice__list--in" data-stagger>
             {walk.in.items.map((it) => (
               <li key={it.title}>
                 <PixelIcon name="check" size={14} animate={false} />

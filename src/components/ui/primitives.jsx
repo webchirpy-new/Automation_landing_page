@@ -1,18 +1,53 @@
 import React, { useRef } from "react"
 import { gsap, ScrollTrigger, useGSAP } from "../../lib/gsap"
 import { MOTION_OK, dur, ease } from "../../lib/motionTokens"
+import { ambient, embers } from "../../config/ambient"
+import SectionAmbient from "../visuals/SectionAmbient"
+import EmberPixelCorner from "../visuals/EmberPixelCorner"
 
 /**
  * SectionShell — every landing section. Handles theme band, anchor, heading
- * association and a once-only staggered reveal of `[data-reveal]` children.
+ * association, a once-only staggered reveal of `[data-reveal]` children and a
+ * cascading reveal of the items inside `[data-stagger]` lists.
+ * theme="night" renders a full-bleed dark panel with rounded corners on the light canvas,
+ * Warm ambient blooms come from config/ambient.js by section id (see SectionAmbient).
  * Content is fully visible without JS; it is only hidden once GSAP takes over.
  */
 export function SectionShell({ id, theme = "light", className = "", labelledBy, children, as: Tag = "section", wide = false }) {
   const ref = useRef(null)
+  const inset = theme === "night"
   useGSAP(
     () => {
       const mm = gsap.matchMedia()
       mm.add(MOTION_OK, () => {
+        // Calm panel entrance: opacity plus a short rise. No scale, so the full-bleed
+        // panel never shows side gutters mid-animation.
+        if (inset) {
+          gsap.from(ref.current.querySelector(".section__panel"), {
+            y: 24,
+            autoAlpha: 0,
+            duration: 0.9,
+            ease: ease.out,
+            scrollTrigger: { trigger: ref.current, start: "top 92%", once: true },
+          })
+        }
+        // [data-stagger] lists: items cascade in once, and their marks (checks, icons,
+        // numbers) pop as each item lands — a small "task done" beat.
+        gsap.utils.toArray("[data-stagger]", ref.current).forEach((list) => {
+          const items = [...list.children]
+          const marks = list.querySelectorAll(":scope > * :is(.px-icon, .mark, .fit__dash, .promises__n)")
+          gsap.set(items, { autoAlpha: 0, y: 14 })
+          ScrollTrigger.create({
+            trigger: list,
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              gsap.to(items, { autoAlpha: 1, y: 0, duration: 0.5, ease: ease.out, stagger: 0.08 })
+              if (marks.length)
+                gsap.from(marks, { scale: 0, transformOrigin: "50% 50%", duration: 0.45, ease: "back.out(2.2)", stagger: 0.08, delay: 0.18 })
+            },
+          })
+        })
         const els = gsap.utils.toArray("[data-reveal]", ref.current)
         if (!els.length) return
         gsap.set(els, { autoAlpha: 0, y: 24 })
@@ -27,9 +62,32 @@ export function SectionShell({ id, theme = "light", className = "", labelledBy, 
     },
     { scope: ref }
   )
+  const glowEl = (
+    <>
+      <SectionAmbient blooms={ambient[id]} tone={inset ? "dark" : "light"} />
+      {embers[id] && <EmberPixelCorner sectionId={id} theme={inset ? "dark" : "light"} {...embers[id]} />}
+    </>
+  )
+  const content = <div className={`container ${wide ? "container--wide" : ""}`}>{children}</div>
   return (
-    <Tag ref={ref} id={id} className={`section section--${theme} ${className}`} aria-labelledby={labelledBy} data-theme={theme}>
-      <div className={`container ${wide ? "container--wide" : ""}`}>{children}</div>
+    <Tag
+      ref={ref}
+      id={id}
+      className={`section section--${theme} ${inset ? "section--inset" : ""} ${className}`}
+      aria-labelledby={labelledBy}
+      data-theme={theme}
+    >
+      {inset ? (
+        <div className="section__panel">
+          {glowEl}
+          {content}
+        </div>
+      ) : (
+        <>
+          {glowEl}
+          {content}
+        </>
+      )}
     </Tag>
   )
 }
@@ -55,7 +113,8 @@ export function DisplayHeading({ id, level = 2, children, className = "", size }
 
 /** Primary/secondary CTA. Renders <a> when `href` is given, else <button>. */
 export function CTAButton({ href, onClick, variant = "primary", size = "md", children, className = "", ...rest }) {
-  const cls = `btn btn--${variant} btn--${size} ${className}`
+  // Primary CTAs are the conversion actions: they carry the ember halo.
+  const cls = `btn btn--${variant} btn--${size} ${variant === "primary" ? "ember" : ""} ${className}`
   const inner = (
     <>
       <span className="btn__pixels" aria-hidden="true">
@@ -100,75 +159,17 @@ export function GlassCard({ children, className = "", dark = false, as: Tag = "d
   )
 }
 
-/**
- * FlowSignal — the violet thread between selected sections. A short vertical
- * route that draws as you scroll past. Variants carry the story:
- *   broken → repaired → ring → dash → loop
- */
-export function FlowSignal({ variant = "repaired", label }) {
-  const ref = useRef(null)
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia()
-      mm.add(MOTION_OK, () => {
-        const paths = ref.current.querySelectorAll(".thread__draw")
-        gsap.fromTo(
-          paths,
-          { drawSVG: "0%" },
-          {
-            drawSVG: "100%",
-            ease: "none",
-            scrollTrigger: { trigger: ref.current, start: "top 85%", end: "bottom 45%", scrub: 0.6 },
-          }
-        )
-        const pkt = ref.current.querySelector(".thread__packet")
-        if (pkt) {
-          gsap.fromTo(
-            pkt,
-            { y: 0, opacity: 0 },
-            {
-              y: variant === "broken" ? 52 : 112,
-              opacity: 1,
-              ease: "none",
-              scrollTrigger: { trigger: ref.current, start: "top 85%", end: "bottom 45%", scrub: 0.6 },
-            }
-          )
-        }
-      })
-      return () => mm.revert()
-    },
-    { scope: ref }
-  )
-
+/** Brand wordmark — lives in the footer now that the page has no top navigation. */
+export function Wordmark({ className = "" }) {
   return (
-    <div ref={ref} className={`thread thread--${variant}`} aria-hidden="true">
-      <svg width="40" height="140" viewBox="0 0 40 140" fill="none">
-        {variant === "broken" ? (
-          <>
-            <path className="thread__draw" d="M20 0 V58" stroke="var(--violet)" strokeWidth="1.5" />
-            <path d="M20 70 V140" stroke="var(--danger)" strokeWidth="1.5" strokeDasharray="3 5" opacity=".7" />
-            <rect x="14" y="60" width="12" height="2" fill="var(--danger)" opacity=".7" />
-          </>
-        ) : variant === "dash" ? (
-          <path className="thread__draw" d="M20 0 V140" stroke="var(--lavender)" strokeWidth="1.5" strokeDasharray="6 6" />
-        ) : (
-          <path className="thread__draw" d="M20 0 C20 40 34 50 34 70 C34 90 20 100 20 140" stroke="var(--violet)" strokeWidth="1.5" />
-        )}
-      </svg>
-      <span className="thread__packet" />
-      {label && <span className="thread__label t-mono">{label}</span>}
-    </div>
+    <span className={`wordmark ${className}`}>
+      <span className="wordmark__mark" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
+      WEBCHIRPY
+    </span>
   )
-}
-
-export function ScrollProgress() {
-  const ref = useRef(null)
-  useGSAP(() => {
-    gsap.fromTo(
-      ref.current,
-      { scaleX: 0 },
-      { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 0.3 } }
-    )
-  })
-  return <div ref={ref} className="scroll-progress" aria-hidden="true" />
 }

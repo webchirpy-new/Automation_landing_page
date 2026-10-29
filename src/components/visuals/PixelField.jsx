@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react"
  * Self-organising pixel field (hero signature).
  *
  * - A quiet grid of tiny squares fills the host (the hero section).
- * - Pointer proximity energises nearby cells (violet), movement/drag leaves a
+ * - Pointer proximity energises nearby cells (warm accent), movement/drag leaves a
  *   decaying trail, a press/tap sends a ring ripple.
  * - Optional (when `stageRef` is given): on a loop, scattered pixels fly in and
  *   assemble into three glyphs on a route — Captured → Replied → Followed up —
@@ -39,14 +39,17 @@ const T_OUT = 8000
 const easeOut = (t) => 1 - Math.pow(1 - t, 3)
 const clamp01 = (t) => (t < 0 ? 0 : t > 1 ? 1 : t)
 
-// grid-dot #DCD9E4 → lavender #A78BFA → violet #7C3AED
+// grid-dot #DCD9E4 → sun #FDC003 → solar orange #F45E00 → accent red #DE2A06
+const RAMP = [
+  [220, 217, 228],
+  [253, 192, 3],
+  [244, 94, 0],
+  [222, 42, 6],
+]
 function bucketColor(b) {
-  const t = (b + 1) / LEVELS
-  const a = [220, 217, 228]
-  const m = [167, 139, 250]
-  const z = [124, 58, 237]
-  const mix = (p, q, k) => p.map((v, i) => Math.round(v + (q[i] - v) * k))
-  const c = t < 0.5 ? mix(a, m, t / 0.5) : mix(m, z, (t - 0.5) / 0.5)
+  const t = ((b + 1) / LEVELS) * (RAMP.length - 1)
+  const i = Math.min(RAMP.length - 2, Math.floor(t))
+  const c = RAMP[i].map((v, j) => Math.round(v + (RAMP[i + 1][j] - v) * (t - i)))
   return `rgb(${c[0]},${c[1]},${c[2]})`
 }
 
@@ -236,7 +239,7 @@ export default function PixelField({ stageRef, onAssembleChange, className = "",
         const y = q.sy + (q.ty - q.sy) * k
         const alpha = 0.28 + 0.72 * k
         ctx.globalAlpha = alpha
-        ctx.fillStyle = k > 0.98 ? "#7c3aed" : "#a78bfa"
+        ctx.fillStyle = k > 0.98 ? "#de2a06" : "#ff7a1a"
         const size = (dot + 1) + (s - dot - 1) * k
         ctx.fillRect(x - size / 2, y - size / 2, size, size)
       }
@@ -245,13 +248,13 @@ export default function PixelField({ stageRef, onAssembleChange, className = "",
         const a = clamp01((t - (T_IN - 200)) / 400) * (t > T_HOLD ? 1 - clamp01((t - T_HOLD) / 400) : 1)
         const rs = Math.max(2, pitch * 0.22)
         ctx.globalAlpha = 0.85 * a
-        ctx.fillStyle = "#a78bfa"
+        ctx.fillStyle = "#ff7a1a"
         for (let i = 0; i < route.length; i += 1) ctx.fillRect(route[i].x - rs / 2, route[i].y - rs / 2, rs, rs)
         const n = route.length
         const head = Math.floor(((t - T_IN) / 1500) * n) % n
         if (head >= 0) {
           ctx.globalAlpha = a
-          ctx.fillStyle = "#7c3aed"
+          ctx.fillStyle = "#de2a06"
           for (let j = 0; j < Math.min(4, n); j++) {
             const r = route[(((head - j) % n) + n) % n]
             const hs = pitch * (0.62 - j * 0.1)

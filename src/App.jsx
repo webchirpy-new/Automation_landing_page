@@ -1,9 +1,8 @@
-import React from "react"
+import React, { useEffect } from "react"
+import { initSmoothScroll } from "./lib/smoothScroll"
 import { SiteProvider } from "./context/SiteContext"
-import Header from "./components/layout/Header"
 import StickyCTA from "./components/layout/StickyCTA"
 import SiteModals from "./components/layout/SiteModals"
-import { FlowSignal } from "./components/ui/primitives"
 import Hero from "./components/sections/Hero"
 import Pattern from "./components/sections/Pattern"
 import Comparison from "./components/sections/Comparison"
@@ -20,19 +19,20 @@ import WalkIn from "./components/sections/WalkIn"
 import FinalCTA from "./components/sections/FinalCTA"
 
 /**
- * 14 sections in the exact DOCX order. The violet thread (FlowSignal) appears
- * only at selected story beats: broken → repaired → into the engine.
+ * 14 sections in the exact DOCX order, alternating light chapters with
+ * full-bleed dark chapters. Sections meet cleanly — no connectors between them.
  */
 export default function App() {
+  useEffect(() => initSmoothScroll(), [])
   return (
     <SiteProvider>
-      <Header />
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <main id="main">
         <Hero />
-        <FlowSignal variant="broken" />
         <Pattern />
         <Comparison />
-        <FlowSignal variant="repaired" />
         <ScorecardSection />
         <EngineSection />
         <DashboardSection />

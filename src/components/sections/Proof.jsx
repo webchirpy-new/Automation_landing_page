@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react"
 import { proof, uiCopy } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
+import { Marked } from "../ui/Highlight"
 
 // UI microcopy: the 3-step process each book reveals, restating the source "What changes".
 const SCENES = [
@@ -80,7 +81,7 @@ export default function Proof() {
     <SectionShell id="proof" theme="light" labelledBy="proof-title" className="proof">
       <header className="section-head section-head--center">
         <h2 id="proof-title" className="t-h2" data-reveal>
-          {proof.headline}
+          <Marked text={proof.headline} phrase="Different outcome." tone="light" />
         </h2>
         <p className="t-lead" data-reveal>
           {proof.sub}

@@ -2,11 +2,14 @@ import React, { useMemo, useRef, useState } from "react"
 import { finalCta, footer } from "../../data/automationContent"
 import { serviceModules } from "../../data/serviceModules"
 import { siteConfig, phoneHref, whatsappHref } from "../../config/site"
-import { CTAButton } from "../ui/primitives"
-import { Wordmark } from "../layout/Header"
+import { CTAButton, Wordmark } from "../ui/primitives"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import SectionAmbient from "../visuals/SectionAmbient"
+import { ambient, embers } from "../../config/ambient"
+import EmberPixelCorner from "../visuals/EmberPixelCorner"
+import { Marked } from "../ui/Highlight"
 
 const CELL = 10
 const C = 180 // centre of 360 viewBox
@@ -83,10 +86,12 @@ export default function FinalCTA() {
 
   return (
     <footer id="final" ref={ref} className={`final ${resolved ? "is-resolved" : ""}`} aria-labelledby="final-title">
+      <SectionAmbient blooms={ambient.final} tone="dark" fadeTop="0%" fadeBottom="48%" />
+      <EmberPixelCorner sectionId="final" theme="dark" {...embers.final} />
       <div className="container final__hero">
         <div className="final__copy">
           <h2 id="final-title" className="t-h2">
-            {finalCta.headline}
+            <Marked text={finalCta.headline} phrase="take the load?" tone="dark" />
           </h2>
           <p className="t-lead">{finalCta.sub}</p>
           <CTAButton size="lg" className="final__cta" onClick={() => openModal("lead")}>

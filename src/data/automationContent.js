@@ -325,6 +325,8 @@ export const engine = {
     },
   ],
   loopLine: "Results feed back into every stage, every month.",
+  cycleNote: "Workflow illustration",
+  cycleReplay: "Replay workflow",
   closing: "One team. One system. One dashboard. Nothing runs alone.",
 }
 

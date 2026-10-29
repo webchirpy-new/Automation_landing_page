@@ -43,13 +43,13 @@ export default function StickyCTA() {
           <span className="sticky-bar__dot" aria-hidden="true" />
           {persistent.stickyBar.text}
         </p>
-        <button type="button" className="btn btn--primary btn--sm" onClick={goToBooking} tabIndex={show ? 0 : -1}>
+        <button type="button" className="btn btn--primary btn--sm ember" onClick={goToBooking} tabIndex={show ? 0 : -1}>
           <span className="btn__label">{persistent.stickyBar.button}</span>
         </button>
       </div>
       <button
         type="button"
-        className={`floating-cta ${show ? "is-visible" : ""}`}
+        className={`floating-cta ember ${show ? "is-visible" : ""}`}
         onClick={goToBooking}
         aria-hidden={!show}
         tabIndex={show ? 0 : -1}

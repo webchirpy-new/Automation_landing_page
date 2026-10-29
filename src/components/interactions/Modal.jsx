@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
+import { getLenis } from "../../lib/smoothScroll"
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'
@@ -21,6 +22,7 @@ export default function Modal({ open, onClose, labelledBy, children, className =
 
     const prevOverflow = document.documentElement.style.overflow
     document.documentElement.style.overflow = "hidden"
+    getLenis()?.stop()
 
     const onKey = (e) => {
       if (e.key === "Escape") {
@@ -45,6 +47,7 @@ export default function Modal({ open, onClose, labelledBy, children, className =
     return () => {
       document.removeEventListener("keydown", onKey)
       document.documentElement.style.overflow = prevOverflow
+      getLenis()?.start()
       const opener = openerRef.current
       if (opener && typeof opener.focus === "function") opener.focus({ preventScroll: true })
     }
@@ -53,7 +56,7 @@ export default function Modal({ open, onClose, labelledBy, children, className =
   if (!open || typeof document === "undefined") return null
 
   return createPortal(
-    <div className="modal" role="presentation">
+    <div className="modal" role="presentation" data-lenis-prevent>
       <div className="modal__scrim" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}

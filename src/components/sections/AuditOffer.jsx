@@ -5,6 +5,7 @@ import PixelIcon from "../visuals/PixelIcon"
 import { goToBooking } from "../../lib/scroll"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { Marked } from "../ui/Highlight"
 
 const DELIV_ICONS = ["leadCapture", "salesPipeline", "check", "backOffice"]
 
@@ -27,11 +28,11 @@ export default function AuditOffer() {
   )
 
   return (
-    <SectionShell id="audit" theme="paper" labelledBy="audit-title" className="audit">
+    <SectionShell id="audit" theme="night" labelledBy="audit-title" className="audit">
       <div ref={ref}>
         <header className="section-head section-head--center">
           <h2 id="audit-title" className="t-h2" data-reveal>
-            {audit.headline}
+            <Marked text={audit.headline} phrase="Everything we promise." tone="dark" />
           </h2>
           <p className="t-lead" data-reveal>
             {audit.sub}
@@ -44,10 +45,7 @@ export default function AuditOffer() {
             <p className="ticket__total-label t-mono">{audit.total.label}</p>
             <p className="ticket__price">{audit.total.value}</p>
             <p className="ticket__note">{audit.total.note}</p>
-            <span className="ticket__seal" aria-hidden="true">
-              <PixelIcon name="seal" size={56} animate={false} />
-              <span className="t-mono">audit</span>
-            </span>
+            
           </div>
           <div className="ticket__perf" aria-hidden="true" />
           <div className="ticket__sheet">
@@ -74,7 +72,7 @@ export default function AuditOffer() {
           <h3 className="t-mono promises__title" data-reveal>
             {audit.promisesTitle}
           </h3>
-          <ol className="promises__list">
+          <ol className="promises__list" data-stagger>
             {audit.promises.map((p, i) => (
               <li key={p.title} data-reveal>
                 <span className="promises__n t-mono">{String(i + 1).padStart(2, "0")}</span>

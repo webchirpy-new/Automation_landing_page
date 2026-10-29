@@ -8,6 +8,7 @@ import ServiceWorkflow from "./ServiceWorkflow"
 import IntegrationShelf from "./IntegrationShelf"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
+import { scrollToElement } from "../../lib/smoothScroll"
 
 const R = 38.4 // node radius, % of wheel
 const pos = (i) => {
@@ -181,7 +182,7 @@ export default function AutomationEngine() {
     setOpen(true)
     setHover(null)
     if (scroll || window.matchMedia("(max-width: 1023px)").matches) {
-      window.requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }))
+      window.requestAnimationFrame(() => panelRef.current && scrollToElement(panelRef.current))
     }
   }
 
@@ -198,7 +199,7 @@ export default function AutomationEngine() {
     return () => window.removeEventListener("hashchange", fromHash)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Idle signal: a violet pulse steps from node to node while visible.
+  // Idle signal: a warm pulse steps from node to node while visible.
   useGSAP(
     () => {
       const mm = gsap.matchMedia()

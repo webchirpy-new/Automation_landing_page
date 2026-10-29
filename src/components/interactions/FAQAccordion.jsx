@@ -15,7 +15,7 @@ export default function FAQAccordion({ items }) {
       return n
     })
   return (
-    <div className="faq-list">
+    <div className="faq-list" data-stagger>
       {items.map((it, i) => {
         const isOpen = open.has(i)
         return (

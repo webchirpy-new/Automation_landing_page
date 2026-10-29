@@ -7,10 +7,28 @@
   --ink-2: #2a2a31;
   --muted: #5c5c66; /* 6.4:1 on white — AA for body text */
   --muted-2: #8a8a94; /* decorative/large text only */
-  --violet: #7c3aed;
-  --violet-ink: #6d28d9; /* violet text on white, 7:1 */
-  --lavender: #a78bfa;
-  --violet-wash: #f3edff;
+  --accent: #de2a06;
+  --accent-ink: #a62507; /* accent text on white, 7.3:1 */
+  --accent-soft: #ff7a1a;
+  --accent-wash: #fff1e8;
+  /* Warm accent family — sampled from the approved yellow → orange → red → near-black reference */
+  --warm-sun: #fdc003;
+  --warm-orange: #f45e00;
+  --warm-ember: #f04402;
+  --warm-red: #d90d04;
+  --warm-crimson: #a60401;
+  --warm-brown: #441714;
+  --warm-near-black: #1e1e20;
+  /* Full reference ramp — for large decorative accents only, never behind small text */
+  --accent-gradient: linear-gradient(115deg, var(--warm-sun) 0%, var(--warm-orange) 28%, var(--warm-red) 58%, var(--warm-crimson) 78%, var(--warm-near-black) 100%);
+  /* Fill behind white text: every stop keeps ≥4.8:1 against #fff */
+  --accent-fill: linear-gradient(115deg, #d9300a 0%, #c80a04 55%, #a60401 100%);
+  /* Highlight edges / rules large enough to carry a gradient */
+  --accent-line: linear-gradient(115deg, var(--warm-sun), var(--warm-orange) 35%, var(--warm-red) 75%, var(--warm-crimson));
+  --surface-light: var(--background);
+  --surface-dark: var(--dark-panel);
+  --text-dark: var(--ink);
+  --text-light: var(--night-text);
   --night: #101017;
   --night-surface: #1a1924;
   --night-raised: #22212e;
@@ -25,6 +43,8 @@
   --success-ink: #137a5f;
   --grid-dot: #dcd9e4;
 
+  --surface: #ffffff; /* card surface — becomes a dark glass tint inside dark chapters */
+  --surface-solid: #ffffff; /* opaque card surface (tiles separated by 1px gaps) */
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-dark-bg: rgba(26, 25, 36, 0.66);
@@ -37,7 +57,7 @@
   --font-sans: var(--font-primary);
   --font-mono: var(--font-primary);
   --fs-display: clamp(2.35rem, 1.2rem + 5.1vw, 5.5rem); /* 38 → 88px */
-  --fs-h2: clamp(2rem, 1.25rem + 3.2vw, 4rem); /* 32 → 64px */
+  --fs-h2: clamp(1.75rem, 1.2rem + 2.3vw, 3.5rem); /* 28 → 56px; ~38 at 768 */
   --fs-h3: clamp(1.35rem, 1.1rem + 1vw, 1.875rem);
   --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
   --fs-body: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
@@ -49,7 +69,11 @@
   --gutter: clamp(16px, 2.4vw, 32px);
   --section-y: clamp(64px, 2.5rem + 4.4vw, 104px); /* 64 → 104px */
   --section-y-tight: clamp(48px, 5vw, 72px);
-  --header-h: 64px;
+
+  /* Dark chapters — full-bleed charcoal panels with rounded top and bottom corners */
+  --dark-panel: #15131d;
+  --panel-gap: clamp(8px, 1.2vw, 16px); /* vertical breathing room so the curves read against the canvas */
+  --panel-r: clamp(24px, 5vw, 80px); /* 24 phone · ~38 tablet · 64 at 1280 · 80 wide */
 
   /* Radius */
   --r-12: 12px;
@@ -62,7 +86,7 @@
   --shadow-1: 0 1px 2px rgba(17, 17, 17, 0.04), 0 2px 8px rgba(17, 17, 17, 0.04);
   --shadow-2: 0 2px 6px rgba(17, 17, 17, 0.05), 0 12px 32px rgba(17, 17, 17, 0.07);
   --shadow-3: 0 8px 24px rgba(17, 17, 17, 0.08), 0 32px 64px rgba(17, 17, 17, 0.1);
-  --shadow-violet: 0 8px 28px rgba(124, 58, 237, 0.28);
+  --shadow-accent: 0 8px 28px rgba(222, 42, 6, 0.28);
 
   /* Motion (mirrors src/lib/motionTokens.js) */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -70,6 +94,57 @@
   --dur-hover: 220ms;
   --dur-micro: 420ms;
   --dur-reveal: 700ms;
+}
+
+/* Dark chapters re-scope the light tokens, so shared components read correctly on charcoal. */
+.section--night,
+.final,
+.on-dark,
+.engine-section .folder {
+  --ink: #f5f3fa;
+  --ink-2: #e4e0ee;
+  --muted: #c4bdce; /* 9:1 on --dark-panel */
+  --muted-2: #8f899d;
+  --line: rgba(255, 255, 255, 0.14);
+  --paper: rgba(255, 255, 255, 0.05);
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-solid: #1c1a26;
+  --accent-ink: #ffb54a;
+  --accent-wash: rgba(244, 94, 0, 0.16);
+  --danger-wash: rgba(218, 93, 103, 0.16);
+  --danger-ink: #f4a3aa;
+  --grid-dot: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.055);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+}
+
+/* Light islands — readable white surfaces placed inside a dark chapter (tools, documents). */
+.on-light,
+.wk,
+.scorecard__summary,
+.scorecard__mini,
+.score-area,
+.ticket,
+.founder__frame,
+.founder__card {
+  --ink: #111111;
+  --ink-2: #2a2a31;
+  --muted: #5c5c66;
+  --muted-2: #8a8a94;
+  --line: #e7e5ee;
+  --paper: #f8f8fa;
+  --surface: #ffffff;
+  --surface-solid: #ffffff;
+  --accent-ink: #a62507;
+  --accent-soft: #c2410c; /* the light orange becomes a deeper orange on white (5.2:1) */
+  --accent-wash: #fff1e8;
+  --danger-wash: #fdf0f1;
+  --danger-ink: #b23a45;
+  --grid-dot: #dcd9e4;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

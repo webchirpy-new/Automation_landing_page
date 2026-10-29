@@ -5,6 +5,7 @@ import PixelIcon from "../visuals/PixelIcon"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
 import { goTo } from "../../lib/scroll"
+import { Marked } from "../ui/Highlight"
 
 const AUTO_STEPS = ["leadCapture", "instantReply", "followUp", "backOffice", "insights"]
 
@@ -64,7 +65,7 @@ export default function Comparison() {
       <div ref={ref}>
         <header className="section-head section-head--center">
           <h2 id="compare-title" className="t-h2" data-reveal>
-            {comparison.headline}
+            <Marked text={comparison.headline} phrase="Which one are you?" tone="light" />
           </h2>
           <p className="t-lead" data-reveal>
             {comparison.sub}
