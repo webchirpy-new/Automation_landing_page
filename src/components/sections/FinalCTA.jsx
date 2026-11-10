@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react"
 import { finalCta, footer } from "../../data/automationContent"
 import { serviceModules } from "../../data/serviceModules"
 import { siteConfig, phoneHref, whatsappHref } from "../../config/site"
-import { CTAButton, Wordmark } from "../ui/primitives"
+import { CTAButton } from "../ui/primitives"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
@@ -81,7 +81,7 @@ export default function FinalCTA() {
 
       <div className="container site-footer">
         <div className="site-footer__brand">
-          <Wordmark />
+          <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" />
           <p className="site-footer__tag">
             <strong>{footer.brand}</strong> {footer.tagline}
           </p>
