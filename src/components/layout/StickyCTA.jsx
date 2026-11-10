@@ -6,7 +6,7 @@ import PixelIcon from "../visuals/PixelIcon"
 
 /**
  * Desktop/tablet: slim glass sticky bar. Phones: compact floating button.
- * Appears only after the hero CTA leaves view; hides while the booking form,
+ * Appears only after the hero CTA leaves view; hides during the Pattern story (it's told first, with its own CTA at the end), and while the booking form,
  * the final CTA or a modal is on screen — so there is never a duplicate CTA
  * covering the form's submit button.
  */
@@ -17,7 +17,7 @@ export default function StickyCTA() {
 
   useEffect(() => {
     const heroCta = document.getElementById("hero-cta")
-    const blockers = ["book", "final"].map((id) => document.getElementById(id)).filter(Boolean)
+    const blockers = ["pattern", "book", "final"].map((id) => document.getElementById(id)).filter(Boolean)
     const visibleBlockers = new Set()
 
     const io1 = new IntersectionObserver(([e]) => setPastHero(!e.isIntersecting && e.boundingClientRect.top < 0))
@@ -43,13 +43,13 @@ export default function StickyCTA() {
           <span className="sticky-bar__dot" aria-hidden="true" />
           {persistent.stickyBar.text}
         </p>
-        <button type="button" className="btn btn--primary btn--sm ember" onClick={goToBooking} tabIndex={show ? 0 : -1}>
+        <button type="button" className="btn btn--primary btn--sm" onClick={goToBooking} tabIndex={show ? 0 : -1}>
           <span className="btn__label">{persistent.stickyBar.button}</span>
         </button>
       </div>
       <button
         type="button"
-        className={`floating-cta ember ${show ? "is-visible" : ""}`}
+        className={`floating-cta ${show ? "is-visible" : ""}`}
         onClick={goToBooking}
         aria-hidden={!show}
         tabIndex={show ? 0 : -1}

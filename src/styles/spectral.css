@@ -1,0 +1,619 @@
+/* =========================================================
+   SPECTRAL MATERIAL — the one accent language of the whole page (V4).
+   Palette (tokens.css): cyan · sapphire blue · violet · lavender · pink, plus one neutral.
+   Every component draws from the same presets and varies only angle, size and phase.
+     1. .hl-flow                 highlighted phrases: ~90% moving colour, ~10% neutral
+     2. .btn--primary/.floating-cta   real CTAs: visible inner flow, 1.2px moving rim, hover bloom
+     3. glass corners            two small mixed-hue glints per card, rotating between neighbours
+     4. app tile shells          the same glint at a quarter of the strength
+     5. spectral accents         progress bars, active dots, selected states, ticks
+   Only background-position, transform and opacity animate. Phrases pause off screen.
+   Reduced motion keeps the same colours, still. Forced colours drop all decoration.
+   ========================================================= */
+
+/* ---------- 1. Highlighted phrases ----------
+   A full spectral base fills the glyphs; four soft colour clouds drift over it, and one small
+   neutral island (white on dark, near-black on white) floats through, so about a tenth of the
+   phrase reads neutral at any moment. The phrase stays one selectable text node; nothing is
+   duplicated for screen readers. Light-ground hues are the deep tones (all ≥5.5:1 on white). */
+.hl-flow {
+  color: var(--accent-ink);
+}
+.hl-flow--dark {
+  color: var(--spectral-lavender);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hl-flow {
+    padding-bottom: 0.1em; /* keeps descenders inside the painted box */
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    /* island · 4 clouds · base */
+    background-size: 15% 150%, 48% 240%, 44% 220%, 42% 230%, 46% 250%, 320% 100%;
+    background-position: 8% 50%, 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
+  }
+  .hl-flow--dark {
+    background-image:
+      radial-gradient(closest-side, var(--highlight-ink-dark), rgba(247, 248, 251, 0.85) 40%, rgba(247, 248, 251, 0) 100%),
+      radial-gradient(closest-side, rgba(140, 230, 240, 1), rgba(140, 230, 240, 0.55) 55%, rgba(140, 230, 240, 0) 100%),
+      radial-gradient(closest-side, rgba(183, 154, 238, 1), rgba(183, 154, 238, 0.55) 55%, rgba(183, 154, 238, 0) 100%),
+      radial-gradient(closest-side, rgba(240, 190, 223, 1), rgba(240, 190, 223, 0.55) 55%, rgba(240, 190, 223, 0) 100%),
+      radial-gradient(closest-side, rgba(135, 186, 255, 1), rgba(135, 186, 255, 0.55) 55%, rgba(135, 186, 255, 0) 100%),
+      linear-gradient(100deg, var(--spectral-cyan), var(--spectral-blue) 18%, var(--spectral-violet) 34%, var(--spectral-lavender) 48%, var(--spectral-pink) 62%, var(--spectral-blue) 80%, var(--spectral-cyan));
+  }
+  .hl-flow--light {
+    background-image:
+      radial-gradient(closest-side, var(--highlight-ink-light), rgba(17, 20, 25, 0.85) 40%, rgba(17, 20, 25, 0) 100%),
+      radial-gradient(closest-side, rgba(29, 111, 150, 1), rgba(29, 111, 150, 0.55) 55%, rgba(29, 111, 150, 0) 100%),
+      radial-gradient(closest-side, rgba(100, 64, 200, 1), rgba(100, 64, 200, 0.55) 55%, rgba(100, 64, 200, 0) 100%),
+      radial-gradient(closest-side, rgba(163, 56, 127, 1), rgba(163, 56, 127, 0.55) 55%, rgba(163, 56, 127, 0) 100%),
+      radial-gradient(closest-side, rgba(47, 85, 200, 1), rgba(47, 85, 200, 0.55) 55%, rgba(47, 85, 200, 0) 100%),
+      linear-gradient(100deg, var(--spectral-cyan-deep), var(--spectral-blue-deep) 18%, var(--spectral-violet-deep) 34%, var(--spectral-lavender-deep) 48%, var(--spectral-pink-deep) 62%, var(--spectral-blue-deep) 80%, var(--spectral-cyan-deep));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hl-flow {
+      /* alternate + ease-in-out: the drift turns round smoothly, never jumps at the loop */
+      animation: spectral-mist var(--spectral-flow-duration) ease-in-out infinite alternate;
+      animation-play-state: paused;
+    }
+    .hl-flow.is-on {
+      animation-play-state: running;
+    }
+    /* Neighbouring chapters never drift in step */
+    .section:nth-of-type(3n + 1) .hl-flow {
+      animation-delay: -5s;
+      animation-duration: 19s;
+    }
+    .section:nth-of-type(3n + 2) .hl-flow {
+      animation-delay: -11s;
+      animation-duration: 13s;
+    }
+  }
+}
+@keyframes spectral-mist {
+  0% {
+    background-position: 8% 50%, 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
+  }
+  33% {
+    background-position: 40% 30%, 22% 70%, 90% 30%, 70% 60%, 6% 40%, 34% 0;
+  }
+  66% {
+    background-position: 70% 70%, 50% 30%, 30% 70%, 100% 80%, 70% 50%, 68% 0;
+  }
+  100% {
+    background-position: 96% 40%, 84% 60%, 6% 40%, 40% 30%, 100% 70%, 100% 0;
+  }
+}
+@media (forced-colors: active) {
+  .hl-flow {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+}
+
+/* ---------- 2. Primary CTAs ----------
+   A near-black glass surface with four slow colour pockets (cyan, sapphire, violet, rose)
+   drifting beneath the label, a 1.2px rim with colour travelling round it, and a small
+   three-colour bloom only on hover or keyboard focus. Pocket colours are the deep tones, so the
+   white label keeps ≥4.5:1 over the brightest point (checked: cyan pocket #2a7aa6 = 4.9:1).
+   Only transform, opacity and background-position animate; the button's size never changes. */
+.btn--primary,
+.floating-cta {
+  --btn-bg: #0e0f17;
+  background: #0e0f17;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 0 0 0 rgba(150, 128, 238, 0);
+  transition: box-shadow 320ms var(--ease-out), transform 220ms var(--ease-out);
+}
+.btn--primary::before,
+.floating-cta::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -45%;
+  bottom: -45%;
+  left: -18%;
+  right: -18%;
+  pointer-events: none;
+  background:
+    radial-gradient(32% 78% at 14% 58%, rgba(42, 122, 166, 0.95), rgba(42, 122, 166, 0) 100%),
+    radial-gradient(30% 80% at 38% 34%, rgba(59, 95, 208, 0.95), rgba(59, 95, 208, 0) 100%),
+    radial-gradient(30% 76% at 62% 66%, rgba(106, 72, 200, 0.95), rgba(106, 72, 200, 0) 100%),
+    radial-gradient(28% 72% at 86% 40%, rgba(168, 72, 143, 0.9), rgba(168, 72, 143, 0) 100%),
+    linear-gradient(100deg, #14182a, #121322 50%, #1a1426);
+  will-change: transform;
+}
+/* Glass sheen: a soft top light over the colour, under the label */
+.btn--primary > .btn__label,
+.floating-cta > * {
+  text-shadow: 0 1px 2px rgba(6, 8, 18, 0.45);
+}
+.btn--primary::after,
+.floating-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: var(--cta-border-width);
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(100deg, rgba(140, 230, 240, 0.9), rgba(135, 186, 255, 0.75) 17%, rgba(183, 154, 238, 0.9) 33%, rgba(240, 190, 223, 0.85) 50%, rgba(140, 230, 240, 0.9) 67%, rgba(183, 154, 238, 0.85) 83%, rgba(140, 230, 240, 0.9)) 0 0 / 300% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0.78;
+  transition: opacity 320ms var(--ease-out);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn--primary::before,
+  .floating-cta::before {
+    animation: cta-liquid 11s ease-in-out infinite alternate;
+  }
+  .btn--primary::after,
+  .floating-cta::after {
+    animation: cta-rim 9s ease-in-out infinite alternate;
+  }
+  /* The sticky CTA breathes on its own phase, never in step with an in-page CTA */
+  .floating-cta::before,
+  .sticky-bar .btn--primary::before {
+    animation-duration: 14s;
+    animation-delay: -6s;
+  }
+  .btn--lg::before {
+    animation-duration: 13s;
+    animation-delay: -3s;
+  }
+}
+@keyframes cta-liquid {
+  0% {
+    transform: translate3d(-9%, 3%, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(2%, -6%, 0) scale(1.08) rotate(-2deg);
+  }
+  70% {
+    transform: translate3d(8%, 4%, 0) scale(1.02) rotate(1deg);
+  }
+  100% {
+    transform: translate3d(12%, -2%, 0) scale(1.06);
+  }
+}
+/* Alternating ease: the colour turns round smoothly, so there is no seam at the loop */
+@keyframes cta-rim {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+@media (hover: hover) {
+  .btn--primary:hover,
+  .floating-cta:hover {
+    box-shadow: var(--spectral-glow);
+    transform: translateY(-1px);
+  }
+  .btn--sm.btn--primary:hover {
+    box-shadow: var(--spectral-glow-sm);
+  }
+  .btn--primary:hover::after,
+  .floating-cta:hover::after {
+    opacity: 1;
+  }
+}
+.btn--primary:focus-visible,
+.floating-cta:focus-visible {
+  box-shadow: var(--spectral-glow);
+  outline: 2px solid var(--focus-ring, #ffffff);
+  outline-offset: 3px;
+}
+.btn--primary:focus-visible::after,
+.floating-cta:focus-visible::after {
+  opacity: 1;
+}
+/* On white ground the focus ring is the dark ink, so it is visible without the glow */
+.section--light .btn--primary:focus-visible,
+.on-light .btn--primary:focus-visible {
+  --focus-ring: #111419;
+}
+.btn--primary[disabled],
+.btn--primary[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+  transform: none;
+}
+.btn--primary[disabled]::before,
+.btn--primary[disabled]::after,
+.btn--primary[aria-disabled="true"]::before,
+.btn--primary[aria-disabled="true"]::after {
+  animation: none;
+}
+@media (forced-colors: active) {
+  .btn--primary::before,
+  .btn--primary::after,
+  .floating-cta::before,
+  .floating-cta::after {
+    display: none;
+  }
+}
+
+/* ---------- 3. Glass corners ----------
+   Two feathered glints per card, each mixing two hues, on opposite corners; the centre stays
+   neutral glass. Four arrangements rotate between neighbours so no two side-by-side cards light
+   the same corners in the same colours. Roughly 8–12% of the card. The card is its own layer
+   (isolation), so the glint at z-index -1 paints over the card surface but under its content. */
+:is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room) {
+  isolation: isolate;
+}
+:is(.orbit-story, .diff, .dash__window, .decision, .lw-detail, .room) {
+  position: relative;
+}
+:is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
+.fit__col::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: calc(var(--glass-corner-strength) * var(--corner-o, 0.62));
+  /* A: cyan→violet top-right · rose→lavender bottom-left */
+  background:
+    radial-gradient(30% 34% at 100% 0%, rgba(140, 230, 240, 0.38), rgba(183, 154, 238, 0.16) 48%, transparent 76%),
+    radial-gradient(26% 30% at 0% 100%, rgba(240, 190, 223, 0.3), rgba(201, 184, 245, 0.1) 50%, transparent 74%);
+}
+/* B: sapphire→cyan top-left · violet→rose bottom-right */
+:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 2)::after,
+.fit__col:nth-child(even)::before {
+  background:
+    radial-gradient(30% 34% at 0% 0%, rgba(135, 186, 255, 0.36), rgba(140, 230, 240, 0.14) 48%, transparent 76%),
+    radial-gradient(26% 30% at 100% 100%, rgba(183, 154, 238, 0.3), rgba(240, 190, 223, 0.12) 50%, transparent 74%);
+}
+/* C: rose→violet bottom-right · cyan top-left */
+:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 3)::after {
+  background:
+    radial-gradient(30% 34% at 100% 100%, rgba(240, 190, 223, 0.34), rgba(183, 154, 238, 0.14) 48%, transparent 76%),
+    radial-gradient(26% 30% at 0% 0%, rgba(140, 230, 240, 0.28), rgba(135, 186, 255, 0.1) 50%, transparent 74%);
+}
+/* D: lavender→sapphire bottom-left · rose→cyan top-right */
+:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n)::after {
+  background:
+    radial-gradient(30% 34% at 0% 100%, rgba(201, 184, 245, 0.36), rgba(135, 186, 255, 0.14) 48%, transparent 76%),
+    radial-gradient(26% 30% at 100% 0%, rgba(240, 190, 223, 0.28), rgba(140, 230, 240, 0.1) 50%, transparent 74%);
+}
+/* On white cards the glint is fainter, so black text and dividers stay crisp */
+.section--light :is(.lw-hub, .lw-detail, .hero__leaks li, .folder, .room, .glass)::after,
+#top .hero__below .hero__leaks li::after {
+  --corner-o: 0.42;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
+  .fit__col::before {
+    animation: corner-breathe 18s ease-in-out infinite alternate;
+  }
+  :is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n)::after {
+    animation-duration: 22s;
+    animation-delay: -7s;
+  }
+  :is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n + 2)::after {
+    animation-duration: 15s;
+    animation-delay: -4s;
+  }
+}
+@keyframes corner-breathe {
+  from {
+    opacity: calc(var(--glass-corner-strength) * var(--corner-o, 0.62) * 0.65);
+  }
+  to {
+    opacity: calc(var(--glass-corner-strength) * var(--corner-o, 0.62));
+  }
+}
+
+/* ---------- 4. App tile shells ----------
+   The glass container gets a tiny two-corner glint (three hues); the brand mark inside keeps its
+   own colours and is never tinted. */
+.app-tile__face {
+  background-image:
+    radial-gradient(46% 42% at 100% 0%, rgba(183, 154, 238, 0.16), rgba(240, 190, 223, 0.06) 50%, transparent 72%),
+    radial-gradient(40% 36% at 0% 100%, rgba(140, 230, 240, 0.12), transparent 70%);
+}
+
+/* ---------- 5. Spectral accents ----------
+   Small accent marks that used to be one flat blue (progress fills, active dots, selected
+   states, ticks) take the shared stroke preset. Meaning is never carried by colour alone:
+   active marks also change size, weight or outline. */
+.spectral-fill {
+  background: var(--spectral-fill-dark);
+}
+.spectral-stroke {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--surface-solid), var(--surface-solid)) padding-box, var(--spectral-stroke) border-box;
+}
+
+/* ---------- 6. Site-wide migration (V4 audit) ----------
+   Decorative accents and selected states that rendered as one flat blue (or carried the old
+   green ramp) now draw from the shared presets. --spectral-fill / --spectral-line follow the
+   same light/dark scoping as --accent, so text on a fill keeps its contrast on both grounds.
+   Deliberately unchanged: focus outlines (solid for clarity), form-field focus, the scorecard
+   map's gap levels and score ring (colour carries a level), dashboard chart series (data),
+   success/danger tokens, and real brand logos. */
+
+/* Ambient light: cyan → violet in one bloom, violet → rose in the other */
+.ambient__bloom::before {
+  background: radial-gradient(closest-side, rgba(140, 230, 240, 0.55), rgba(150, 128, 238, 0.3) 46%, rgba(150, 128, 238, 0) 100%);
+}
+.ambient__bloom::after {
+  background: radial-gradient(closest-side, rgba(150, 128, 238, 0.4), rgba(214, 140, 200, 0.2) 48%, rgba(60, 36, 104, 0.08) 74%, rgba(60, 36, 104, 0) 100%);
+}
+.ambient--dark .ambient__bloom::after {
+  background: radial-gradient(closest-side, rgba(130, 120, 236, 0.46), rgba(190, 120, 196, 0.24) 44%, rgba(36, 22, 66, 0.32) 72%, rgba(36, 22, 66, 0) 100%);
+}
+.orbit-glow {
+  background: radial-gradient(closest-side at 66% 36%, rgba(140, 230, 240, 0.14), rgba(183, 154, 238, 0.08) 48%, rgba(240, 190, 223, 0.04) 70%, transparent 100%);
+}
+
+/* Small marks */
+.eyebrow__dot {
+  background: var(--spectral-fill);
+  box-shadow: 10px 0 0 var(--spectral-pink-deep);
+}
+:is(.section--night, .final, .on-dark) .eyebrow__dot {
+  box-shadow: 10px 0 0 var(--spectral-pink);
+}
+.sticky-bar__dot,
+.bc__dots li.is-active,
+.hint-dot {
+  background: var(--spectral-fill-dark);
+}
+.bc__dots li {
+  background: rgba(183, 154, 238, 0.3);
+}
+.choice__pixels i {
+  background: var(--spectral-cyan-deep);
+}
+.choice__pixels i:nth-child(2) {
+  background: var(--spectral-blue-deep);
+}
+.choice__pixels i:nth-child(3) {
+  background: var(--spectral-violet-deep);
+}
+.choice__pixels i:nth-child(4) {
+  background: var(--spectral-pink-deep);
+}
+
+/* Fills that carry an icon, number or label: deep tones under white, pastel under dark ink */
+.mark--ok,
+.check.is-checked .check__box,
+.wheel__node.is-selected .wheel__node-icon,
+.engine__list-btn.is-selected,
+.lw-stage.is-active .lw-hub__num,
+.lw-detail__num,
+.detail__icon,
+.lw-tag i,
+.steps li:first-child .steps__n,
+.book__steps .t-mono,
+.ticket__tag,
+.wf-bubble--out,
+.wf-cal__booking,
+.wf-deal,
+.room--auto .room__chrome i:first-child {
+  background: var(--spectral-fill);
+}
+.check.is-checked .check__box,
+.wheel__node.is-selected .wheel__node-icon,
+.engine__list-btn.is-selected,
+.lw-stage.is-active .lw-hub__num {
+  border-color: transparent;
+}
+.wheel__node.is-selected .wheel__node-icon {
+  box-shadow: -6px 0 16px -4px rgba(29, 111, 150, 0.32), 6px 0 16px -4px rgba(163, 56, 127, 0.28), 0 0 0 6px rgba(100, 64, 200, 0.1);
+}
+.lw-stage.is-active .lw-hub {
+  background: linear-gradient(150deg, var(--spectral-cyan-deep), var(--spectral-blue-deep) 38%, var(--spectral-violet-deep) 72%, var(--spectral-pink-deep));
+  box-shadow: 0 0 0 6px rgba(100, 64, 200, 0.12), -8px 10px 26px -8px rgba(29, 111, 150, 0.32), 8px 10px 26px -8px rgba(163, 56, 127, 0.3);
+}
+
+/* Lines, rails and progress */
+.results__list li::before,
+.dtimeline::before,
+.story__line-fill,
+.room--auto .room__rail,
+.wf-line,
+.wf-track__fill,
+.wf-capsule {
+  background: var(--spectral-line);
+}
+.book__path {
+  background: linear-gradient(90deg, var(--line), var(--spectral-blue-deep) 40%, var(--spectral-violet-deep) 70%, var(--spectral-pink-deep));
+}
+:is(.section--night, .final, .on-dark) .book__path {
+  background: linear-gradient(90deg, var(--line), var(--spectral-cyan) 40%, var(--spectral-violet) 70%, var(--spectral-pink));
+}
+.ps {
+  border-left: 3px solid transparent;
+  border-image: var(--spectral-line) 1;
+}
+.folder__papers i:nth-child(3) {
+  background: var(--spectral-fill-dark);
+}
+
+/* Travelling dots and capsules */
+.room--auto .room__packet,
+.dtimeline__dot {
+  background: var(--spectral-fill);
+  box-shadow: -3px 0 10px rgba(140, 230, 240, 0.45), 3px 0 10px rgba(240, 190, 223, 0.4);
+}
+.ddd__capsule {
+  background: var(--spectral-fill-dark);
+  box-shadow: -6px 0 14px rgba(140, 230, 240, 0.5), 6px 0 14px rgba(240, 190, 223, 0.45);
+}
+.ddd__glow,
+.story__glow {
+  background: radial-gradient(closest-side, rgba(183, 154, 238, 0.36) 46%, rgba(140, 230, 240, 0.12) 72%, rgba(240, 190, 223, 0) 100%);
+}
+
+/* SVG strokes: gradients are defined beside the markup (FinalCTA, AudienceFit, AutomationEngine) */
+.final__loop,
+.final__check {
+  stroke: url(#final-spectral);
+}
+.branch__good {
+  stroke: url(#branch-spectral);
+}
+.branch__dot--good {
+  fill: var(--spectral-pink);
+}
+.wheel__ball {
+  fill: url(#wheel-ball-fill);
+}
+.wheel__spoke.is-active {
+  stroke: var(--spectral-violet-deep);
+}
+
+/* Selected tabs, pills and decision buttons on dark ground */
+.dash__tab.is-active {
+  background: linear-gradient(120deg, rgba(140, 230, 240, 0.16), rgba(150, 128, 238, 0.26) 50%, rgba(240, 190, 223, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(201, 184, 245, 0.5);
+}
+.decision__do {
+  border-color: rgba(201, 184, 245, 0.45);
+}
+.decision__do[aria-expanded="true"] {
+  background: linear-gradient(120deg, rgba(140, 230, 240, 0.18), rgba(150, 128, 238, 0.3) 50%, rgba(240, 190, 223, 0.2));
+}
+.sc-pill {
+  box-shadow: -8px 0 18px -6px rgba(140, 230, 240, 0.14), 8px 0 18px -6px rgba(240, 190, 223, 0.12), 0 12px 22px -14px rgba(5, 6, 10, 0.6);
+}
+@media (hover: hover) {
+  .sc-pill:hover {
+    box-shadow: var(--spectral-glow-sm), 0 16px 26px -14px rgba(5, 6, 10, 0.65);
+  }
+  .diff:hover {
+    border-color: rgba(201, 184, 245, 0.5);
+  }
+  .bc-card:not([aria-current]):hover .bc-card__face {
+    border-color: rgba(201, 184, 245, 0.55);
+  }
+}
+.sc-card__aura {
+  background: radial-gradient(closest-side, rgba(150, 128, 238, 0.42), rgba(240, 190, 223, 0.14) 58%, rgba(140, 230, 240, 0) 100%);
+}
+
+/* Large dark-card glows: each card takes a different pair, never one blue wash */
+.dcell--main {
+  background:
+    radial-gradient(80% 110% at 0% 0%, rgba(59, 95, 208, 0.24), transparent 60%),
+    radial-gradient(50% 70% at 100% 100%, rgba(168, 72, 143, 0.14), transparent 70%),
+    var(--night-raised);
+}
+.book__cover {
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(106, 72, 200, 0.36), transparent 60%),
+    radial-gradient(60% 50% at 0% 100%, rgba(42, 122, 166, 0.2), transparent 70%),
+    var(--night);
+}
+.book--2 .book__cover {
+  background:
+    radial-gradient(90% 90% at 0% 100%, rgba(59, 95, 208, 0.32), transparent 60%),
+    radial-gradient(60% 50% at 100% 0%, rgba(168, 72, 143, 0.2), transparent 70%),
+    #0f1116;
+}
+.ticket__stub {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(106, 72, 200, 0.36), transparent 60%),
+    radial-gradient(70% 60% at 100% 100%, rgba(42, 122, 166, 0.2), transparent 70%),
+    #171a21;
+}
+.folder--bento .folder__front {
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgba(106, 72, 200, 0.32), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, rgba(168, 72, 143, 0.16), transparent 70%),
+    #0f1116;
+}
+.video-card__play {
+  box-shadow: -14px 8px 40px rgba(42, 122, 166, 0.4), 14px 8px 40px rgba(168, 72, 143, 0.36);
+}
+.badge--dark {
+  background: linear-gradient(120deg, rgba(140, 230, 240, 0.1), rgba(150, 128, 238, 0.16), rgba(240, 190, 223, 0.1));
+  border-color: rgba(201, 184, 245, 0.32);
+}
+
+/* Spectral edges. Opaque surface: a padding-box fill over a border-box gradient draws the
+   gradient only in the border, radius intact. Translucent glass: a masked rim layer instead,
+   so the gradient never shows through the glass. */
+.choice--in {
+  border-color: transparent;
+  background:
+    radial-gradient(100% 80% at 100% 0%, rgba(100, 64, 200, 0.1), transparent 60%) padding-box,
+    radial-gradient(60% 60% at 0% 100%, rgba(29, 111, 150, 0.08), transparent 70%) padding-box,
+    linear-gradient(#fff, #fff) padding-box,
+    var(--spectral-stroke-light) border-box;
+}
+/* The good-fit card keeps its glass; its corner glint moves into the background so the
+   ::before layer can carry the rim */
+.fit__col--good {
+  border-color: transparent;
+  background:
+    radial-gradient(30% 34% at 100% 0%, rgba(140, 230, 240, 0.14), transparent 76%),
+    radial-gradient(26% 30% at 0% 100%, rgba(240, 190, 223, 0.12), transparent 74%),
+    linear-gradient(180deg, rgba(150, 128, 238, 0.14), transparent 60%);
+}
+.fit__col--good::before {
+  inset: -2px;
+  padding: 2px;
+  opacity: 0.9;
+  background: var(--spectral-stroke);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: none;
+}
+.bc-card__glow {
+  border: 0;
+  box-shadow:
+    -10px 0 30px -6px rgba(140, 230, 240, 0.26),
+    10px 0 30px -6px rgba(240, 190, 223, 0.24),
+    0 26px 34px -18px rgba(150, 128, 238, 0.5);
+}
+.bc-card__glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: var(--spectral-stroke);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* Hover-sweep glints on cards: cyan → violet → rose instead of cyan → blue */
+:is(.fit__col, .choice, .proof-points li, .promises__list li, .ticket__item)::after {
+  background: linear-gradient(110deg, transparent 40%, rgba(140, 230, 240, 0.12) 46%, rgba(183, 154, 238, 0.12) 50%, rgba(240, 190, 223, 0.1) 54%, transparent 60%) 130% 0 / 250% 100% no-repeat;
+}
+@media (forced-colors: active) {
+  .fit__col--good::before,
+  .bc-card__glow::before {
+    display: none;
+  }
+  .fit__col--good,
+  .choice--in {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+
+/* Vertical rails carry the ramp along their length */
+.room--auto .room__rail {
+  background: linear-gradient(180deg, var(--spectral-cyan-deep), var(--spectral-blue-deep) 35%, var(--spectral-violet-deep) 70%, var(--spectral-pink-deep));
+}
+.story__line-fill {
+  background: linear-gradient(180deg, var(--spectral-cyan), var(--spectral-blue) 35%, var(--spectral-violet) 70%, var(--spectral-pink));
+}

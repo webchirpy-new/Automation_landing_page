@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { scorecard, uiCopy } from "../../data/automationContent"
 import { moduleById } from "../../data/serviceModules"
 import { useSite } from "../../context/SiteContext"
@@ -7,10 +7,14 @@ import PixelIcon from "../visuals/PixelIcon"
 import { goToBooking } from "../../lib/scroll"
 
 const C = 2 * Math.PI * 52
+// Corner glow for each card, cycling so neighbours never share a corner.
+const CORNERS = ["top-right", "bottom-left", "top-left", "bottom-right"]
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`
 
 function ScoreRing({ summary, compact = false }) {
-  const { complete, score, reviewedCount, gapCount } = summary
-  const frac = complete ? score / 100 : reviewedCount / 8
+  const { complete, score, reviewedCount, gapCount, totalAreas, totalChecks } = summary
+  // While areas are open the ring shows completion; once all are reviewed it shows the score.
+  const frac = complete ? score / 100 : reviewedCount / totalAreas
   return (
     <div className={`score-ring ${complete ? "is-complete" : ""} ${compact ? "score-ring--compact" : ""}`}>
       <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -25,13 +29,16 @@ function ScoreRing({ summary, compact = false }) {
               <small>/100</small>
             </span>
             <span className="score-ring__sub t-mono">
-              {gapCount} of 16 gaps
+              {gapCount} of {totalChecks} gaps
             </span>
           </>
         ) : (
           <>
-            <span className="score-ring__value score-ring__value--na">—</span>
-            <span className="score-ring__sub t-mono">{reviewedCount} of 8 areas</span>
+            <span className="score-ring__value">
+              {reviewedCount}
+              <small>/{totalAreas}</small>
+            </span>
+            <span className="score-ring__sub t-mono">{uiCopy.scoreAreasReviewed}</span>
           </>
         )}
       </div>
@@ -39,7 +46,7 @@ function ScoreRing({ summary, compact = false }) {
   )
 }
 
-/** 4×2 automation map; a warm route links every reviewed area in order. */
+/** 4×2 automation map; a green route links every reviewed area in order. */
 function AutomationMap({ summary }) {
   const pts = summary.areas
     .map((a, i) => (a.reviewed ? `${((i % 4) + 0.5) * 25},${(Math.floor(i / 4) + 0.5) * 50}` : null))
@@ -52,7 +59,7 @@ function AutomationMap({ summary }) {
       </svg>
       {summary.areas.map((a) => {
         const state = !a.reviewed ? "todo" : a.gaps === 0 ? "ok" : a.gaps === 1 ? "gap1" : "gap2"
-        const label = !a.reviewed ? "not reviewed" : a.gaps === 0 ? "no gaps" : `${a.gaps} gap${a.gaps > 1 ? "s" : ""}`
+        const label = !a.reviewed ? "not reviewed" : a.gaps === 0 ? "no gaps" : plural(a.gaps, "gap")
         return (
           <div key={a.id} role="listitem" className={`auto-map__cell auto-map__cell--${state}`}>
             <PixelIcon name={moduleById[a.id].icon} size={20} animate={false} />
@@ -69,10 +76,23 @@ export default function Scorecard() {
   const { score, summary, toggleCheck, clearArea, resetScore } = useSite()
   const isMobile = useIsMobile()
   const [openId, setOpenId] = useState(scorecard.areas[0].id)
+  const areasRef = useRef(null)
 
-  const status = summary.complete
-    ? `Score ${summary.score} out of 100. ${summary.gapCount} of 16 gaps.`
-    : `${uiCopy.scoreNotAssessed}. ${summary.gapCount} gaps selected, ${summary.reviewedCount} of 8 areas reviewed.`
+  // The cards' corner glow only drifts while they are on screen.
+  useEffect(() => {
+    const el = areasRef.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    const io = new IntersectionObserver(([e]) => el.classList.toggle("is-live", e.isIntersecting))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  const { totalAreas, totalChecks, reviewedCount, gapCount, complete } = summary
+  const gapsLine = `${gapCount} of ${totalChecks} gaps ticked`
+  const areasLeft = plural(totalAreas - reviewedCount, "area")
+  const status = complete
+    ? `Score ${summary.score} out of 100. ${gapCount} of ${totalChecks} gaps.`
+    : `${uiCopy.scoreNotAssessed}. ${gapsLine}, ${reviewedCount} of ${totalAreas} areas reviewed.`
 
   return (
     <div className="scorecard">
@@ -87,12 +107,12 @@ export default function Scorecard() {
           <ScoreRing summary={summary} />
           <div className="scorecard__ring-copy">
             <p className="scorecard__state">
-              {summary.complete ? (summary.gapCount === 0 ? "No gaps ticked" : "Your automation score") : uiCopy.scoreNotAssessed}
+              {complete ? (gapCount === 0 ? "No gaps ticked" : "Your automation score") : uiCopy.scoreNotAssessed}
             </p>
             <p className="t-muted scorecard__ring-help">
-              {summary.complete
-                ? `${summary.gapCount} of 16 gaps`
-                : `${summary.gapCount} gaps ticked · review all 8 areas to see your score`}
+              {complete
+                ? `${gapsLine} · all ${totalAreas} areas reviewed`
+                : `${gapsLine} · review ${areasLeft} more to see your score`}
             </p>
           </div>
         </div>
@@ -105,13 +125,13 @@ export default function Scorecard() {
         {summary.priorities.length > 0 && (
           <div className="scorecard__priorities">
             <p className="t-mono">Your priority order</p>
-            <ol>
+            <ol style={{ "--pri-rows": Math.ceil(summary.priorities.length / 2) }} data-many={summary.priorities.length > 4 || undefined}>
               {summary.priorities.map((a) => (
                 <li key={a.id}>
                   <PixelIcon name={moduleById[a.id].icon} size={14} animate={false} />
                   <span>{a.area}</span>
                   <span className="scorecard__gapcount t-mono">
-                    {a.gaps} gap{a.gaps > 1 ? "s" : ""}
+                    {plural(a.gaps, "gap")}
                   </span>
                 </li>
               ))}
@@ -120,7 +140,7 @@ export default function Scorecard() {
         )}
 
         <div className="scorecard__cta">
-          <button type="button" className="btn btn--primary btn--lg btn--block ember" onClick={goToBooking}>
+          <button type="button" className="btn btn--primary btn--lg btn--block" onClick={goToBooking}>
             <span className="btn__label">{scorecard.button}</span>
           </button>
           <p className="scorecard__under">{scorecard.underButton}</p>
@@ -133,10 +153,10 @@ export default function Scorecard() {
       {/* Compact sticky status for phones */}
       <div className="scorecard__mini" aria-hidden="true">
         <ScoreRing summary={summary} compact />
-        <span>{summary.complete ? `${summary.score}/100 · ${summary.gapCount} of 16 gaps` : `${summary.reviewedCount}/8 areas · ${summary.gapCount} gaps`}</span>
+        <span>{complete ? `${summary.score}/100 · ${gapCount} of ${totalChecks} gaps` : `${reviewedCount}/${totalAreas} areas · ${plural(gapCount, "gap")}`}</span>
       </div>
 
-      <div className="scorecard__areas">
+      <div ref={areasRef} className="scorecard__areas">
         <p className="scorecard__helper">{scorecard.helper}</p>
         {summary.areas.map((a, ai) => {
           const open = !isMobile || openId === a.id
@@ -151,12 +171,12 @@ export default function Scorecard() {
                 <span className="score-area__promise">{a.promise}</span>
               </span>
               <span className={`score-area__badge t-mono ${a.reviewed ? (a.gaps ? "is-gap" : "is-ok") : ""}`}>
-                {a.reviewed ? (a.gaps ? `${a.gaps} gap${a.gaps > 1 ? "s" : ""}` : "No gaps") : "To review"}
+                {a.reviewed ? (a.gaps ? plural(a.gaps, "gap") : "No gaps") : "To review"}
               </span>
             </>
           )
           return (
-            <section key={a.id} className={`score-area ${a.reviewed ? "is-reviewed" : ""} ${open ? "is-open" : ""}`} aria-labelledby={`score-h-${a.id}`}>
+            <section key={a.id} className={`score-area ${a.reviewed ? "is-reviewed" : ""} ${open ? "is-open" : ""}`} data-corner={CORNERS[ai % CORNERS.length]} aria-labelledby={`score-h-${a.id}`}>
               <h3 id={`score-h-${a.id}`} className="score-area__head">
                 {isMobile ? (
                   <button type="button" className="score-area__toggle" aria-expanded={open} aria-controls={panelId} onClick={() => setOpenId(open ? null : a.id)}>

@@ -1,0 +1,326 @@
+/* =========================================================
+   HERO: Automation Dimension (first fold only)
+   Everything is scoped to .hero__fold / .intro. Site-wide tokens, other sections and other
+   CTAs are untouched; the green system is re-pointed locally by the custom properties below.
+   ========================================================= */
+.hero__fold {
+  --hd-bg: #05070e;
+  --hd-bg-2: #090b15;
+  --hd-white: #f7f8fb;
+  --hd-blue: #6ba9f8;
+  --hd-cyan: #75e9f4;
+  --hd-violet: #9877e8;
+  --hd-pink: #e6a3e8;
+  /* Local re-point: the eyebrow pixels and the pixel-glyph accents follow the Hero palette */
+  --accent: var(--hd-cyan);
+  --accent-soft: var(--hd-violet);
+  --accent-ink: rgba(247, 248, 251, 0.74);
+  color: var(--hd-white);
+  background-color: var(--hd-bg);
+  background-image: none;
+}
+/* Sparse edge light, never a full-bleed wash */
+.hero__fold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(34% 40% at 100% 0%, rgba(152, 119, 232, 0.13), transparent 72%),
+    radial-gradient(30% 36% at 0% 100%, rgba(117, 233, 244, 0.08), transparent 72%),
+    radial-gradient(26% 30% at 100% 100%, rgba(230, 163, 232, 0.07), transparent 72%);
+}
+.hero__fold::after {
+  content: none;
+}
+.hero__fold :focus-visible {
+  outline-color: var(--hd-white);
+}
+
+/* ---------- Copy ---------- */
+.hero__fold .hero__center {
+  z-index: 4;
+  max-width: min(1060px, 100%);
+}
+.hero__fold .eyebrow {
+  color: rgba(247, 248, 251, 0.72);
+}
+.hero__fold .hero__title {
+  max-width: none;
+  color: var(--hd-white);
+  font-size: clamp(2.125rem, 0.95rem + 4.15vw, 4.75rem);
+  line-height: 1.03;
+}
+.hero__line {
+  display: block;
+}
+.hero__fold .hero__punch {
+  color: var(--hd-white);
+}
+.hero__fold .hero__body {
+  color: rgba(247, 248, 251, 0.72);
+}
+.hero__fold .hero__micro {
+  color: rgba(247, 248, 251, 0.6);
+}
+.hero__fold .hero__meta {
+  z-index: 4;
+}
+.hero__fold .hero__disclaimer {
+  color: rgba(247, 248, 251, 0.5);
+}
+@media (min-width: 900px) {
+  .hero__line {
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Eyebrow: the landed aircraft replaces the two pixel markers ---------- */
+.hero__fold .hero__eyebrow {
+  gap: 8px;
+}
+/* The landed aircraft is sized from the eyebrow type itself: its height is the rendered text
+   height (1.1667em = 14px at the 12px eyebrow), its width follows the mark (96:97). The intro
+   measures this box and lands the 3D craft into it by height, so the two always agree. */
+.hero__mark {
+  flex: none;
+  display: block;
+  height: 1.1667em;
+  width: auto;
+  aspect-ratio: 96 / 97;
+  margin-top: -1px; /* optical centre on the cap height */
+}
+.hero__mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* "Find the leaks." uses the shared dark-ground highlight (.hl-flow--dark, styles/spectral.css) */
+
+/* ---------- Hero CTA: the shared spectral CTA material (styles/spectral.css) ---------- */
+.hero__fold .hero-cta:focus-visible {
+  outline: 2px solid var(--hd-white);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__fold .hero-cta:hover,
+  .hero__fold .hero-cta:focus-visible,
+  .hero__fold .hero-cta:active {
+    transform: none;
+  }
+}
+
+/* ---------- Glass app tiles: only the container is styled, never the brand mark ---------- */
+/* The idle float moves this wrapper every frame from script. Its own compositor layer means the
+   tile and its soft shadow are drawn once and only moved, instead of repainted every frame. */
+.hero__fold .htile__float {
+  will-change: transform;
+}
+.hero__fold .htile .app-tile {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero__fold .htile .app-tile__face {
+  width: 100%;
+  height: 100%;
+  border-radius: 28%;
+  color: var(--hd-white);
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.07) 55%, rgba(255, 255, 255, 0.11));
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -8px 14px rgba(120, 120, 240, 0.07), 0 10px 26px rgba(0, 0, 0, 0.42);
+}
+.hero__fold .htile .app-tile__face > svg {
+  width: 52%;
+  height: 52%;
+}
+.hero__fold .htile__btn:hover .app-tile__face,
+.hero__fold .htile__btn:focus-visible .app-tile__face {
+  transform: translateY(-3px) scale(1.04);
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 0 0 3px rgba(117, 233, 244, 0.2), 0 14px 30px rgba(0, 0, 0, 0.5);
+}
+.hero__fold .htile--faded .htile__mag {
+  opacity: 0.88;
+}
+/* Visual size stays small; the hit area keeps a comfortable touch target */
+.hero__fold .htile__btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+.hero__fold .htile__tip {
+  background: #14162b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+@media (max-width: 1279px) {
+  .hero__fold .htile {
+    width: calc(var(--s) * 0.82);
+    height: calc(var(--s) * 0.82);
+    margin: calc(var(--s) * -0.41) 0 0 calc(var(--s) * -0.41);
+  }
+}
+@media (max-width: 768px) {
+  .hero__fold .htile {
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+  }
+  .hero__fold .htile .app-tile__face {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* ---------- Corner cubes (CSS 3D, matches the intro's WebGL camera) ---------- */
+.hv {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 420ms linear;
+}
+.hv.is-on {
+  opacity: 1;
+}
+.hv__cube {
+  position: absolute;
+  width: var(--vw);
+  height: var(--vh);
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--vw) / -2));
+}
+.hv__spin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.hv__f {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+.hv__f--front {
+  background: linear-gradient(145deg, #fbfbfd, #e6e8ef);
+  box-shadow: inset 0 0 0 0.5px rgba(40, 44, 66, 0.2), inset 1px 1px 0 rgba(255, 255, 255, 0.85);
+  transform: translateZ(calc(var(--vw) / 2));
+}
+.hv__f--back {
+  background: linear-gradient(145deg, #2a2d3b, #15171f);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.1), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
+  transform: rotateY(180deg) translateZ(calc(var(--vw) / 2));
+}
+.hv__f--top {
+  height: var(--vw);
+  background: #d9dbe5;
+  transform: rotateX(90deg) translateZ(calc(var(--vw) / 2));
+}
+.hv__f--bottom {
+  top: auto;
+  bottom: 0;
+  height: var(--vw);
+  background: #8f93a6;
+  transform: rotateX(-90deg) translateZ(calc(var(--vw) / 2));
+}
+.hv__f--left {
+  width: var(--vw);
+  background: #c6c9d6;
+  transform: rotateY(-90deg) translateZ(calc(var(--vw) / 2));
+}
+.hv__f--right {
+  left: auto;
+  right: 0;
+  width: var(--vw);
+  background: #a5a9bb;
+  transform: rotateY(90deg) translateZ(calc(var(--vw) / 2));
+}
+
+/* ---------- Intro stage ---------- */
+.hero__fold.is-intro {
+  z-index: 40;
+  isolation: isolate;
+}
+.hero__fold.is-intro .hero__tiles {
+  z-index: auto; /* lets a tile pass behind (1) or in front of (3) the canvas (2) */
+}
+/* During the flight tiles sit on their own layers, and nothing behind them needs blurring */
+.hero__fold.is-intro .htile {
+  will-change: transform, opacity;
+}
+.hero__fold.is-intro .htile .app-tile__face {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.intro__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--hd-bg);
+  pointer-events: none;
+  transition: opacity 420ms linear;
+}
+.intro__canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 420ms linear;
+}
+/* Matches the wall until the first WebGL frame replaces it */
+.intro__veil {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: #eceef3;
+  pointer-events: none;
+  transition: opacity 320ms linear;
+}
+.intro__veil.is-gone {
+  transition-duration: 60ms;
+}
+.intro__canvas.is-gone,
+.intro__veil.is-gone,
+.intro__backdrop.is-gone {
+  opacity: 0;
+}
+.intro__skip {
+  position: fixed;
+  z-index: 6;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(var(--gutter), env(safe-area-inset-right));
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(10, 12, 24, 0.74);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--hd-white);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 180ms, border-color 180ms;
+}
+/* On phones the app tiles land along the top band, so Skip sits at the bottom instead */
+@media (max-width: 767px) {
+  .intro__skip {
+    top: auto;
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+.intro__skip:hover {
+  background: rgba(24, 27, 48, 0.9);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.intro__skip:focus-visible {
+  outline: 2px solid var(--hd-white);
+  outline-offset: 3px;
+}

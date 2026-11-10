@@ -6,6 +6,10 @@ import "./styles/global.css"
 import "./styles/components.css"
 import "./styles/sections.css"
 import "./styles/sections-2.css"
+import "./styles/hero-dimension.css"
+import "./styles/space-atmosphere.css"
+import "./styles/spectral.css"
+import "./styles/hero-leaks.css"
 import App from "./App.jsx"
 
 createRoot(document.getElementById("root")).render(

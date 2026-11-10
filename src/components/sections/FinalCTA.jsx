@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import { finalCta, footer } from "../../data/automationContent"
 import { serviceModules } from "../../data/serviceModules"
 import { siteConfig, phoneHref, whatsappHref } from "../../config/site"
@@ -7,60 +7,25 @@ import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
 import SectionAmbient from "../visuals/SectionAmbient"
-import { ambient, embers } from "../../config/ambient"
-import EmberPixelCorner from "../visuals/EmberPixelCorner"
+import { ambient } from "../../config/ambient"
 import { Marked } from "../ui/Highlight"
+import SpaceAtmosphere from "../atmosphere/SpaceAtmosphere"
 
-const CELL = 10
 const C = 180 // centre of 360 viewBox
-
-/** Target composition: a closed pixel ring with a check — the hero's route, resolved. */
-function buildMark() {
-  const cells = new Map()
-  const add = (x, y) => cells.set(`${x},${y}`, { x, y })
-  for (let a = 0; a < 360; a += 4) {
-    const r = (a * Math.PI) / 180
-    add(Math.round((C + 120 * Math.cos(r)) / CELL), Math.round((C + 120 * Math.sin(r)) / CELL))
-  }
-  const check = [
-    [12, 18], [13, 19], [14, 20], [15, 21], [16, 22], [17, 21], [18, 20], [19, 19], [20, 18], [21, 17], [22, 16], [23, 15], [24, 14],
-  ]
-  check.forEach(([x, y]) => {
-    add(x, y)
-    add(x, y + 1)
-  })
-  let seed = 3
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
-  return Array.from(cells.values()).map((c) => {
-    const ang = Math.atan2(c.y * CELL - C, c.x * CELL - C)
-    const cluster = Math.floor(((ang + Math.PI) / (2 * Math.PI)) * 8) % 8
-    return { ...c, cluster, dx: (rnd() - 0.5) * 520, dy: (rnd() - 0.5) * 420 }
-  })
-}
 
 export default function FinalCTA() {
   const ref = useRef(null)
   const [resolved, setResolved] = useState(true) // final state by default (SSR / reduced motion)
   const { openModal } = useSite()
-  const pixels = useMemo(buildMark, [])
 
   useGSAP(
     () => {
       const mm = gsap.matchMedia()
       mm.add(MOTION_OK, () => {
         setResolved(false)
-        const px = gsap.utils.toArray(".final__px", ref.current)
-        gsap.set(px, { x: (i) => pixels[i].dx, y: (i) => pixels[i].dy, opacity: 0.35 })
-        gsap.set(".final__loop", { drawSVG: "0%" })
+        gsap.set(".final__loop, .final__check", { drawSVG: "0%" })
         const tl = gsap.timeline({ paused: true, onComplete: () => setResolved(true) })
-        tl.to(px, {
-          x: 0,
-          y: 0,
-          opacity: 1,
-          duration: 1.4,
-          ease: "power3.inOut",
-          stagger: (i) => pixels[i].cluster * 0.09 + (i % 7) * 0.012,
-        }).to(".final__loop", { drawSVG: "100%", duration: 1.2, ease: "power2.inOut" }, "-=0.3")
+        tl.to(".final__loop", { drawSVG: "100%", duration: 1.2, ease: "power2.inOut" }).to(".final__check", { drawSVG: "100%", duration: 0.7, ease: "power2.out" }, "-=0.35")
         const io = new IntersectionObserver(
           ([e]) => {
             if (e.isIntersecting) {
@@ -87,7 +52,7 @@ export default function FinalCTA() {
   return (
     <footer id="final" ref={ref} className={`final ${resolved ? "is-resolved" : ""}`} aria-labelledby="final-title">
       <SectionAmbient blooms={ambient.final} tone="dark" fadeTop="0%" fadeBottom="48%" />
-      <EmberPixelCorner sectionId="final" theme="dark" {...embers.final} />
+      <SpaceAtmosphere preset="cta" seed="final" />
       <div className="container final__hero">
         <div className="final__copy">
           <h2 id="final-title" className="t-h2">
@@ -100,10 +65,16 @@ export default function FinalCTA() {
         </div>
         <div className="final__art" aria-hidden="true">
           <svg viewBox="0 0 360 360">
+            <defs>
+              <linearGradient id="final-spectral" x1="40" y1="40" x2="320" y2="320" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#8ce6f0" />
+                <stop offset=".35" stopColor="#87baff" />
+                <stop offset=".68" stopColor="#b79aee" />
+                <stop offset="1" stopColor="#f0bedf" />
+              </linearGradient>
+            </defs>
             <circle className="final__loop" cx={C} cy={C} r="150" />
-            {pixels.map((p, i) => (
-              <rect key={i} className={`final__px final__px--c${p.cluster}`} x={p.x * CELL - 3.5} y={p.y * CELL - 3.5} width="7" height="7" />
-            ))}
+            <path className="final__check" d="M120 184 L160 224 L240 144" />
           </svg>
         </div>
       </div>

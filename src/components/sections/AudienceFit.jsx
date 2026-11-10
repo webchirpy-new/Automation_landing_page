@@ -37,11 +37,18 @@ export default function AudienceFit() {
         </header>
 
         <svg className="branch" viewBox="0 0 400 90" aria-hidden="true">
+          <defs>
+            <linearGradient id="branch-spectral" x1="200" y1="30" x2="100" y2="90" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#8ce6f0" />
+              <stop offset=".55" stopColor="#b79aee" />
+              <stop offset="1" stopColor="#f0bedf" />
+            </linearGradient>
+          </defs>
           <path className="branch__stem" d="M200 0 V30" />
           <path className="branch__good" d="M200 30 C200 60 100 56 100 90" />
           <path className="branch__other" d="M200 30 C200 60 300 56 300 90" />
-          <rect className="branch__dot branch__dot--good" x="95" y="80" width="10" height="10" />
-          <rect className="branch__dot branch__dot--other" x="296" y="82" width="8" height="8" />
+          <rect className="branch__dot branch__dot--good" x="95" y="80" width="10" height="10" rx="5" />
+          <rect className="branch__dot branch__dot--other" x="296" y="82" width="8" height="8" rx="4" />
         </svg>
 
         <div className="fit__cols">

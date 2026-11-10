@@ -35,6 +35,7 @@ html.lenis body {
     animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
   }
 }
 
@@ -162,8 +163,8 @@ main,
 .section--night .t-muted {
   color: var(--night-muted);
 }
-.section--night :is(.on-light, .wk, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .t-lead,
-.section--night :is(.on-light, .wk, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .t-muted {
+.section--night :is(.on-light, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .t-lead,
+.section--night :is(.on-light, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .t-muted {
   color: var(--muted);
 }
 
@@ -196,7 +197,7 @@ main,
   position: relative;
 }
 
-/* Warm ambient blooms (SectionAmbient) — one or two per chapter, behind content, never
+/* Green ambient blooms (SectionAmbient) — one or two per chapter, behind content, never
    over it. The wrapper mask dissolves them before the top/bottom edge so every chapter
    meets its neighbour on native white or charcoal. Only transform + opacity animate. */
 .ambient {
@@ -225,19 +226,19 @@ main,
   inset: 0;
   border-radius: 50%;
 }
-/* Core: sun → solar orange */
+/* Core: mint → green */
 .ambient__bloom::before {
-  background: radial-gradient(closest-side, rgba(253, 192, 3, 0.62), rgba(244, 94, 0, 0.34) 46%, rgba(244, 94, 0, 0) 100%);
+  background: radial-gradient(closest-side, rgba(140, 230, 240, 0.62), rgba(110, 126, 236, 0.34) 46%, rgba(110, 126, 236, 0) 100%);
   transform: translate(-9%, -7%) scale(0.6);
 }
-/* Halo: ember → signal red → crimson, offset so a slow turn shifts the hues */
+/* Halo: green → deep green → forest, offset so a slow turn shifts the hues */
 .ambient__bloom::after {
-  background: radial-gradient(closest-side, rgba(240, 68, 2, 0.44), rgba(217, 13, 4, 0.24) 48%, rgba(166, 4, 1, 0.09) 74%, rgba(166, 4, 1, 0) 100%);
+  background: radial-gradient(closest-side, rgba(110, 126, 236, 0.44), rgba(66, 72, 190, 0.24) 48%, rgba(34, 36, 104, 0.09) 74%, rgba(34, 36, 104, 0) 100%);
   transform: translate(11%, 9%);
 }
-/* On charcoal the halo deepens toward crimson/burnt brown */
+/* On black the halo deepens toward forest */
 .ambient--dark .ambient__bloom::after {
-  background: radial-gradient(closest-side, rgba(240, 68, 2, 0.5), rgba(217, 13, 4, 0.3) 44%, rgba(68, 23, 20, 0.35) 72%, rgba(68, 23, 20, 0) 100%);
+  background: radial-gradient(closest-side, rgba(110, 126, 236, 0.5), rgba(66, 72, 190, 0.3) 44%, rgba(22, 22, 66, 0.35) 72%, rgba(22, 22, 66, 0) 100%);
 }
 @media (prefers-reduced-motion: no-preference) {
   .ambient__bloom {
@@ -283,101 +284,6 @@ main,
 .logo-strip {
   isolation: isolate;
 }
-/* Digital Ember Fragmentation (EmberPixelCorner) — a corner cluster confined to the
-   section's empty padding band, behind everything. Dark panels clip it to their radius. */
-.epc {
-  position: absolute;
-  z-index: -1;
-  width: clamp(120px, 22vw, 320px);
-  height: min(var(--section-y), 140px);
-  pointer-events: none;
-}
-.epc--top {
-  top: 0;
-}
-.epc--bottom {
-  bottom: 0;
-}
-.epc--left {
-  left: 0;
-}
-.epc--right {
-  right: 0;
-}
-.epc__px {
-  position: absolute;
-  border-radius: 1px;
-  opacity: 0;
-}
-.epc--dark .epc__px {
-  box-shadow: 0 0 5px rgba(244, 94, 0, 0.55);
-}
-.epc--light .epc__px {
-  box-shadow: 0 0 3px rgba(233, 196, 106, 0.35);
-}
-/* soft warm light gathered in the corner itself */
-.epc__glow {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background: radial-gradient(70% 110% at var(--gx) var(--gy), var(--glow-a), var(--glow-b) 45%, transparent 75%);
-}
-.epc--dark {
-  --glow-a: rgba(244, 94, 0, 0.3);
-  --glow-b: rgba(217, 13, 4, 0.1);
-}
-.epc--light {
-  --glow-a: rgba(253, 192, 3, 0.2);
-  --glow-b: rgba(244, 150, 0, 0.06);
-}
-.epc--top {
-  --gy: 0%;
-}
-.epc--bottom {
-  --gy: 100%;
-}
-.epc--left {
-  --gx: 0%;
-}
-.epc--right {
-  --gx: 100%;
-}
-/* scan glint: a short warm signal along the corner's edge */
-.epc__glint {
-  position: absolute;
-  left: 0;
-  width: 56px;
-  height: 2px;
-  margin-left: -28px;
-  border-radius: 2px;
-  opacity: 0;
-}
-.epc--top .epc__glint {
-  top: 0;
-}
-.epc--bottom .epc__glint {
-  bottom: 0;
-}
-.epc--dark .epc__glint {
-  background: linear-gradient(90deg, transparent, #ffd36b 40%, #f45e00 60%, transparent);
-  box-shadow: 0 0 8px rgba(244, 94, 0, 0.6);
-}
-.epc--light .epc__glint {
-  background: linear-gradient(90deg, transparent, #f3d27a 40%, #f6a86b 60%, transparent);
-  box-shadow: 0 0 6px rgba(233, 196, 106, 0.5);
-}
-/* fewer pixels on smaller screens (the ones nearest the corner stay) */
-@media (max-width: 1023px) {
-  .epc__px[data-tier="3"] {
-    display: none;
-  }
-}
-@media (max-width: 767px) {
-  .epc__px[data-tier="2"] {
-    display: none;
-  }
-}
-
 /* Hero: between the pixel canvas (z 0) and the white copy halo (z 1) */
 .ambient--hero {
   z-index: 0;
@@ -386,7 +292,7 @@ main,
 .section-head {
   display: grid;
   gap: 18px;
-  margin-bottom: clamp(36px, 4vw, 56px);
+  margin-bottom: clamp(32px, 3.4vw, 48px);
   max-width: 62rem;
 }
 .section-head--center {
@@ -446,68 +352,13 @@ main,
   font-size: var(--fs-lead);
 }
 .section--night .text-link {
-  color: var(--accent-ink); /* amber on charcoal, deep red again inside light islands */
+  color: var(--accent-ink); /* bright green on dark, deep green again inside light islands */
 }
 
-/* Editorial highlight (Marked) — one phrase per major heading. Strips are measured per
-   wrapped line and sit behind the upright text inside the heading's own layer. */
-:is(h1, h2, h3, p):has(> .hl) {
-  position: relative;
-  isolation: isolate;
-}
-.hl__text {
-  position: relative;
-  z-index: 1;
-}
-.hl__mark {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  transform-origin: 0 50%;
-  overflow: hidden;
-}
-/* Light: feathered pale-yellow → gold → soft-orange marker with a warm core, tilted */
-.hl--light .hl__mark {
-  rotate: -1.5deg;
-  border-radius: 0.3em;
-  /* background:
-    radial-gradient(55% 90% at 42% 55%, rgba(253, 192, 3, 0.32), rgba(253, 192, 3, 0) 75%),
-    linear-gradient(90deg, rgba(253, 192, 3, 0) 0%, rgba(253, 192, 3, 0.42) 7%, rgba(253, 176, 3, 0.46) 45%, rgba(244, 128, 0, 0.34) 82%, rgba(244, 94, 0, 0.2) 94%, rgba(244, 94, 0, 0) 100%); */
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26%, #000 74%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0, #000 26%, #000 74%, transparent 100%);
-}
-/* Dark: short warm underline + an extremely faint amber backing (white text stays white) */
-.hl--dark .hl__mark {
-  rotate: -1deg;
-  border-radius: 0.2em;
-  background:
-    linear-gradient(90deg, rgba(253, 192, 3, 0), #fdc003 10%, #f45e00 55%, rgba(217, 13, 4, 0.85) 88%, rgba(217, 13, 4, 0)) 0 100% / 100% max(3px, 0.075em) no-repeat,
-    radial-gradient(70% 55% at 50% 72%, rgba(244, 94, 0, 0.16), rgba(244, 94, 0, 0) 75%);
-}
-/* One-time warm light sweep after the reveal, then fully static */
-.hl.is-swept .hl__mark::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 35%, rgba(255, 246, 214, 0.7) 50%, transparent 65%) 0 0 / 260% 100% no-repeat;
-  animation: hl-sweep 1.1s var(--ease-out) both;
-}
-.hl--dark.is-swept .hl__mark::after {
-  background-image: linear-gradient(100deg, transparent 35%, rgba(255, 214, 140, 0.35) 50%, transparent 65%);
-}
-@keyframes hl-sweep {
-  from {
-    background-position: 120% 0;
-  }
-  to {
-    background-position: -40% 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hl.is-swept .hl__mark::after {
-    display: none;
-  }
-}
+/* Editorial highlight (Marked): a gradient flowing inside the letters of one phrase. The stops
+   stay at 3:1 or better on the chapter's background (these are large headings); the plain
+   colour underneath is the fallback wherever text clipping is unavailable. */
+/* Highlighted phrases (.hl-flow): see styles/spectral.css */
 
 .badge {
   display: inline-flex;
@@ -524,9 +375,9 @@ main,
   background: var(--background);
 }
 .badge--dark {
-  background: rgba(244, 94, 0, 0.14);
+  background: rgba(110, 126, 236, 0.14);
   color: var(--accent-soft);
-  border: 1px solid rgba(244, 94, 0, 0.3);
+  border: 1px solid rgba(110, 126, 236, 0.3);
 }
 
 .mark {
@@ -544,7 +395,7 @@ main,
   background: var(--danger-wash);
 }
 .mark--ok {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
 }
 

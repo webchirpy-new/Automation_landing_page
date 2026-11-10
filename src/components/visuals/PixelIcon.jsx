@@ -5,7 +5,7 @@ import React from "react"
  * rectangles, rendered crisp. Layers:
  *   base   — ink (currentColor)
  *   muted  — 35% ink
- *   accent — warm accent; carries the 1–3 frame "operation" motion (see components.css)
+ *   accent — green accent; carries the 1–3 frame "operation" motion (see components.css)
  *
  * Motion plays when an ancestor has `.is-active`, `[aria-expanded=true]`,
  * `[aria-selected=true]` or is hovered/focused (`.px-host`). Rest state is static.

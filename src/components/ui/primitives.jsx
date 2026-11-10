@@ -1,16 +1,17 @@
 import React, { useRef } from "react"
 import { gsap, ScrollTrigger, useGSAP } from "../../lib/gsap"
 import { MOTION_OK, dur, ease } from "../../lib/motionTokens"
-import { ambient, embers } from "../../config/ambient"
+import { ambient } from "../../config/ambient"
 import SectionAmbient from "../visuals/SectionAmbient"
-import EmberPixelCorner from "../visuals/EmberPixelCorner"
+import SpaceAtmosphere from "../atmosphere/SpaceAtmosphere"
+import { SECTION_PRESET } from "../atmosphere/starfieldPresets"
 
 /**
  * SectionShell — every landing section. Handles theme band, anchor, heading
  * association, a once-only staggered reveal of `[data-reveal]` children and a
  * cascading reveal of the items inside `[data-stagger]` lists.
  * theme="night" renders a full-bleed dark panel with rounded corners on the light canvas,
- * Warm ambient blooms come from config/ambient.js by section id (see SectionAmbient).
+ * Ambient green blooms come from config/ambient.js by section id (see SectionAmbient).
  * Content is fully visible without JS; it is only hidden once GSAP takes over.
  */
 export function SectionShell({ id, theme = "light", className = "", labelledBy, children, as: Tag = "section", wide = false }) {
@@ -63,10 +64,7 @@ export function SectionShell({ id, theme = "light", className = "", labelledBy, 
     { scope: ref }
   )
   const glowEl = (
-    <>
-      <SectionAmbient blooms={ambient[id]} tone={inset ? "dark" : "light"} />
-      {embers[id] && <EmberPixelCorner sectionId={id} theme={inset ? "dark" : "light"} {...embers[id]} />}
-    </>
+    <SectionAmbient blooms={ambient[id]} tone={inset ? "dark" : "light"} />
   )
   const content = <div className={`container ${wide ? "container--wide" : ""}`}>{children}</div>
   return (
@@ -80,6 +78,7 @@ export function SectionShell({ id, theme = "light", className = "", labelledBy, 
       {inset ? (
         <div className="section__panel">
           {glowEl}
+          <SpaceAtmosphere preset={SECTION_PRESET[id] || "narrative"} seed={id} />
           {content}
         </div>
       ) : (
@@ -113,18 +112,8 @@ export function DisplayHeading({ id, level = 2, children, className = "", size }
 
 /** Primary/secondary CTA. Renders <a> when `href` is given, else <button>. */
 export function CTAButton({ href, onClick, variant = "primary", size = "md", children, className = "", ...rest }) {
-  // Primary CTAs are the conversion actions: they carry the ember halo.
-  const cls = `btn btn--${variant} btn--${size} ${variant === "primary" ? "ember" : ""} ${className}`
-  const inner = (
-    <>
-      <span className="btn__pixels" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-      </span>
-      <span className="btn__label">{children}</span>
-    </>
-  )
+  const cls = `btn btn--${variant} btn--${size} ${className}`
+  const inner = <span className="btn__label">{children}</span>
   if (href) {
     return (
       <a

@@ -23,19 +23,7 @@
   overflow: hidden;
   transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out), background var(--dur-hover);
 }
-/* Warm gradient fill (every stop ≥4.8:1 with white) with an amber top-edge reflection;
-   hover slides toward the deeper crimson end. */
-.btn--primary {
-  --btn-bg: var(--accent);
-  background: var(--accent-fill) 0 0 / 180% 100%;
-  box-shadow: var(--shadow-accent), inset 0 1px 0 rgba(253, 192, 3, 0.38);
-  transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out),
-    background-position 420ms var(--ease-out);
-}
-.btn--primary:hover {
-  background-position: 100% 0;
-  transform: translateY(-1px);
-}
+/* Primary and floating CTAs (.btn--primary, .floating-cta): see styles/spectral.css */
 .btn--dark:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-2);
@@ -76,205 +64,6 @@
   position: relative;
   z-index: 1;
 }
-/* Pixel shimmer: three cells align toward the label on hover */
-.btn__pixels {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-.btn__pixels i {
-  position: absolute;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-  background: rgba(255, 255, 255, 0.55);
-  opacity: 0;
-  transform: translateX(-30px);
-}
-.btn__pixels i:nth-child(1) {
-  left: 10px;
-}
-.btn__pixels i:nth-child(2) {
-  left: 18px;
-  transition-delay: 40ms;
-}
-.btn__pixels i:nth-child(3) {
-  left: 26px;
-  transition-delay: 80ms;
-}
-.btn:hover .btn__pixels i,
-.btn:focus-visible .btn__pixels i {
-  opacity: 1;
-  transform: translateX(0);
-  transition: transform 320ms var(--ease-out), opacity 200ms;
-}
-.btn--ghost .btn__pixels i {
-  background: var(--accent);
-}
-
-/* =========================================================
-   EMBER HALO — conversion CTAs only (CTAButton primary, scorecard CTA, sticky CTAs).
-   The fill moves to ::before so a blurred warm rim (::after) can sit *behind* it,
-   just outside the edge, inside the button's own stacking context. Size, radius,
-   label and behaviour are untouched; only transform/opacity animate.
-   ========================================================= */
-.ember {
-  --ember-fill: var(--accent-fill);
-  --ember-o: 0.5; /* idle halo strength */
-  --ember-spread: clamp(4px, 0.25vw + 3px, 6px);
-  --ember-blur: 8px;
-  --ember-dur: 9s;
-  --ember-delay: 0s;
-  --ember-rim: rgba(253, 192, 3, 0.28); /* layer 1: static amber rim */
-  background: none;
-  overflow: visible;
-  isolation: isolate;
-  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out);
-}
-.ember::before,
-.ember::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  border-radius: inherit;
-}
-/* the button's own fill + amber top-edge reflection + soft amber rim */
-.ember::before {
-  inset: 0;
-  z-index: -1;
-  background: var(--ember-fill) 0 0 / 180% 100%;
-  box-shadow: inset 0 1px 0 rgba(253, 192, 3, 0.38), 0 0 calc(var(--ember-spread) + 4px) var(--ember-rim);
-  transition: background-position 420ms var(--ease-out), box-shadow 300ms var(--ease-out);
-}
-/* layer 2: ember drift — a warm gradient rim breathing slightly off-centre */
-.ember::after {
-  inset: calc(var(--ember-spread) * -1);
-  z-index: -2;
-  background: linear-gradient(100deg, rgb(116 88 0 / 90%), rgba(244, 94, 0, 0.95) 40%, rgba(217, 13, 4, 0.85) 75%, rgba(166, 4, 1, 0.6));
-  filter: blur(var(--ember-blur));
-  opacity: var(--ember-o);
-  transition: opacity 300ms var(--ease-out);
-}
-.ember .btn__pixels {
-  overflow: hidden; /* the button no longer clips; keep the hover pixels inside */
-  border-radius: inherit;
-}
-.ember:hover,
-.ember:focus-visible {
-  --ember-o: 0.78;
-  --ember-rim: rgba(253, 192, 3, 0.42);
-  transform: translateY(-2px);
-}
-.ember:hover::before,
-.ember:focus-visible::before {
-  background-position: 100% 0;
-}
-.ember:active {
-  transform: translateY(0) scale(0.985);
-  transition-duration: 90ms;
-}
-.ember:disabled::after,
-.ember[aria-disabled="true"]::after {
-  display: none;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ember::after {
-    animation: ember-drift var(--ember-dur) ease-in-out var(--ember-delay) infinite alternate;
-  }
-}
-@keyframes ember-drift {
-  0% {
-    transform: translate(-3px, 1px) scale(1, 0.9);
-    opacity: calc(var(--ember-o) * 0.85);
-  }
-  30% {
-    transform: translate(2px, -1px) scale(1.03, 1.06);
-    opacity: var(--ember-o);
-  }
-  65% {
-    transform: translate(4px, 1px) scale(0.99, 0.95);
-    opacity: calc(var(--ember-o) * 0.75);
-  }
-  100% {
-    transform: translate(-1px, -1px) scale(1.02, 1.02);
-    opacity: calc(var(--ember-o) * 0.95);
-  }
-}
-/* Dark chapters: a slightly richer rim (the label keeps its ≥4.8:1 fill) */
-.section--night .ember,
-.final .ember {
-  --ember-o: 0.68;
-  --ember-spread: clamp(5px, 0.3vw + 4px, 8px);
-  --ember-blur: 10px;
-  --ember-rim: rgba(244, 94, 0, 0.3);
-}
-/* …except on the white scorecard card inside the dark chapter */
-.section--night :is(.scorecard__summary, .score-area, .on-light) .ember {
-  --ember-o: 0.45;
-  --ember-blur: 8px;
-  --ember-rim: rgba(253, 192, 3, 0.26);
-}
-/* Phase offsets so no two visible CTAs breathe together */
-.hero .ember {
-  --ember-delay: -1.5s;
-}
-.scorecard-section .ember {
-  --ember-delay: -6s;
-  --ember-dur: 10s;
-}
-.why .ember {
-  --ember-delay: -3.5s;
-  --ember-dur: 11s;
-}
-.fit .ember {
-  --ember-delay: -8s;
-}
-.audit .ember {
-  --ember-delay: -4.5s;
-  --ember-dur: 12s;
-}
-.final .ember {
-  --ember-delay: -2.5s;
-  --ember-dur: 10.5s;
-}
-/* Sticky CTAs: distinctly quieter and slower — never competing with the section */
-.sticky-bar .ember,
-.floating-cta.ember {
-  --ember-o: 0.24;
-  --ember-spread: 3px;
-  --ember-blur: 5px;
-  --ember-dur: 13s;
-  --ember-delay: -7s;
-  --ember-rim: rgba(253, 192, 3, 0.14);
-}
-.sticky-bar .ember:hover,
-.sticky-bar .ember:focus-visible,
-.floating-cta.ember:hover,
-.floating-cta.ember:focus-visible {
-  --ember-o: 0.4;
-}
-.floating-cta.ember {
-  --ember-fill: var(--accent-fill);
-}
-.floating-cta.ember .px-icon {
-  transition: transform 260ms var(--ease-out);
-}
-.floating-cta.ember:hover .px-icon,
-.floating-cta.ember:focus-visible .px-icon {
-  transform: translateX(3px);
-}
-@media (prefers-reduced-motion: reduce) {
-  .ember::after {
-    opacity: calc(var(--ember-o) * 0.6); /* static, low-intensity rim */
-  }
-  .ember:hover,
-  .ember:focus-visible {
-    transform: none;
-  }
-}
-
 /* =========================================================
    GLASS / CHIPS
    ========================================================= */
@@ -282,7 +71,7 @@
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-  border: 1px solid rgba(231, 229, 238, 0.9);
+  border: 1px solid rgba(229, 231, 236, 0.9);
   border-radius: var(--r-24);
   box-shadow: var(--shadow-2);
 }
@@ -302,7 +91,7 @@
   }
   .glass--dark,
   .section--night .glass:not(.founder__card) {
-    background: rgba(28, 26, 38, 0.94);
+    background: rgba(17, 19, 25, 0.94);
   }
 }
 
@@ -337,7 +126,7 @@
 }
 .chip--btn:hover {
   border-color: var(--accent-soft);
-  background: rgba(222, 42, 6, 0.18);
+  background: rgba(76, 92, 214, 0.18);
 }
 .chip-btn {
   min-height: 40px;
@@ -380,7 +169,7 @@
 .dash .px-accent {
   fill: var(--accent-soft);
 }
-.section--night :is(.on-light, .wk, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .px-accent {
+.section--night :is(.on-light, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .px-accent {
   fill: var(--accent);
 }
 .px-icon rect {
@@ -558,12 +347,12 @@
 .app-tile--btn:hover .app-tile__face,
 .app-tile--btn:focus-visible .app-tile__face {
   transform: translateY(-3px);
-  box-shadow: 0 10px 24px rgba(222, 42, 6, 0.18);
+  box-shadow: 0 10px 24px rgba(76, 92, 214, 0.18);
   border-color: var(--accent-soft);
 }
 .app-tile--btn.is-picked .app-tile__face {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(222, 42, 6, 0.16), 0 10px 24px rgba(222, 42, 6, 0.2);
+  box-shadow: 0 0 0 4px rgba(76, 92, 214, 0.16), 0 10px 24px rgba(76, 92, 214, 0.2);
 }
 
 /* Gentle idle float (outer wrapper is used by GSAP magnet) */
@@ -623,7 +412,7 @@
   gap: 16px;
   padding: 6px 6px 6px 20px;
   border-radius: var(--r-pill);
-  background: rgba(16, 16, 23, 0.86);
+  background: rgba(7, 8, 12, 0.86);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: #fff;
@@ -671,14 +460,12 @@
     max-width: calc(100vw - 24px);
     padding: 0 16px;
     border-radius: var(--r-pill);
-    background: var(--accent);
     color: #fff;
     font-weight: 700;
     font-size: 0.875rem;
-    box-shadow: var(--shadow-accent);
     transform: translateY(160%);
     visibility: hidden;
-    transition: transform 380ms var(--ease-out), visibility 0s 380ms;
+    transition: transform 380ms var(--ease-out), visibility 0s 380ms, box-shadow var(--dur-micro) var(--ease-out);
   }
   .floating-cta .px-accent {
     fill: #fff;
@@ -686,7 +473,7 @@
   .floating-cta.is-visible {
     transform: none;
     visibility: visible;
-    transition: transform 380ms var(--ease-out), visibility 0s;
+    transition: transform 380ms var(--ease-out), visibility 0s, box-shadow var(--dur-micro) var(--ease-out);
   }
 }
 
@@ -704,7 +491,7 @@
 .modal__scrim {
   position: absolute;
   inset: 0;
-  background: rgba(16, 16, 23, 0.55);
+  background: rgba(7, 8, 12, 0.55);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: fade-in 240ms var(--ease-out);
@@ -849,7 +636,7 @@
 .field textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(222, 42, 6, 0.14);
+  box-shadow: 0 0 0 4px rgba(76, 92, 214, 0.14);
 }
 .field--error input,
 .field--error textarea {
@@ -932,7 +719,7 @@
   height: 34px;
   padding: 8px 18px 0;
   border-radius: 12px 12px 0 0;
-  background: var(--fold-tab, #2c2a3a);
+  background: var(--fold-tab, #272b36);
   color: var(--accent-soft);
   z-index: 0;
 }
@@ -950,20 +737,20 @@
   top: -10px;
   height: 60px;
   border-radius: 10px 10px 0 0;
-  background: #f6f4f2;
+  background: #f4f5f8;
   transition: transform 520ms var(--ease-out);
 }
 .folder__papers i:nth-child(2) {
   left: 30px;
   right: 30px;
   top: -16px;
-  background: #efe8e2;
+  background: #e8eaef;
 }
 .folder__papers i:nth-child(3) {
   left: 44px;
   right: 44px;
   top: -20px;
-  background: linear-gradient(100deg, var(--warm-sun), var(--warm-orange) 42%, var(--warm-red));
+  background: linear-gradient(100deg, var(--neo-mint), var(--neo-green) 42%, var(--neo-deep));
   opacity: 0.82;
 }
 .folder.is-closed:hover .folder__papers i:nth-child(1) {
@@ -983,7 +770,7 @@
   position: relative;
   z-index: 2;
   border-radius: 6px var(--r-24) var(--r-24) var(--r-24);
-  background: var(--fold-front, linear-gradient(160deg, #23212f, #1a1924));
+  background: var(--fold-front, linear-gradient(160deg, #181b22, #111318));
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: clamp(24px, 3vw, 36px);
   display: grid;
@@ -996,6 +783,14 @@
 .folder.is-closed:hover .folder__front {
   transform: rotateX(-4deg) translateY(-2px);
 }
+/* The outgoing card while it retreats. Geometry and shadow are set when it is cloned. */
+.folder__ghost {
+  position: absolute;
+  z-index: 1;
+  animation: none;
+  transition: box-shadow 700ms ease-in-out;
+  pointer-events: none;
+}
 .folder__lid {
   position: absolute;
   left: 0;
@@ -1004,7 +799,7 @@
   height: 220px;
   z-index: 3;
   border-radius: 6px var(--r-24) var(--r-24) var(--r-24);
-  background: var(--fold-front, linear-gradient(160deg, #23212f, #1a1924));
+  background: var(--fold-front, linear-gradient(160deg, #181b22, #111318));
   transform-origin: 50% 100%;
   animation: lid-open 620ms var(--ease-out) forwards;
   pointer-events: none;
@@ -1055,15 +850,15 @@
 
 /* Variant styling */
 .folder--stack {
-  --fold-tab: #2a2838;
+  --fold-tab: #1f222b;
 }
 .folder--stack .folder__papers i {
   border-radius: 6px;
-  background: repeating-linear-gradient(180deg, #f6f4f2 0 8px, #ebe6e1 8px 9px);
+  background: repeating-linear-gradient(180deg, #f4f5f8 0 8px, #e5e7ec 8px 9px);
 }
 .folder--stack .folder__front {
   border-radius: var(--r-18);
-  box-shadow: 8px 8px 0 -2px #2a2838, 16px 16px 0 -4px #232130, var(--shadow-3);
+  box-shadow: 8px 8px 0 -2px #1f222b, 16px 16px 0 -4px #1a1d25, var(--shadow-3);
 }
 .folder--sleeve {
   --fold-tab: transparent;
@@ -1090,7 +885,7 @@
 }
 .folder--sleeve .folder__front {
   border-radius: var(--r-24);
-  background: linear-gradient(100deg, #1e1c2a 60%, #2a2740);
+  background: linear-gradient(100deg, #161920 60%, #1f2230);
 }
 .folder--bento {
   --fold-tab: var(--accent);
@@ -1102,7 +897,7 @@
   display: none;
 }
 .folder--bento .folder__front {
-  background: radial-gradient(120% 100% at 100% 0%, rgba(222, 42, 6, 0.35), transparent 60%), #17161f;
+  background: radial-gradient(120% 100% at 100% 0%, rgba(76, 92, 214, 0.35), transparent 60%), #0f1116;
 }
 
 /* Folder cover content */
@@ -1114,8 +909,8 @@
   width: 64px;
   height: 64px;
   border-radius: var(--r-18);
-  background: rgba(244, 94, 0, 0.12);
-  border: 1px solid rgba(244, 94, 0, 0.25);
+  background: rgba(110, 126, 236, 0.12);
+  border: 1px solid rgba(110, 126, 236, 0.25);
   display: grid;
   place-items: center;
   color: #fff;
@@ -1129,8 +924,15 @@
   letter-spacing: -0.035em;
 }
 .folder-cover__promise {
+  display: grid;
   color: var(--night-muted);
   font-size: 1.0625rem;
+}
+.folder-cover__promise > span {
+  grid-area: 1 / 1;
+}
+.folder-cover__promise-sizer {
+  visibility: hidden;
 }
 .folder-cover__tiles {
   display: flex;
@@ -1166,7 +968,7 @@
   font-size: 1.1rem;
 }
 .workflow__replay:hover {
-  background: rgba(244, 94, 0, 0.12);
+  background: rgba(110, 126, 236, 0.12);
 }
 .workflow__stage {
   min-height: 170px;
@@ -1334,7 +1136,7 @@
   font-weight: 600;
 }
 .wf-chip--ok {
-  border-color: rgba(244, 94, 0, 0.5);
+  border-color: rgba(110, 126, 236, 0.5);
   color: #fff;
 }
 .wf-card {
@@ -1343,8 +1145,8 @@
   align-items: center;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(222, 42, 6, 0.2);
-  border: 1px solid rgba(244, 94, 0, 0.4);
+  background: rgba(76, 92, 214, 0.2);
+  border: 1px solid rgba(110, 126, 236, 0.4);
 }
 .wf-card strong {
   display: block;
@@ -1384,7 +1186,7 @@
 .wf-bar {
   height: 6px;
   border-radius: 3px;
-  background: rgba(244, 94, 0, 0.5);
+  background: rgba(110, 126, 236, 0.5);
 }
 @media (max-width: 520px) {
   .wf--merge {
@@ -1414,14 +1216,14 @@
 .wf-bubble--out {
   justify-self: end;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border-bottom-right-radius: 4px;
 }
 .wf-time {
   display: block;
   margin-top: 4px;
   opacity: 0.8;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
 }
 .wf-typing {
   display: flex;
@@ -1485,8 +1287,8 @@
 .wf-task {
   padding: 6px 10px;
   border-radius: 8px;
-  background: rgba(244, 94, 0, 0.18);
-  border: 1px solid rgba(244, 94, 0, 0.4);
+  background: rgba(110, 126, 236, 0.18);
+  border: 1px solid rgba(110, 126, 236, 0.4);
   white-space: nowrap;
 }
 
@@ -1505,7 +1307,7 @@
 }
 .wf-sheet__cell {
   height: 12px;
-  background: rgba(52, 168, 83, 0.55);
+  background: rgba(49, 65, 171, 0.55);
   border-radius: 2px;
 }
 .wf-arrow {
@@ -1516,14 +1318,14 @@
   width: 86px;
   padding: 8px;
   border-radius: 8px;
-  background: #f6f4fb;
+  background: #f5f6f9;
   color: var(--ink);
   display: grid;
   gap: 5px;
 }
 .wf-invoice .t-mono,
 .wf-report .t-mono {
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   color: var(--accent-ink);
 }
 .wf-line {
@@ -1624,7 +1426,7 @@
   min-height: 120px;
 }
 .wf-kcol .t-mono {
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   color: var(--night-muted);
 }
 .wf-kcard {
@@ -1644,7 +1446,7 @@
   text-align: center;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-weight: 700;
   font-size: 0.6875rem;
 }

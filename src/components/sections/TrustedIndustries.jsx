@@ -1,31 +1,27 @@
 import React from "react"
-import { trusted, uiCopy } from "../../data/automationContent"
+import { trusted } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
-import PixelIcon from "../visuals/PixelIcon"
 import BrandCarousel from "../interactions/BrandCarousel"
-import { useSite } from "../../context/SiteContext"
-import { siteConfig } from "../../config/site"
+import ClientStoryScatter from "../interactions/ClientStoryScatter"
 import { Marked } from "../ui/Highlight"
 
 /**
- * Work gallery. Only the YRE portal is described in the DOCX (the hero "Source"
+ * Project assets. Only the YRE portal is described in the DOCX (the hero "Source"
  * line); every other slot is an explicit placeholder awaiting real screenshots.
  */
-const GALLERY = [
+const PROJECTS = [
   {
     title: "Young Reporters for the Environment 2026 portal",
     meta: "Taylor’s University · GGAF · RTM",
     body: "One automated platform runs registration, team invites, blind judging and verified certificates, with zero spreadsheets.",
-    size: "xl",
   },
-  { title: "Project slot 02", size: "tall" },
-  { title: "Project slot 03", size: "sm" },
-  { title: "Project slot 04", size: "sm" },
-  { title: "Project slot 05", size: "full" },
+  { title: "Project slot 02" },
+  { title: "Project slot 03" },
+  { title: "Project slot 04" },
+  { title: "Project slot 05" },
 ]
 
 export default function TrustedIndustries() {
-  const { openModal } = useSite()
   return (
     <SectionShell id="trusted" theme="light" labelledBy="trusted-title" className="trusted">
       <header className="section-head section-head--center">
@@ -39,40 +35,13 @@ export default function TrustedIndustries() {
 
       <BrandCarousel />
 
-      <div className="voices" data-reveal>
-        <h3 className="t-h3">{trusted.clientVoicesHeading}</h3>
-        <div className="voices__row">
-          <p className="voices__pending">
-            Client testimonials pending approval — no quotes are shown until real, permitted ones are supplied.
-          </p>
-          <button type="button" className="btn btn--ghost btn--sm" onClick={() => openModal("video:testimonial")}>
-            <span className="btn__label">
-              ▶ Client story {siteConfig.testimonialVideoUrl ? "" : `· ${uiCopy.assetPending}`}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div className="gallery">
-        <h3 className="t-h3 gallery__title" data-reveal>
-          {trusted.galleryHeading}
-        </h3>
-        <ul className="gallery__grid">
-          {GALLERY.map((g) => (
-            <li key={g.title} className={`gallery__item gallery__item--${g.size} ${g.body ? "has-copy" : "is-pending"}`} data-reveal>
-              <div className="gallery__shot" aria-hidden="true">
-                <PixelIcon name={g.body ? "form" : "chart"} size={28} animate={false} />
-                <span className="t-mono">Screenshot · {uiCopy.assetPending}</span>
-              </div>
-              <div className="gallery__copy">
-                <h4>{g.title}</h4>
-                {g.meta && <p className="t-mono">{g.meta}</p>}
-                {g.body && <p className="t-muted">{g.body}</p>}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ClientStoryScatter
+        heading={trusted.clientVoicesHeading}
+        phrase="clients say"
+        pendingNote="Client testimonials pending approval — no quotes are shown until real, permitted ones are supplied."
+        galleryHeading={trusted.galleryHeading}
+        projects={PROJECTS}
+      />
     </SectionShell>
   )
 }

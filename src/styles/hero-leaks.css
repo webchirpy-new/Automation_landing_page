@@ -1,0 +1,405 @@
+/* =========================================================
+   WHERE LEADS LEAK — spectral refinement (Hero lower band only)
+   Every rule is scoped to #top .hero__below, so nothing else on the site changes.
+   Colours come from the shared --spectral-* tokens (design/tokens.css). Mid tones are
+   mixed from the pastel and deep tokens so a 1px stroke still reads on white.
+   Motion: slow background-position / transform drifts only (12–24 s), staggered per card,
+   all switched off under prefers-reduced-motion.
+   ========================================================= */
+#top .hero__below {
+  --lk-cyan: color-mix(in oklab, var(--spectral-cyan) 62%, var(--spectral-cyan-deep));
+  --lk-blue: color-mix(in oklab, var(--spectral-blue) 48%, var(--spectral-blue-deep));
+  --lk-violet: color-mix(in oklab, var(--spectral-violet) 45%, var(--spectral-violet-deep));
+  --lk-lavender: color-mix(in oklab, var(--spectral-lavender) 70%, var(--spectral-violet-deep));
+  --lk-pink: color-mix(in oklab, var(--spectral-pink) 52%, var(--spectral-pink-deep));
+  /* Long enough (200%) to drift through, cyan → pink → back, so the loop has no seam */
+  --lk-stroke: linear-gradient(
+    var(--lk-angle, 110deg),
+    var(--lk-cyan),
+    var(--lk-blue) 18%,
+    var(--lk-violet) 34%,
+    var(--lk-lavender) 42%,
+    var(--lk-pink) 52%,
+    var(--lk-violet) 70%,
+    var(--lk-blue) 84%,
+    var(--lk-cyan)
+  );
+  /* Figures: deep-weighted stops, so every part of each glyph stays ≥ 3:1 on white */
+  --lk-figure: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--spectral-blue-deep) 80%, var(--spectral-cyan)),
+    color-mix(in oklab, var(--spectral-blue-deep) 85%, var(--spectral-blue)) 22%,
+    var(--spectral-violet-deep) 44%,
+    color-mix(in oklab, var(--spectral-pink-deep) 85%, var(--spectral-pink)) 64%,
+    var(--spectral-violet-deep) 82%,
+    color-mix(in oklab, var(--spectral-blue-deep) 80%, var(--spectral-cyan))
+  );
+  --lk-surface: #fdfdff;
+}
+
+/* ---------- Label pill ---------- */
+/* A small glass capsule: a darkened spectral core (so the white label holds ≥ 4.5:1 everywhere),
+   soft light drifting inside it (::before), a frosted top sheen (::after) and a thin rim whose
+   hues travel round the outline. */
+#top .hero__below .hero__leaks-title {
+  --lk-core-cyan: color-mix(in oklab, var(--spectral-cyan-deep) 88%, #0b0c10);
+  --lk-core-blue: var(--spectral-blue-deep);
+  --lk-core-violet: var(--spectral-violet-deep);
+  --lk-core-pink: color-mix(in oklab, var(--spectral-pink-deep) 92%, #0b0c10);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1.25px solid transparent;
+  background:
+    linear-gradient(100deg, var(--lk-core-cyan), var(--lk-core-blue) 30%, var(--lk-core-violet) 64%, var(--lk-core-pink)) padding-box,
+    linear-gradient(
+        100deg,
+        var(--spectral-cyan),
+        var(--spectral-blue) 20%,
+        #fff 30%,
+        var(--spectral-lavender) 42%,
+        var(--spectral-pink) 54%,
+        var(--spectral-violet) 72%,
+        var(--spectral-cyan)
+      )
+      border-box;
+  background-size: 100% 100%, 200% 100%;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(20, 16, 60, 0.28);
+  box-shadow: 0 6px 18px -10px rgba(100, 64, 200, 0.45), 0 2px 6px -3px rgba(29, 111, 150, 0.25);
+}
+/* Internal light: a wide, soft strip of the spectrum sliding through the capsule */
+#top .hero__below .hero__leaks-title::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 300%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* Deep, saturated hues: they shift the colour, not the lightness, so white text keeps 4.5:1 */
+    radial-gradient(18% 120% at 12% 50%, rgba(22, 120, 168, 0.55), transparent 70%),
+    radial-gradient(16% 120% at 32% 50%, rgba(98, 62, 204, 0.5), transparent 70%),
+    radial-gradient(18% 120% at 52% 50%, rgba(160, 52, 128, 0.5), transparent 70%),
+    radial-gradient(16% 120% at 72% 50%, rgba(44, 84, 204, 0.5), transparent 70%),
+    radial-gradient(18% 120% at 92% 50%, rgba(22, 120, 168, 0.55), transparent 70%);
+  transform: translate3d(-33.333%, 0, 0);
+}
+/* Frosted glass sheen along the top edge; never over the letters' contrast */
+#top .hero__below .hero__leaks-title::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 70% 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+}
+#top .hero__below .leak-dot {
+  border-radius: 1px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+  animation: none;
+}
+
+/* ---------- Four leak cards ---------- */
+#top .hero__below .hero__leaks li {
+  --lk-angle: 115deg;
+  border: 1.25px solid transparent;
+  background:
+    linear-gradient(var(--lk-surface), var(--lk-surface)) padding-box,
+    var(--lk-stroke) border-box;
+  background-size: 100% 100%, 200% 100%;
+  background-position: 0 0, var(--lk-from, 0%) 0;
+  box-shadow: 0 1px 2px rgba(17, 20, 25, 0.04), 0 10px 26px -18px rgba(100, 64, 200, 0.28);
+  color: var(--ink);
+}
+#top .hero__below .hero__leaks li:nth-child(2) {
+  --lk-angle: 100deg;
+  --lk-from: 30%;
+}
+#top .hero__below .hero__leaks li:nth-child(3) {
+  --lk-angle: 125deg;
+  --lk-from: 60%;
+}
+#top .hero__below .hero__leaks li:nth-child(4) {
+  --lk-angle: 108deg;
+  --lk-from: 90%;
+}
+/* Internal light: a soft wash that slides around the card edges, under the text.
+   The shared corner glint (::after, spectral.css) stays as the second, breathing layer. */
+#top .hero__below .hero__leaks li::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Corner-only light, ~2–5% of the card: it enters a corner, drifts along the edge, fades */
+  background:
+    radial-gradient(22% 55% at 0% 0%, rgba(140, 230, 240, 0.13), transparent 70%),
+    radial-gradient(22% 60% at 100% 100%, rgba(240, 190, 223, 0.15), transparent 70%),
+    radial-gradient(18% 48% at 100% 0%, rgba(183, 154, 238, 0.09), transparent 72%);
+  background-size: 160% 160%;
+  background-position: 0% 0%;
+}
+#top .hero__below .hero__leaks li:hover {
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(17, 20, 25, 0.05), 0 16px 32px -18px rgba(100, 64, 200, 0.36);
+}
+#top .hero__below .hero__leak-icon {
+  border: 1px solid transparent;
+  background:
+    radial-gradient(60% 60% at 100% 0%, rgba(183, 154, 238, 0.22), transparent 70%) padding-box,
+    radial-gradient(60% 60% at 0% 100%, rgba(140, 230, 240, 0.2), transparent 70%) padding-box,
+    linear-gradient(180deg, #fff, #f7f7fc) padding-box,
+    linear-gradient(135deg, color-mix(in oklab, var(--lk-cyan) 70%, #fff), color-mix(in oklab, var(--lk-violet) 60%, #fff), color-mix(in oklab, var(--lk-pink) 70%, #fff)) border-box;
+  color: var(--ink);
+}
+#top .hero__below .hero__leak-icon .px-accent {
+  fill: var(--spectral-violet-deep);
+}
+/* The pipeline behind the cards and the drips keep their motion, now in the spectrum */
+@media (min-width: 1024px) {
+  #top .hero__below .hero__leaks ul::before {
+    background: var(--lk-stroke);
+    background-size: 100% 2px;
+    -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 14px);
+    mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 14px);
+    -webkit-mask-size: 14px 2px;
+    mask-size: 14px 2px;
+    opacity: 0.55;
+    animation: lk-pipe 0.9s linear infinite;
+  }
+}
+#top .hero__below .hero__leak-drip {
+  background: linear-gradient(135deg, var(--lk-violet), var(--lk-pink));
+}
+
+/* ---------- Video placeholder ---------- */
+#top .hero__below .video-card__screen {
+  isolation: isolate;
+  background: var(--night);
+}
+/* Black first: colour lives only in the corners (violet/rose top-right, cyan/blue bottom-left,
+   a trace of rose bottom-right); the centre stays dark. Slightly oversized so its slow drift
+   never uncovers an edge; transform + opacity only. */
+#top .hero__below .video-card__screen::after {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(30% 38% at 96% 4%, rgba(150, 100, 232, 0.42), rgba(214, 112, 186, 0.16) 48%, transparent 74%),
+    radial-gradient(14% 60% at 99% 30%, rgba(214, 112, 186, 0.14), transparent 72%),
+    radial-gradient(22% 30% at 3% 4%, rgba(70, 120, 236, 0.08), transparent 72%);
+}
+/* The bottom corners sit under the caption scrim, so their light is a layer above it: small,
+   hugging the edges, screen-blended, never reaching the caption text */
+#top .hero__below .video-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(9% 34% at 0% 82%, rgba(56, 196, 226, 0.5), rgba(70, 120, 236, 0.16) 50%, transparent 76%),
+    radial-gradient(26% 10% at 6% 100%, rgba(56, 180, 230, 0.4), rgba(70, 120, 236, 0.1) 52%, transparent 78%),
+    radial-gradient(8% 26% at 100% 88%, rgba(214, 112, 186, 0.36), transparent 74%),
+    radial-gradient(20% 8% at 96% 100%, rgba(170, 100, 220, 0.3), transparent 76%);
+}
+#top .hero__below .video-card__mono {
+  position: relative;
+  color: rgba(255, 255, 255, 0.08);
+}
+#top .hero__below .video-card__play {
+  z-index: 1;
+  color: var(--spectral-violet-deep);
+  /* A dark glass halo and a hair of spectral reflection, no coloured glow */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 0 0 12px rgba(255, 255, 255, 0.05),
+    0 0 0 13px rgba(201, 184, 245, 0.12),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+}
+#top .hero__below .video-card__play .px-accent {
+  fill: var(--spectral-pink-deep);
+}
+#top .hero__below .video-card__play::before,
+#top .hero__below .video-card__play::after {
+  border-color: rgba(201, 184, 245, 0.32);
+}
+#top .hero__below .video-card__pending {
+  z-index: 1;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(12, 13, 20, 0.86), rgba(12, 13, 20, 0.86)) padding-box,
+    linear-gradient(110deg, var(--spectral-cyan), var(--spectral-violet) 55%, var(--spectral-pink)) border-box;
+  color: var(--night-text);
+}
+
+/* ---------- Statistics panel ---------- */
+#top .hero__below .results {
+  background:
+    radial-gradient(40% 50% at 100% 0%, rgba(183, 154, 238, 0.07), transparent 70%),
+    radial-gradient(40% 50% at 0% 100%, rgba(140, 230, 240, 0.06), transparent 70%),
+    linear-gradient(180deg, #fff, var(--paper));
+}
+#top .hero__below .results__list li {
+  background:
+    radial-gradient(60% 40% at 0% 0%, rgba(140, 230, 240, 0.07), transparent 70%),
+    radial-gradient(60% 40% at 100% 0%, rgba(240, 190, 223, 0.08), transparent 70%),
+    #fff;
+}
+#top .hero__below .results__list li::before {
+  height: 2px;
+  background: var(--lk-stroke);
+  background-size: 200% 100%;
+}
+#top .hero__below .results__value {
+  color: var(--spectral-violet-deep); /* fallback without background-clip: text */
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  #top .hero__below .results__value {
+    background: var(--lk-figure);
+    background-size: 150% 100%;
+    background-position: var(--lk-from, 0%) 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+#top .hero__below .results__list li:nth-child(2) {
+  --lk-from: 35%;
+}
+#top .hero__below .results__list li:nth-child(3) {
+  --lk-from: 70%;
+}
+@media (forced-colors: active) {
+  #top .hero__below .results__value {
+    -webkit-text-fill-color: CanvasText;
+  }
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* Pill: rim hues travel the outline (14 s); the inner light drifts on its own 13 s cycle */
+  #top .hero__below .hero__leaks-title {
+    animation: lk-rim 14s ease-in-out infinite alternate;
+  }
+  #top .hero__below .hero__leaks-title::before {
+    animation: lk-glass 13s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  #top .hero__below .hero__leaks li {
+    animation: lk-rim 15s ease-in-out infinite alternate;
+  }
+  #top .hero__below .hero__leaks li::before {
+    animation: lk-wash 16s ease-in-out infinite alternate;
+  }
+  /* Phase offsets ~3 s apart, slightly different periods (12–18 s): never in step */
+  #top .hero__below .hero__leaks li:nth-child(2),
+  #top .hero__below .hero__leaks li:nth-child(2)::before {
+    animation-delay: -3s;
+    animation-duration: 17s;
+  }
+  #top .hero__below .hero__leaks li:nth-child(3),
+  #top .hero__below .hero__leaks li:nth-child(3)::before {
+    animation-delay: -6.5s;
+    animation-duration: 13s;
+  }
+  #top .hero__below .hero__leaks li:nth-child(4),
+  #top .hero__below .hero__leaks li:nth-child(4)::before {
+    animation-delay: -9.5s;
+    animation-duration: 18s;
+  }
+  #top .hero__below .video-card__screen::after {
+    animation: lk-field 20s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+  #top .hero__below .video-card::after {
+    animation: lk-breathe 17s ease-in-out -6s infinite alternate;
+  }
+  #top .hero__below .results__value,
+  #top .hero__below .results__list li::before {
+    animation: lk-figure 18s ease-in-out infinite alternate;
+  }
+  #top .hero__below .results__list li:nth-child(2) :is(.results__value),
+  #top .hero__below .results__list li:nth-child(2)::before {
+    animation-delay: -6s;
+  }
+  #top .hero__below .results__list li:nth-child(3) :is(.results__value),
+  #top .hero__below .results__list li:nth-child(3)::before {
+    animation-delay: -12s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #top .hero__below .hero__leaks ul::before,
+  #top .hero__below .hero__leak-drip {
+    animation: none;
+  }
+}
+
+@keyframes lk-glass {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-66.667%, 0, 0);
+  }
+}
+@keyframes lk-rim {
+  from {
+    background-position: 0 0, 0% 0;
+  }
+  to {
+    background-position: 0 0, 100% 0;
+  }
+}
+@keyframes lk-wash {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 40%;
+  }
+  100% {
+    background-position: 40% 100%;
+  }
+}
+@keyframes lk-field {
+  from {
+    transform: translate3d(-2.5%, 2%, 0);
+    opacity: 0.78;
+  }
+  to {
+    transform: translate3d(2.5%, -2%, 0);
+    opacity: 1;
+  }
+}
+@keyframes lk-breathe {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes lk-figure {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+@keyframes lk-pipe {
+  to {
+    -webkit-mask-position: 14px 0;
+    mask-position: 14px 0;
+  }
+}

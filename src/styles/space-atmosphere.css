@@ -1,0 +1,76 @@
+/* =========================================================
+   DARK SPACE DEPTH: the starfield layer and the glass that softens it.
+   Dark sections only. Nothing here applies to a light section.
+   ========================================================= */
+.space-atmo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: clip;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity var(--atmo-fade, 700ms) ease-out;
+}
+/* Set once it is allowed to show and has first come near the screen */
+.space-atmo.is-on {
+  opacity: 1;
+}
+.space-atmo__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.space-atmo--pinned .space-atmo__canvas {
+  position: sticky;
+  top: 0;
+}
+/* In the Hero the stars sit under the corner cubes, which come later at the same level */
+.space-atmo--hero {
+  z-index: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-atmo {
+    transition: none;
+  }
+}
+
+/* The footer panel clips rather than hides, so the pinned canvas can stay in view */
+.final {
+  overflow: clip;
+}
+
+/* Existing ambient light stays as still light: the stars are the only background motion, and
+   lowering it keeps these panels reading as black space rather than coloured fog */
+.ambient--dark {
+  opacity: 0.55;
+}
+.ambient--dark .ambient__bloom {
+  animation: none;
+}
+
+/* Service icons stay; their square-by-square micro-animation does not, in dark sections */
+.section--night .px-icon--anim rect,
+.final .px-icon--anim rect {
+  animation: none !important;
+}
+
+/* ---------- Glass: stars soften only behind these translucent surfaces ---------- */
+.section--night {
+  --space-glass-blur: 6px;
+}
+@media (max-width: 767px) {
+  .section--night {
+    --space-glass-blur: 4px;
+  }
+}
+.section--night :is(.orbit-story, .orbit-card, .fit__col, .diff, .decision) {
+  -webkit-backdrop-filter: blur(var(--space-glass-blur));
+  backdrop-filter: blur(var(--space-glass-blur));
+}
+/* No backdrop-filter: a more solid surface, so stars never sit sharp behind copy */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .section--night :is(.orbit-story, .orbit-card, .fit__col, .diff, .decision) {
+    background-color: rgba(10, 11, 15, 0.82);
+  }
+}

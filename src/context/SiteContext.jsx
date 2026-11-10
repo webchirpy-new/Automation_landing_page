@@ -5,6 +5,7 @@ const SiteContext = createContext(null)
 const STORAGE_KEY = "wc-scorecard-v1"
 
 const emptyScore = () => ({ checked: {}, cleared: {} })
+const asMap = (v) => (v && typeof v === "object" && !Array.isArray(v) ? v : {})
 
 /** Derived scorecard summary. Unanswered areas are never counted as "no gap". */
 export function summarise(state) {
@@ -16,9 +17,12 @@ export function summarise(state) {
   const gapCount = areas.reduce((n, a) => n + a.gaps, 0)
   const reviewedCount = areas.filter((a) => a.reviewed).length
   const complete = reviewedCount === areas.length
-  const score = complete ? 100 - Math.round((100 * gapCount) / 16) : null
+  const totalAreas = areas.length
+  const totalChecks = areas.reduce((n, a) => n + a.checks.length, 0)
+  const score = complete ? 100 - Math.round((100 * gapCount) / totalChecks) : null
+  // Most gaps first; equal counts keep the page's area order.
   const priorities = areas.filter((a) => a.gaps > 0).sort((a, b) => b.gaps - a.gaps)
-  return { areas, gapCount, reviewedCount, complete, score, priorities }
+  return { areas, gapCount, reviewedCount, complete, score, priorities, totalAreas, totalChecks }
 }
 
 export function SiteProvider({ children }) {
@@ -30,7 +34,10 @@ export function SiteProvider({ children }) {
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY)
-      if (raw) setScore({ ...emptyScore(), ...JSON.parse(raw) })
+      if (raw) {
+        const saved = JSON.parse(raw)
+        setScore({ checked: asMap(saved?.checked), cleared: asMap(saved?.cleared) })
+      }
     } catch (e) {
       /* storage unavailable — scorecard still works in memory */
     }

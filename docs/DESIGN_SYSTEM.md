@@ -2,6 +2,31 @@
 
 Scattered business inputs (pixels) organise into routed, completed work. The hero opens as a reactive pixel field. A thin violet signal recurs at key beats: broken, repaired, a ring, a data dash. The footer resolves the hero's pixels into one completed loop.
 
+## Current colour and CTA system: Spectral (V4)
+V4 replaces the V3 notes (70–80% highlight coverage, blue-leaning accents) and the Neo Green system and the older violet and ember descriptions further down this file. The accent language comes from the iridescent glass aircraft in the Hero intro. Backgrounds, layout and copy did not change; only accents did.
+
+- **Palette** (`src/design/tokens.css`): `--spectral-cyan` #8CE6F0, `--spectral-blue` #87BAFF, `--spectral-periwinkle` #A3A1F7, `--spectral-violet` #B79AEE, `--spectral-lavender` #C9B8F5, `--spectral-pink` #F0BEDF, plus deep tones for white ground (`--spectral-*-deep`, all at least 5.5:1 on white). Neutrals: `--spectral-light-neutral` #F7F8FB (on dark ground), `--spectral-dark-neutral` #111419 (on white).
+- **Presets:** `--spectral-stroke` / `--spectral-stroke-light` (edges, rails, progress), `--spectral-fill-dark` / `--spectral-fill-light` (small fills), `--spectral-glow` / `--spectral-glow-sm` (hover and focus bloom only), `--spectral-flow-duration` 16 s. `--spectral-fill` and `--spectral-line` are scope-aware: they switch with `--accent`, so text on a fill keeps its contrast. Components vary angle, size and phase, never the palette.
+- **Neutrals:** the old green-tinted greys (#0A0F0C, #F2F7F3, #58625B…) are now cool neutrals at the same lightness, so every contrast ratio is unchanged.
+- **Shared materials** (`src/styles/spectral.css`, CSS only, no per-element script):
+  - `.hl-flow--dark` / `.hl-flow--light` (via `Marked` / `FlowText`): a full spectral base inside the letters, four drifting colour clouds over it, and one small neutral island, so about 90% of the phrase is coloured and about 10% neutral. Alternating ease-in-out loop (13–19 s, phase-shifted per section), so it never jumps. Paused off screen, static spectral under reduced motion, system text colour in forced-colours mode.
+  - `.btn--primary` and `.floating-cta`: near-black glass with four visible colour pockets (cyan, sapphire, violet, rose; `cta-liquid`, 11–14 s), a 1.2 px multi-hue rim (`cta-rim`), and a small three-colour bloom plus a 1 px lift on hover or keyboard focus only. Focus keeps a solid 2 px ring. The white label keeps at least 4.9:1 against the brightest pocket.
+  - Glass corners: two mixed-hue glints per card on opposite corners, in four arrangements that rotate between neighbours (`::after`, `.fit__col::before`), about 8–12% of the card, fainter on white cards.
+  - Starfield behind glass: `backdrop-filter: blur(6px)` (4 px on phones) on translucent cards in dark chapters only (`space-atmosphere.css`); stars stay sharp everywhere else.
+  - App tiles: a two-hue corner glint on the tile container only. Brand logos keep their own colours.
+  - Section 6 of `spectral.css` migrates the remaining flat-blue decorative accents (selected tabs, step numbers, rails, check fills, carousel focus rim, dark-card glows, SVG strokes with gradients defined next to the markup).
+- **Kept on purpose:** focus outlines (solid, for clarity), form-field focus, the scorecard map's gap levels and score ring, dashboard chart series (colour carries data), `--danger` red, `--success` green (semantic), and every third-party logo colour.
+
+## Font status: New Black is not installed
+The page still uses Bricolage Grotesque. "New Black Typeface" (Evin Tony, FoxType) is a paid family and no files or licence are in this repo. MyFonts lists seven styles (Ultra Light, Light, Regular, Medium, Semi Bold, Bold, Extra Bold) and sells a separate per-domain Webfonts licence.
+
+To switch once a Webfonts licence and WOFF2 files are supplied:
+1. Put the files in `src/assets/fonts/`.
+2. Add one `@font-face` per weight at the top of `src/design/tokens.css`, with `font-display: swap`.
+3. Put `"New Black Typeface"` first in `--font-primary`.
+4. Remove the Bricolage links from `index.html`.
+5. Re-check the type scale, because the family has no 800+ "Black" cut listed and headings currently use weights 750 and 800.
+
 ## Master frame
 - Design at 1440 px. Content max 1280 px (`--content-max`) with 16–32 px fluid gutters. At 1920 px and above, content centres.
 - 12-column editorial grid on desktop, 6–8 on tablet, one column on mobile. Content never uses page-level absolute positioning.
@@ -37,7 +62,7 @@ Radius scale: 12 / 18 / 24 / 32 / pill. Glass (`.glass`, blur 16px) appears only
 | Dark control room | Dashboard | Bento KPI grid, single-series lavender charts |
 | **Book covers** | Proof | Three proportions; cover hinges open (rotateY) |
 | Stat strip + timeline + split frame | Why | Drawn 3-stop line, founder frame |
-| Typographic grid + asymmetric bento | Trusted | Ink-invert hover |
+| 3D logo carousel + five scattered project cards | Trusted | Lift, glow and depth on hover |
 | Branching columns | Fit | Solid violet vs dashed grey path |
 | Hairline accordion | FAQ | Pixel "+" rotates 45° |
 | Perforated ticket | Audit | Night stub with ₹0 and seal, unfolding sheet |

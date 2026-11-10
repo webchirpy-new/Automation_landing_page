@@ -10,6 +10,7 @@ import { Marked } from "../ui/Highlight"
 
 const STORY_ICONS = ["cross", "backOffice", "check"] // problem → build → tested
 const DIFF_ICONS = ["leadCapture", "check", "insights"]
+const PULSE = { scale: 1.08, rise: 0.26, hold: 0.1, fall: 0.5 } // seconds
 
 export default function WhyWebchirpy() {
   const ref = useRef(null)
@@ -17,20 +18,87 @@ export default function WhyWebchirpy() {
 
   useGSAP(
     () => {
+      const story = ref.current.querySelector(".story")
+      const track = story.querySelector(".story__line")
+      const fill = story.querySelector(".story__line-fill")
+      const icons = gsap.utils.toArray(".story__icon", story)
+      const glows = gsap.utils.toArray(".story__glow", story)
+
+      // How far along the track each node sits, from 0 to 1. Filled in by measureTrack.
+      let arrivals = []
+      let storyTrigger = null
+
+      // The track runs from the bottom of the first icon to the top of the last, whatever the text around them does.
+      // offsetTop ignores transforms, so entrance reveals and the pulse can't affect the measurement.
+      const measureTrack = () => {
+        const tops = icons.map((icon) => icon.parentElement.offsetTop + icon.offsetTop)
+        const start = tops[0] + icons[0].offsetHeight
+        const length = tops[tops.length - 1] - start
+        track.style.top = `${start}px`
+        track.style.height = `${length}px`
+        arrivals = tops.map((top, i) => (i === 0 ? 0 : (top - start) / length))
+        storyTrigger?.refresh()
+      }
+      measureTrack()
+      const resize = new ResizeObserver(measureTrack)
+      resize.observe(story)
+
       const mm = gsap.matchMedia()
       mm.add(MOTION_OK, () => {
-        gsap.fromTo(
-          ".story__line-fill",
-          { scaleY: 0 },
-          { scaleY: 1, ease: "none", scrollTrigger: { trigger: ".story", start: "top 70%", end: "bottom 60%", scrub: 0.5 } }
-        )
+        const reached = icons.map(() => false)
+
+        const arrive = (i) => {
+          icons[i].classList.add("is-active")
+          // force3D off keeps the icon's edges sharp at every scale.
+          gsap.timeline({ defaults: { overwrite: "auto" } })
+            .to(icons[i], { scale: PULSE.scale, duration: PULSE.rise, ease: "power2.out", force3D: false }, 0)
+            .to(glows[i], { opacity: 1, duration: PULSE.rise, ease: "power2.out" }, 0)
+            .to(icons[i], { scale: 1, duration: PULSE.fall, ease: "power2.inOut", force3D: false }, PULSE.rise + PULSE.hold)
+            .to(glows[i], { opacity: 0, duration: PULSE.fall, ease: "power2.inOut" }, PULSE.rise + PULSE.hold)
+        }
+        const leave = (i) => {
+          icons[i].classList.remove("is-active")
+          gsap.to(icons[i], { scale: 1, duration: 0.3, ease: "power2.out", force3D: false, overwrite: "auto" })
+          gsap.to(glows[i], { opacity: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" })
+        }
+
+        // One scrubbed timeline. Nodes respond to how far the drawn line has actually got, not to the scrollbar,
+        // so a node never lights ahead of the line, including while the scrub is catching up.
+        const line = gsap.timeline({
+          scrollTrigger: { trigger: icons[0], start: "center 68%", endTrigger: icons[icons.length - 1], end: "center 56%", scrub: 0.5 },
+          onUpdate() {
+            const p = this.progress()
+            arrivals.forEach((at, i) => {
+              if (!reached[i] && p > at - 0.001 && p > 0) {
+                reached[i] = true
+                arrive(i)
+              } else if (reached[i] && (i === 0 ? p <= 0 : p < at - 0.006)) {
+                reached[i] = false
+                leave(i)
+              }
+            })
+          },
+        })
+        line.fromTo(fill, { scaleY: 0 }, { scaleY: 1, ease: "none", duration: 1 })
+        storyTrigger = line.scrollTrigger
+
         gsap.fromTo(
           ".founder__frame",
           { clipPath: "inset(12% 12% 12% 12% round 32px)" },
           { clipPath: "inset(0% 0% 0% 0% round 32px)", duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: ".founder", start: "top 75%", once: true } }
         )
+
+        return () => {
+          storyTrigger = null
+          gsap.killTweensOf([...icons, ...glows])
+          gsap.set([...icons, ...glows], { clearProps: "transform,opacity" })
+          icons.forEach((icon) => icon.classList.remove("is-active"))
+        }
       })
-      return () => mm.revert()
+      return () => {
+        resize.disconnect()
+        mm.revert()
+      }
     },
     { scope: ref }
   )
@@ -68,6 +136,7 @@ export default function WhyWebchirpy() {
               {why.story.map((s, i) => (
                 <li key={s.title} className="story__stop px-host" data-reveal>
                   <span className="story__icon">
+                    <span className="story__glow" aria-hidden="true" />
                     <PixelIcon name={STORY_ICONS[i]} size={22} />
                   </span>
                   <div>

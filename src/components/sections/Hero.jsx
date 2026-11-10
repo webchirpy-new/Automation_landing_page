@@ -2,19 +2,20 @@ import React, { useEffect, useRef } from "react"
 import { hero, uiCopy, trusted } from "../../data/automationContent"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
-import PixelField from "../visuals/PixelField"
-import SectionAmbient from "../visuals/SectionAmbient"
-import { ambient } from "../../config/ambient"
+import HeroVoxels from "../hero-intro/HeroVoxels"
+import SpaceAtmosphere from "../atmosphere/SpaceAtmosphere"
+import { useHeroIntro } from "../hero-intro/useHeroIntro"
+import { floatFor } from "../hero-intro/introConfig"
+import markUrl from "../../assets/arrowcraft-mark.png"
 import PixelIcon from "../visuals/PixelIcon"
 import AppTile from "../visuals/AppTile"
 import CountUp from "../visuals/CountUp"
 import { CTAButton, Eyebrow } from "../ui/primitives"
+import { FlowText } from "../ui/Highlight"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
 import { goTo } from "../../lib/scroll"
 import { useSite } from "../../context/SiteContext"
-import { useCoarsePointer } from "../../hooks/useMediaQuery"
-import { Marked } from "../ui/Highlight"
 
 /**
  * Floating tile field around the centred copy (storyboard frames 02–06).
@@ -24,28 +25,38 @@ import { Marked } from "../ui/Highlight"
  * from: entrance offset in px. faded: depth tile (smaller, lower opacity).
  */
 const TILES = [
-  { id: "whatsapp", x: 15, y: 17, s: 60, from: [-70, -40], pri: 1, mx: 10, my: 7 },
-  { id: "gmail", x: 84, y: 15, s: 56, from: [70, -50], pri: 1, mx: 90, my: 7 },
-  { id: "hubspot", x: 8, y: 45, s: 56, from: [-80, 0], pri: 2 },
-  { id: "calendar", x: 91, y: 43, s: 56, from: [80, 10], pri: 1, mx: 70, my: 10 },
-  { id: "report", x: 13, y: 76, s: 54, from: [-60, 60], pri: 2 },
-  { id: "chat", x: 50, y: 89, s: 56, from: [0, 70], pri: 1, mx: 50, my: 6 },
-  { id: "leadcap", x: 86, y: 77, s: 56, from: [70, 60], pri: 1 },
-  { id: "sheets", x: 29, y: 7, s: 46, from: [-30, -60], pri: 3, faded: true, mx: 30, my: 10 },
-  { id: "phone", x: 4, y: 24, s: 44, from: [-60, -20], pri: 3, faded: true },
-  { id: "instagram", x: 70, y: 6, s: 44, from: [30, -60], pri: 3, faded: true },
-  { id: "invoice", x: 96, y: 62, s: 44, from: [60, 30], pri: 3, faded: true },
-  { id: "followup", x: 27, y: 89, s: 46, from: [-30, 70], pri: 2, faded: true },
-  { id: "meta", x: 72, y: 89, s: 44, from: [30, 70], pri: 3, faded: true },
+  { id: "whatsapp", x: 15, y: 17, s: 56, from: [-70, -40], pri: 1, mx: 10, my: 7 },
+  { id: "gmail", x: 84, y: 15, s: 52, from: [70, -50], pri: 1, mx: 90, my: 7 },
+  { id: "hubspot", x: 8, y: 45, s: 50, from: [-80, 0], pri: 2 },
+  { id: "calendar", x: 91, y: 43, s: 52, from: [80, 10], pri: 1, mx: 70, my: 10 },
+  { id: "report", x: 13, y: 76, s: 46, from: [-60, 60], pri: 2 },
+  { id: "chat", x: 50, y: 89, s: 44, from: [0, 70], pri: 1, mx: 50, my: 6 },
+  { id: "leadcap", x: 86, y: 77, s: 50, from: [70, 60], pri: 1 },
+  { id: "sheets", x: 29, y: 7, s: 40, from: [-30, -60], pri: 3, faded: true, mx: 30, my: 10 },
+  { id: "phone", x: 4, y: 24, s: 36, from: [-60, -20], pri: 3, faded: true },
+  { id: "instagram", x: 70, y: 6, s: 38, from: [30, -60], pri: 3, faded: true },
+  { id: "invoice", x: 96, y: 62, s: 34, from: [60, 30], pri: 3, faded: true },
+  { id: "followup", x: 27, y: 89, s: 40, from: [-30, 70], pri: 2, faded: true },
+  { id: "meta", x: 72, y: 89, s: 36, from: [30, 70], pri: 3, faded: true },
 ]
 
 const LEAK_ICONS = ["form", "chat", "clock", "chart"]
+
+/** The headline's two sentences, split from the approved string so the words can't drift. */
+const HEADLINE_LINES = hero.headline.split(/(?<=\.)\s+/)
 
 export default function Hero() {
   const root = useRef(null)
   const foldRef = useRef(null)
   const { openModal } = useSite()
-  const coarse = useCoarsePointer()
+  const intro = useHeroIntro({ foldRef })
+  const inIntro = intro.phase === "intro"
+  const introPhase = useRef(intro.phase)
+  useEffect(() => {
+    introPhase.current = intro.phase
+  }, [intro.phase])
+  // Floats start once, when the tiles have landed (or straight away without the intro)
+  const floatOn = !inIntro
 
   // Collision guard: any tile whose box would touch the copy column, CTA or the
   // footnote row is hidden — at every viewport, before and after font load.
@@ -59,7 +70,10 @@ export default function Hero() {
         const s = t.offsetWidth
         const left = fr.left + t.offsetLeft
         const top = fr.top + t.offsetTop
-        const r = { left: left - 12, top: top - 12, right: left + s + 12, bottom: top + s + 12 }
+        // Clearance covers the widest idle drift at this size (14 / 10 / 6 px), so a floating
+        // tile never reaches the copy
+        const pad = window.innerWidth <= 767 ? 12 : window.innerWidth <= 1024 ? 15 : 18
+        const r = { left: left - pad, top: top - pad, right: left + s + pad, bottom: top + s + pad }
         const outside = r.left < fr.left || r.right > fr.right || r.top < fr.top || r.bottom > fr.bottom
         const hit = keep.some((k) => r.left < k.right && r.right > k.left && r.top < k.bottom && r.bottom > k.top)
         t.classList.toggle("is-blocked", outside || hit)
@@ -76,9 +90,11 @@ export default function Hero() {
     () => {
       const mm = gsap.matchMedia()
 
-      // 01 Initial load + 02 icons enter
+      // Returning visits skip the cinematic and keep the short entrance
       mm.add(MOTION_OK, () => {
-        gsap.from(".hero__center > *", { y: 18, autoAlpha: 0, duration: 0.7, ease: "power2.out", stagger: 0.09 })
+        if (intro.played) return
+        // Opacity, not autoAlpha: the copy and CTA are live from the first frame, the fade is only visual
+        gsap.from(".hero__center > *", { y: 18, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.09 })
         const tiles = gsap.utils.shuffle(gsap.utils.toArray(".htile", root.current))
         tiles.forEach((t, i) => {
           const [fx, fy] = (t.dataset.from || "0,0").split(",").map(Number)
@@ -90,28 +106,6 @@ export default function Hero() {
         })
       })
 
-      // 03 Soft float loop — independent paths, phases and durations
-      mm.add({ motion: MOTION_OK, small: "(max-width: 1024px)" }, (ctx) => {
-        if (!ctx.conditions.motion) return undefined
-        const amp = ctx.conditions.small ? 0.55 : 1
-        const r = gsap.utils.random
-        const loops = gsap.utils.toArray(".htile__float", root.current).map((el) =>
-          gsap.to(el, {
-            x: r(-8, 8) * amp,
-            y: r(-10, -4) * amp,
-            rotation: r(-1.6, 1.6),
-            duration: r(3.4, 6.2),
-            delay: r(0, 2),
-            ease: "sine.inOut",
-            yoyo: true,
-            repeat: -1,
-          })
-        )
-        const io = new IntersectionObserver(([e]) => loops.forEach((l) => (e.isIntersecting ? l.resume() : l.pause())))
-        io.observe(foldRef.current)
-        return () => io.disconnect()
-      })
-
       // Gentle magnet toward a fine pointer
       mm.add("(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)", () => {
         const movers = gsap.utils.toArray(".htile__mag", root.current).map((el) => ({
@@ -121,6 +115,7 @@ export default function Hero() {
         }))
         const fold = foldRef.current
         const onMove = (e) => {
+          if (introPhase.current === "intro") return
           movers.forEach((m) => {
             const b = m.el.getBoundingClientRect()
             const dx = e.clientX - (b.left + b.width / 2)
@@ -149,6 +144,53 @@ export default function Hero() {
     { scope: root }
   )
 
+  // Idle float: seeded per tile, so it is stable between loads. Each tile keeps its own
+  // amplitudes and periods (4.5–9 s) and is never in step with its neighbours.
+  useGSAP(
+    () => {
+      if (!floatOn) return undefined
+      const mm = gsap.matchMedia()
+      mm.add({ motion: MOTION_OK, small: "(max-width: 1024px)", phone: "(max-width: 767px)" }, (ctx) => {
+        if (!ctx.conditions.motion) return undefined
+        const cleanups = []
+        const loops = gsap.utils.toArray(".htile", root.current).flatMap((tile, i) => {
+          const el = tile.querySelector(".htile__float")
+          const f = floatFor(i, ctx.conditions.phone ? 0.42 : ctx.conditions.small ? 0.7 : 1)
+          const common = { ease: "sine.inOut", yoyo: true, repeat: -1 }
+          const tweens = [
+            gsap.to(el, { y: f.y, rotation: f.rotation, duration: f.yDur, delay: f.delay, ...common }),
+            gsap.to(el, { x: f.x, duration: f.xDur, delay: f.delay * 0.6, ...common }),
+            gsap.to(el, { scale: f.scale, duration: f.scaleDur, delay: f.delay * 1.3, ...common }),
+          ]
+          // Hover or keyboard focus eases the tile to a stop, so it is easy to hit and read
+          const soften = (v) => () => tweens.forEach((t) => gsap.to(t, { timeScale: v, duration: 0.35, overwrite: true }))
+          const hold = soften(0)
+          const release = soften(1)
+          tile.addEventListener("pointerenter", hold)
+          tile.addEventListener("pointerleave", release)
+          tile.addEventListener("focusin", hold)
+          tile.addEventListener("focusout", release)
+          cleanups.push(() => {
+            tile.removeEventListener("pointerenter", hold)
+            tile.removeEventListener("pointerleave", release)
+            tile.removeEventListener("focusin", hold)
+            tile.removeEventListener("focusout", release)
+            tweens.forEach((t) => gsap.killTweensOf(t))
+          })
+          return tweens
+        })
+        const io = new IntersectionObserver(([e]) => loops.forEach((l) => (e.isIntersecting ? l.resume() : l.pause())))
+        io.observe(foldRef.current)
+        return () => {
+          io.disconnect()
+          cleanups.forEach((c) => c())
+        }
+      })
+      return () => mm.revert()
+    },
+    { scope: root, dependencies: [floatOn], revertOnUpdate: true }
+  )
+
   const openPart = (id) => {
     const part = toolRoutes[id]?.[0]
     const m = part && moduleByName[part]
@@ -158,9 +200,30 @@ export default function Hero() {
   return (
     <section ref={root} id="top" className="hero" aria-labelledby="hero-title">
       {/* First fold: centred copy, floating tiles, reactive pixel grid */}
-      <div ref={foldRef} className="hero__fold">
-        <PixelField intensity={0.7} />
-        <SectionAmbient blooms={ambient.top} fadeTop="0%" fadeBottom="20%" className="ambient--hero" />
+      <div ref={foldRef} className={`hero__fold ${intro.stageMounted ? "is-intro" : ""}`}>
+        {/* Under the corner cubes. Hidden through the intro; fades in only after it played to the end */}
+        <SpaceAtmosphere
+          preset="hero"
+          seed="hero"
+          pinned={false}
+          className="space-atmo--hero"
+          visible={intro.phase === "ready"}
+          fadeMs={intro.endedBy === "complete" ? 1100 : 0}
+        />
+        <HeroVoxels foldRef={foldRef} active={intro.phase === "ready"} />
+
+        {intro.stageMounted && (
+          <>
+            <div ref={intro.backdropRef} className="intro__backdrop" aria-hidden="true" />
+            <canvas ref={intro.canvasRef} className="intro__canvas" aria-hidden="true" />
+            <div ref={intro.veilRef} className="intro__veil" aria-hidden="true" />
+            {intro.phase !== "ready" && (
+              <button ref={intro.skipBtnRef} type="button" className="intro__skip" onClick={intro.skip}>
+                Skip intro
+              </button>
+            )}
+          </>
+        )}
 
         <div className="hero__tiles" role="group" aria-label={uiCopy.toolsDisclaimer}>
           {TILES.map((t) => {
@@ -183,6 +246,7 @@ export default function Hero() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
+                data-tile={t.id}
                 data-from={t.from.join(",")}
                 style={{
                   "--x": `${t.x}%`,
@@ -209,14 +273,27 @@ export default function Hero() {
         </div>
 
         <div className="hero__center">
-          <Eyebrow>{hero.eyebrow}</Eyebrow>
+          <Eyebrow dot={false} className="hero__eyebrow">
+            {/* The intro's aircraft, at rest. Replaces the two pixel markers; its slot is reserved */}
+            <span className="hero__mark" aria-hidden="true">
+              <img src={markUrl} alt="" width="22" height="22" decoding="async" />
+            </span>
+            {hero.eyebrow}
+          </Eyebrow>
           <h1 id="hero-title" className="hero__title">
-            {hero.headline}
+            {HEADLINE_LINES.map((line, i) => (
+              <React.Fragment key={line}>
+                {i > 0 && " "}
+                <span className="hero__line">{line}</span>
+              </React.Fragment>
+            ))}
           </h1>
-          <p className="hero__punch"><Marked text={hero.punchLine} phrase="Find the leaks." tone="light" /></p>
+          <p className="hero__punch">
+            <FlowText tone="dark">{hero.punchLine}</FlowText>
+          </p>
           <p className="hero__body">{hero.body}</p>
           <div className="hero__cta">
-            <CTAButton id="hero-cta" href="#scorecard" size="lg" onClick={() => goTo("#scorecard", { focusSelector: ".score-area__toggle, input" })}>
+            <CTAButton id="hero-cta" className="hero-cta" href="#scorecard" size="lg" onClick={() => goTo("#scorecard", { focusSelector: ".score-area__toggle, input" })}>
               {hero.button}
             </CTAButton>
             <p className="hero__micro">{hero.underButton}</p>
@@ -224,10 +301,6 @@ export default function Hero() {
         </div>
 
         <div className="hero__meta">
-          <p className="hero__hint t-mono" aria-hidden="true">
-            <span className="hint-cursor" />
-            {coarse ? uiCopy.heroHintTouch : uiCopy.heroHintPointer}
-          </p>
           <p className="hero__disclaimer">{uiCopy.toolsDisclaimer}</p>
         </div>
       </div>

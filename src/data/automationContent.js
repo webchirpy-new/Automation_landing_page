@@ -709,6 +709,7 @@ export const uiCopy = {
   illustrative: "Illustrative",
   scenario: "Capability scenario",
   scoreNotAssessed: "Not assessed yet",
+  scoreAreasReviewed: "areas reviewed",
   noneApply: "Neither applies to us",
   resetScore: "Reset",
   compareAgain: "Compare again",
@@ -721,4 +722,20 @@ export const uiCopy = {
   formError: "We couldn't send your request. Please try again in a moment.",
   consent: "I agree to be contacted about my free audit call.",
   assetPending: "Asset pending",
+  // Workload Orbit (02 — The pattern). Orbit annotations reuse words from the approved chips.
+  orbit: {
+    disclaimer: "Illustration · not measured data",
+    note:
+      "Illustration, not measured data: the team stays the same size while manual work, repeat replies, data entry and chasing follow-ups take a growing share of the week away from customer work.",
+    groupLabel: "Where work slips through",
+    pointsLabel: "What you already have",
+    prev: "Previous moment",
+    next: "Next moment",
+    waitsOvernight: "waits overnight",
+    manualAllDay: "manual all day",
+    dependsOnMemory: "depends on memory",
+    channelWebsite: "Website",
+    channelWhatsApp: "WhatsApp",
+    channelSheets: "sheets",
+  },
 }

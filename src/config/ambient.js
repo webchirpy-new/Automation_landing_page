@@ -1,5 +1,5 @@
 /**
- * Warm ambient bloom placement per chapter (see SectionAmbient). Keyed by section id.
+ * Green ambient bloom placement per chapter (see SectionAmbient). Keyed by section id.
  * Anchors sit in quiet corners/edges away from copy, forms and logos; no two neighbouring
  * chapters share a corner or a drift direction, and durations/phases never line up.
  * Light chapters run quieter than dark ones so white stays white.
@@ -7,7 +7,7 @@
 const S = (px, vw = 80) => `min(${px}px, ${vw}vw)`
 
 export const ambient = {
-  // Hero first fold — upper-left, plus a small ember at the far right edge
+  // Hero first fold — upper-left, plus a small bloom at the far right edge
   top: [
     { x: "4%", y: "10%", size: S(640, 90), opacity: 0.26, dx: 28, dy: 18, dur: 26, delay: 3, rot: -10 },
     { x: "100%", y: "62%", size: S(380, 60), opacity: 0.16, dx: -18, dy: -24, dur: 19, delay: 11, rot: 40 },
@@ -26,31 +26,11 @@ export const ambient = {
   faq: [{ x: "2%", y: "6%", size: S(480, 70), opacity: 0.12, dx: 18, dy: 24, dur: 29, delay: 15, rot: 50 }],
   audit: [{ x: "64%", y: "0%", size: S(600), opacity: 0.42, dx: 30, dy: 26, dur: 16, delay: 7, rot: 270 }],
   decide: [{ x: "0%", y: "92%", size: S(560), opacity: 0.18, dx: 24, dy: -28, dur: 25, delay: 10, rot: 140 }],
-  // Final CTA + footer — warm upper-left, a small amber near the art; footer stays true dark
+  // Final CTA + footer — green upper-left, a small bloom near the art; footer stays true dark
   final: [
     { x: "6%", y: "8%", size: S(700, 90), opacity: 0.42, dx: 26, dy: 34, dur: 20, delay: 13, rot: 10 },
     { x: "82%", y: "26%", size: S(340, 55), opacity: 0.22, dx: -22, dy: 18, dur: 14, delay: 4, rot: 230 },
   ],
 }
 
-/**
- * Digital Ember Fragmentation corners (see EmberPixelCorner), keyed by section id.
- * Each sits in an empty corner of the section's padding band; variant, corner and
- * strength vary so no two neighbouring chapters repeat. Busy sections run quieter.
- * The Hero keeps its own interactive pixel field and gets none.
- */
-export const embers = {
-  pattern: { variant: "dissolve", corner: "top-right" },
-  compare: { variant: "materialise", corner: "bottom-left", intensity: 0.85 },
-  scorecard: { variant: "scan", corner: "top-left", density: 0.7 },
-  engine: { variant: "materialise", corner: "top-right", density: 0.8, intensity: 0.8 },
-  dashboard: { variant: "scan", corner: "bottom-left", density: 0.75 },
-  proof: { variant: "dissolve", corner: "top-left", density: 0.6, intensity: 0.7 },
-  why: { variant: "materialise", corner: "bottom-right" },
-  trusted: { variant: "scan", corner: "top-right", density: 0.6, intensity: 0.75 },
-  fit: { variant: "dissolve", corner: "bottom-right" },
-  faq: { variant: "materialise", corner: "top-left", density: 0.6, intensity: 0.6 },
-  audit: { variant: "materialise", corner: "top-right", density: 0.7 },
-  decide: { variant: "scan", corner: "bottom-left", density: 0.7, intensity: 0.8 },
-  final: { variant: "dissolve", corner: "top-left", animationDuration: 1.6 },
-}
+//END

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react"
 
 /**
- * SectionAmbient — warm, slowly drifting light blooms anchored inside one section.
+ * SectionAmbient — green, slowly drifting light blooms anchored inside one section.
  *
- * Each bloom is two offset radial layers (sun/orange core, ember/red/crimson halo), so
+ * Each bloom is two offset radial layers (mint/green core, deep green halo), so
  * a slow drift-and-turn shifts the hues like an aurora while only transform and opacity
  * animate. The wrapper's mask dissolves every bloom before the section's top and bottom
  * edge, so chapters always meet on their native white or charcoal. Motion runs only
