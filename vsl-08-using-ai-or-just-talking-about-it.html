@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Using AI, or Just Talking About It? | AI Automation Engine</title>
+    <meta
+      name="description"
+      content="Asking ChatGPT for captions is not AI adoption. See how AI automation works inside your inbox, CRM and WhatsApp every day, doing real work."
+    />
+    <meta property="og:title" content="Using AI, or Just Talking About It?" />
+    <meta
+      property="og:description"
+      content="Asking ChatGPT for captions is not AI adoption. See how AI automation works inside your inbox, CRM and WhatsApp every day, doing real work."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Hero intro: a reload of the homepage replays the cinematic from the top, so the browser
+      // must not restore the old scroll position (it would land mid-page and cancel the intro).
+      // Deep links and reduced-motion visits keep normal restoration. See introConfig.js.
+      try {
+        if (!location.hash && "scrollRestoration" in history && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          history.scrollRestoration = "manual"
+          window.__wcIntroScrollReset = true
+        }
+      } catch (e) {}
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root" data-page="vsl-08"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

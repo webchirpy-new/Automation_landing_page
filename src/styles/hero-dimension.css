@@ -324,3 +324,17 @@
   outline: 2px solid var(--hd-white);
   outline-offset: 3px;
 }
+
+/* ---------- Landing pages 2–8: longer headlines ----------
+   Headlines with a sentence longer than page 1's (e.g. "Can you tell how your business did
+   yesterday, without calling anyone?") wrap and step down a size, so they never overflow. */
+.hero__fold .hero__title--long {
+  max-width: 20ch;
+  font-size: clamp(2rem, 0.9rem + 3.4vw, 4rem);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.hero__title--long .hero__line {
+  display: inline;
+  white-space: normal;
+}

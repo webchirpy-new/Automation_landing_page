@@ -16,7 +16,11 @@ npm run lint        # oxlint
 
 Requires Node 20.19+ (Vite 8). Built and tested with Node 24.20 and npm 11.
 
-Page title, meta description, OG tags and Google Fonts live in [index.html](index.html). The app entry is [src/main.jsx](src/main.jsx), which renders [src/App.jsx](src/App.jsx).
+Page title, meta description, OG tags and Google Fonts live in [index.html](index.html).
+
+### Landing pages 2–8
+
+`vsl-02-*.html` … `vsl-08-*.html` at the project root are the seven sub-pages from `3-2_AI Automation Engine – Landing Pages 2–8 Hero Content.docx`. Each has its own title/meta/OG tags and sets `<div id="root" data-page="vsl-0N">`. Every page renders the same app; only the hero copy changes, taken from [src/data/landingPages.js](src/data/landingPages.js). `vite.config.js` builds every `vsl-NN-*.html` file automatically. Page 5 still contains the DOCX `[X]` / `[channels]` placeholders and ships with `noindex` until the real figures are filled in. The app entry is [src/main.jsx](src/main.jsx), which renders [src/App.jsx](src/App.jsx).
 
 ## Configuration
 

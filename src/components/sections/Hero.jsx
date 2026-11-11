@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
-import { hero, uiCopy, trusted } from "../../data/automationContent"
+import { uiCopy, trusted } from "../../data/automationContent"
+import { pageHero as hero } from "../../data/landingPages"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
 import HeroVoxels from "../hero-intro/HeroVoxels"
@@ -40,10 +41,13 @@ const TILES = [
   { id: "meta", x: 72, y: 89, s: 36, from: [30, 70], pri: 3, faded: true },
 ]
 
-const LEAK_ICONS = ["form", "chat", "clock", "chart"]
+/** The headline's sentences, split from the approved string so the words can't drift. */
+const HEADLINE_LINES = hero.headline.split(/(?<=[.?])\s+/)
+/** Long single-sentence headlines (page 3) get a wider, smaller setting so they stay readable */
+const HEADLINE_LONG = HEADLINE_LINES.some((l) => l.length > 32)
 
-/** The headline's two sentences, split from the approved string so the words can't drift. */
-const HEADLINE_LINES = hero.headline.split(/(?<=\.)\s+/)
+/** "21x", "88%", "42 hrs" count up; anything else ("1 in 3", "Daily", "[X]") is shown as written */
+const COUNTABLE = /^(\d+)(x|%| hrs)?$/
 
 export default function Hero() {
   const root = useRef(null)
@@ -191,6 +195,9 @@ export default function Hero() {
     { scope: root, dependencies: [floatOn], revertOnUpdate: true }
   )
 
+  const list = hero.list
+  const ListTag = list?.ordered ? "ol" : "ul"
+
   const openPart = (id) => {
     const part = toolRoutes[id]?.[0]
     const m = part && moduleByName[part]
@@ -280,7 +287,7 @@ export default function Hero() {
             </span>
             {hero.eyebrow}
           </Eyebrow>
-          <h1 id="hero-title" className="hero__title">
+          <h1 id="hero-title" className={`hero__title${HEADLINE_LONG ? " hero__title--long" : ""}`}>
             {HEADLINE_LINES.map((line, i) => (
               <React.Fragment key={line}>
                 {i > 0 && " "}
@@ -307,23 +314,27 @@ export default function Hero() {
 
       {/* Remaining hero content: leaks → video + results, then the trust band */}
       <div className="container hero__below">
-        <aside className="hero__leaks" aria-labelledby="leaks-title">
-          <p id="leaks-title" className="t-mono hero__leaks-title">
-            <span className="leak-dot" aria-hidden="true" />
-            {hero.listTitle}
-          </p>
-          <ul>
-            {hero.leaks.map((l, i) => (
-              <li key={l} className="px-host" style={{ "--i": i }}>
-                <span className="hero__leak-icon">
-                  <PixelIcon name={LEAK_ICONS[i]} size={20} />
-                </span>
-                <span>{l}</span>
-                <span className="hero__leak-drip" aria-hidden="true" />
-              </li>
-            ))}
-          </ul>
-        </aside>
+        {list && (
+          <aside className="hero__leaks" {...(list.title ? { "aria-labelledby": "leaks-title" } : { "aria-label": hero.headline })}>
+            {list.title && (
+              <p id="leaks-title" className="t-mono hero__leaks-title">
+                <span className="leak-dot" aria-hidden="true" />
+                {list.title}
+              </p>
+            )}
+            <ListTag className={list.ordered ? "hero__leaks-list is-ordered" : "hero__leaks-list"} style={{ "--n": list.items.length }}>
+              {list.items.map((l, i) => (
+                <li key={l} className="px-host" style={{ "--i": i }}>
+                  <span className="hero__leak-icon">
+                    <PixelIcon name={list.icons[i] || "check"} size={20} />
+                  </span>
+                  <span>{l}</span>
+                  <span className="hero__leak-drip" aria-hidden="true" />
+                </li>
+              ))}
+            </ListTag>
+          </aside>
+        )}
 
         <div className="hero__proof-grid">
           <button type="button" className="video-card" onClick={() => openModal("video:founder")}>
@@ -342,22 +353,21 @@ export default function Hero() {
               {hero.resultsHeading}
             </h2>
             <ul className="results__list">
-              {hero.results.map((r) => {
-                const n = parseInt(r.value, 10)
-                const suffix = r.value.replace(/^\d+/, "")
+              {hero.results.map((r, i) => {
+                const m = r.value.match(COUNTABLE)
                 return (
-                  <li key={r.value}>
-                    <CountUp value={n} suffix={suffix} className="results__value" />
+                  <li key={`${r.value}-${i}`}>
+                    {m ? (
+                      <CountUp value={parseInt(m[1], 10)} suffix={m[2] || ""} className="results__value" />
+                    ) : (
+                      <span className={`results__value${r.value.length >= 6 ? " results__value--text" : ""}`}>{r.value}</span>
+                    )}
                     <span className="results__label">{r.label}</span>
                   </li>
                 )
               })}
             </ul>
-            {siteConfig.showHeroSourceLine ? (
-              <p className="results__source">{hero.sourceLine}</p>
-            ) : (
-              <p className="results__source t-mono">{uiCopy.statsNote}</p>
-            )}
+            <p className={`results__source${hero.footnote.mono ? " t-mono" : ""}`}>{hero.footnote.text}</p>
           </div>
         </div>
       </div>

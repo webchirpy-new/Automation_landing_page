@@ -3,6 +3,7 @@ import { walk, uiCopy } from "../../data/automationContent"
 import { siteConfig, whatsappHref } from "../../config/site"
 import { useSite } from "../../context/SiteContext"
 import PixelIcon from "../visuals/PixelIcon"
+import { pageId } from "../../data/landingPages"
 
 const INDUSTRIES = [
   "Clinic / healthcare",
@@ -85,7 +86,8 @@ export default function LeadForm({ idPrefix, compact = false }) {
             score: summary.score,
             priorities: summary.priorities.map((a) => ({ area: a.area, gaps: a.gaps })),
           },
-          source: "webchirpy-automation-landing",
+          // Page 1 keeps its original value; pages 2–8 append their id so leads can be traced to the page
+          source: pageId === "vsl-01" ? "webchirpy-automation-landing" : `webchirpy-automation-landing:${pageId}`,
         }),
       })
       if (!res.ok) throw new Error(String(res.status))

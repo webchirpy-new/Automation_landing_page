@@ -291,7 +291,7 @@
   background: var(--danger);
   animation: px-blink 2.4s infinite;
 }
-.hero__leaks ul {
+.hero__leaks-list {
   position: relative;
   width: 100%;
   display: grid;
@@ -299,13 +299,13 @@
   gap: 10px;
 }
 @media (min-width: 600px) {
-  .hero__leaks ul {
+  .hero__leaks-list {
     gap: 14px;
   }
 }
 /* Phones: compact 2×2 tiles, icon above text */
 @media (max-width: 599px) {
-  .hero__leaks ul li {
+  .hero__leaks-list li {
     grid-template-columns: 1fr;
     align-content: start;
     gap: 10px;
@@ -319,12 +319,12 @@
   }
 }
 @media (min-width: 1024px) {
-  .hero__leaks ul {
+  .hero__leaks-list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
   }
   /* the leaking pipeline running behind the cards */
-  .hero__leaks ul::before {
+  .hero__leaks-list::before {
     content: "";
     position: absolute;
     left: 2%;

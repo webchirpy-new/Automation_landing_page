@@ -161,7 +161,7 @@
 }
 /* The pipeline behind the cards and the drips keep their motion, now in the spectrum */
 @media (min-width: 1024px) {
-  #top .hero__below .hero__leaks ul::before {
+  #top .hero__below .hero__leaks-list::before {
     background: var(--lk-stroke);
     background-size: 100% 2px;
     -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 14px);
@@ -338,7 +338,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  #top .hero__below .hero__leaks ul::before,
+  #top .hero__below .hero__leaks-list::before,
   #top .hero__below .hero__leak-drip {
     animation: none;
   }
@@ -402,4 +402,53 @@
     -webkit-mask-position: 14px 0;
     mask-position: 14px 0;
   }
+}
+
+/* ---------- Landing pages 2–8: 3 or 5 cards, ordered steps, text figures ---------- */
+.hero__leaks-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 1024px) {
+  .hero__leaks-list {
+    grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+  }
+}
+/* Two-up below desktop: an odd last card takes the full row instead of leaving a hole */
+@media (max-width: 1023px) {
+  .hero__leaks-list > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+/* Steps and questions read in order: a small index in the card corner */
+.hero__leaks-list.is-ordered {
+  counter-reset: lk-step;
+}
+.hero__leaks-list.is-ordered > li {
+  counter-increment: lk-step;
+}
+.hero__leaks-list.is-ordered > li .hero__leak-icon {
+  position: relative;
+}
+.hero__leaks-list.is-ordered > li .hero__leak-icon::after {
+  content: counter(lk-step);
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--spectral-violet-deep, #4b2fa8);
+  color: #fff;
+  font: 700 0.6875rem/1 var(--font-mono, ui-monospace, monospace);
+}
+/* Figures that are words, not numbers ("1 in 3", "Up to 30%", "[X hrs] → [X min]") */
+#top .hero__below .results__value--text {
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
 }
