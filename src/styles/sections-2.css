@@ -199,7 +199,7 @@
 }
 .dgrid {
   display: grid;
-  gap: 10px;
+  gap: clamp(10px, 1.4vw, 16px);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 @media (min-width: 900px) {
@@ -210,9 +210,14 @@
 .dcell {
   border-radius: var(--r-18);
   background: var(--night-raised);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: clamp(16px, 2vw, 22px);
   min-width: 0;
+}
+/* Stat tiles: the number and its label sit together at the bottom, aligned across a row */
+.dcell--stat {
+  display: grid;
+  align-content: end;
 }
 .dcell--main {
   grid-column: 1 / -1;
@@ -226,11 +231,23 @@
   .dgrid--overview .dcell--main {
     grid-row: span 2;
   }
+  /* Area tabs: the chart gets the full width and the decision a full-width row below it.
+     (A quarter-width decision card wrapped its sentence over four lines beside the button.) */
   .dcell--panel {
-    grid-column: span 3;
+    grid-column: 1 / -1;
   }
   .dcell--decision {
-    grid-column: span 1;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+  }
+  .dcell--decision .dcell__title {
+    margin-bottom: 0;
+  }
+  .dcell--decision .decision {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .dgrid--overview .dcell--split,
   .dgrid--overview .dcell--journey {
@@ -261,9 +278,15 @@
     grid-column: 1 / -1;
   }
 }
+/* Phones: the area cards stack one per row, so their numbers and sentences get the full width */
+@media (max-width: 599px) {
+  .dgrid--overview .dcell--card {
+    grid-column: 1 / -1;
+  }
+}
 .dcell__title {
   color: var(--night-muted);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 .dcell__sub {
   text-transform: none;
@@ -315,6 +338,19 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   color: #fff;
+}
+/* Narrow phones: a long figure ("Invoice processing") in a half-width card stays inside it */
+.dcell__big,
+.dstat__value,
+.dmain__value {
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+@media (max-width: 374px) {
+  .dcell__big {
+    font-size: 1.25rem;
+  }
 }
 .dcell__text {
   color: var(--night-muted);
@@ -539,14 +575,14 @@
 }
 .decisions {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 .decision {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 6px 12px;
+  gap: 8px 16px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: var(--r-12);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--line-dark);
@@ -585,7 +621,7 @@
 }
 @media (min-width: 900px) {
   .dcell--decisions .decisions {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
 
@@ -596,20 +632,23 @@
   display: grid;
   gap: 20px;
 }
+/* Desktop: three equal cards in one row. (Was a bento with card 1 spanning two rows: its few
+   lines were spread over ~800px, leaving large empty gaps.) */
 @media (min-width: 1024px) {
   .books {
-    grid-template-columns: repeat(12, 1fr);
-    grid-auto-rows: minmax(300px, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
   }
-  .book--1 {
-    grid-column: 1 / span 5;
-    grid-row: span 2;
+  /* A third of the row is too narrow for two pages side by side: the open book stacks them */
+  .books .book__inner {
+    grid-template-columns: 1fr;
   }
-  .book--2 {
-    grid-column: 6 / span 7;
+  .books .book__page--left {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
-  .book--3 {
-    grid-column: 6 / span 7;
+  .book__outcome {
+    font-size: clamp(2.25rem, 1.2rem + 1.9vw, 3.25rem);
   }
 }
 .book {
@@ -636,12 +675,19 @@
 .book__inner:focus {
   outline: none;
 }
+/* While a card is closed, its hidden pages do not set its height: the cover's own content does.
+   (Otherwise the taller hidden pages stretched the cover and left an empty gap mid-card.)
+   Opened, the pages are back in flow and the card grows to fit them. */
+.book:not(.is-open) > .book__inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* Tablet: every card opens as two pages side by side. Card 1 used to stay single-column (it was
+   the narrow bento card), so its hidden pages were taller and stretched its cover. */
 @media (min-width: 640px) {
   .book__inner {
     grid-template-columns: 1fr 1fr;
-  }
-  .book--1 .book__inner {
-    grid-template-columns: 1fr;
   }
 }
 .book__page {
@@ -653,10 +699,6 @@
 .book__page--left {
   background: var(--paper);
   border-right: 1px solid var(--line);
-}
-.book--1 .book__page--left {
-  border-right: 0;
-  border-bottom: 1px solid var(--line);
 }
 .book__k {
   color: var(--muted);
@@ -780,8 +822,13 @@
   --btn-bg: #fff;
   --btn-fg: var(--ink);
 }
-.book--1 .book__cover {
-  align-content: space-between;
+/* Headline group at the top, the doubt and the button together at the bottom: no stretched gaps */
+.book__cover {
+  display: flex;
+  flex-direction: column;
+}
+.book__cover .book__btn {
+  align-self: flex-start;
 }
 .proof__line {
   display: flex;
@@ -962,6 +1009,18 @@
   max-width: 300px;
   padding: 18px 20px;
   z-index: 1;
+}
+/* Phones: the card sits centred under the portrait, text centred too */
+@media (max-width: 767px) {
+  .founder__card {
+    margin: -48px auto 0;
+    width: calc(100% - 32px);
+    max-width: 340px;
+    text-align: center;
+  }
+  .founder__roles {
+    justify-items: center;
+  }
 }
 .section--night .founder__card {
   background: #fff;
@@ -1253,301 +1312,273 @@
     width: 16px;
   }
 }
-/* Client story + project assets (ClientStoryScatter.jsx).
-   All final positions live here; the entrance measures them and animates back to them. */
-.sc {
-  margin-top: clamp(48px, 6vw, 80px);
+/* Client video testimonials (VideoTestimonials.jsx).
+   Portrait 9:16 videos in dark phone-style frames; the even cards sit lower for rhythm. */
+.vt {
+  margin-top: clamp(64px, 8vw, 112px);
 }
-.sc__stage {
-  --sc-card-w: clamp(186px, 21.5vw, 268px);
-  --sc-card-h: calc(var(--sc-card-w) * 10 / 16); /* one landscape, photo-like 16:10 for all five */
-  position: relative;
-  padding-top: clamp(96px, 9vw, 128px);
-  padding-bottom: calc(var(--sc-card-h) * 1.05 + 36px);
+.vt-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px 32px;
+  margin-bottom: clamp(28px, 3.6vw, 48px);
 }
-.sc__centre {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  justify-items: center;
-  gap: clamp(18px, 2vw, 26px);
-  margin-inline: auto;
+.vt-title {
+  max-width: 14ch;
 }
-.sc__title {
-  margin: 0;
-  text-align: center;
-  white-space: nowrap;
-}
-.sc__mask {
-  display: block;
-  overflow: clip;
-  padding-bottom: 0.14em; /* room for descenders inside the reveal mask */
-  margin-bottom: -0.14em;
-}
-.sc__line {
-  display: block;
-}
-
-.sc-pill {
+.vt-sub {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 6px 22px 6px 7px;
-  border-radius: var(--r-pill);
-  border: 1px solid rgba(140, 230, 240, 0.3);
-  background:
-    radial-gradient(70% 150% at 92% 0%, rgba(110, 126, 236, 0.42), transparent 70%),
-    linear-gradient(120deg, #050609, #0a0c14);
-  box-shadow: 0 0 18px rgba(135, 186, 255, 0.12), 0 12px 22px -14px rgba(5, 6, 10, 0.6);
-  color: #fff;
-  cursor: pointer;
-  transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
-}
-.sc-pill__play {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--neo-black);
-}
-.sc-pill__label {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-.sc__note {
-  max-width: 46ch;
-  margin: 0;
-  font-size: var(--fs-small);
-  line-height: 1.45;
+  font-size: 0.75rem;
   color: var(--muted);
-  text-align: center;
-  text-wrap: balance;
 }
-.sc-pill:focus-visible,
-.sc-card__face:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
-}
-@media (hover: hover) {
-  .sc-pill:hover {
-    transform: translateY(-2px);
-    border-color: rgba(140, 230, 240, 0.55);
-    box-shadow: 0 0 24px rgba(135, 186, 255, 0.22), 0 16px 26px -14px rgba(5, 6, 10, 0.65);
-  }
-}
-
-.sc__assets {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.sc-card {
-  position: absolute;
-  z-index: 2;
-  width: calc(var(--sc-card-w) * var(--sc-k));
-  height: calc(var(--sc-card-h) * var(--sc-k));
-}
-/* Five curated spots; size stays within about 10% and tilt within a few degrees */
-.sc-card--1 { --sc-k: 1.05; --sc-tilt: -4.5deg; left: 1%; top: 0; }
-.sc-card--2 { --sc-k: 0.97; --sc-tilt: 3deg; right: 2%; top: 34px; }
-.sc-card--3 { --sc-k: 0.99; --sc-tilt: 3.5deg; left: 3.5%; bottom: 46px; }
-.sc-card--4 { --sc-k: 1.03; --sc-tilt: -2.5deg; right: 1%; bottom: 66px; }
-.sc-card--5 { --sc-k: 0.95; --sc-tilt: 1.5deg; left: calc(50% - var(--sc-card-w) * 0.475 + 2%); bottom: 0; }
-.sc-card__float,
-.sc-card__tilt {
-  width: 100%;
-  height: 100%;
-}
-.sc-card__tilt {
-  rotate: var(--sc-tilt);
-}
-.sc-card__face {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 6px;
-  width: 100%;
-  height: 100%;
-  overflow: clip;
-  padding: clamp(11px, 1.15vw, 16px);
-  border-radius: clamp(14px, 1.5vw, 20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(155deg, #0a0b0e, #050609);
-  box-shadow: 0 2px 6px rgba(5, 6, 10, 0.2), 0 22px 32px -18px rgba(5, 6, 10, 0.62);
-  color: #fff;
-  text-align: left;
-  cursor: pointer;
-  transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
-}
-/* The only green on a card: a small glow from one corner, drifted and faded very slowly by GSAP */
-.sc-card__aura {
-  position: absolute;
-  z-index: 0;
-  width: 46%;
-  aspect-ratio: 1;
+.vt-sub__dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(110, 126, 236, 0.5), rgba(110, 126, 236, 0.14) 58%, rgba(110, 126, 236, 0) 100%);
-  opacity: 0.85;
-  pointer-events: none;
-}
-.sc-card--1 .sc-card__aura { top: -22%; right: -12%; }
-.sc-card--2 .sc-card__aura { top: -24%; left: -14%; }
-.sc-card--3 .sc-card__aura { right: -14%; bottom: -24%; }
-.sc-card--4 .sc-card__aura { left: -12%; bottom: -26%; }
-.sc-card--5 .sc-card__aura { right: -12%; bottom: -24%; }
-.sc-card__face[aria-pressed="true"] {
-  border-color: rgba(140, 230, 240, 0.6);
-}
-@media (hover: hover) {
-  .sc-card__face:hover {
-    transform: translateY(-4px) scale(1.015);
-    border-color: rgba(140, 230, 240, 0.42);
-    box-shadow: 0 2px 6px rgba(5, 6, 10, 0.22), 0 30px 38px -18px rgba(5, 6, 10, 0.68);
-  }
-}
-.sc-card__glyph {
-  position: relative;
-  flex: none;
-  width: clamp(22px, 2.3vw, 28px);
-  color: rgba(255, 255, 255, 0.62);
-}
-.sc-card__copy {
-  position: relative;
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.sc-card__title {
-  font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
-  font-weight: 600;
-  line-height: 1.22;
-  letter-spacing: -0.01em;
-}
-.sc-card__status {
-  font-size: 0.6875rem;
-  line-height: 1.25;
-  color: #b1b4c0;
-}
-
-.sc__details {
-  display: grid;
-  gap: 14px 40px;
-  margin-top: clamp(32px, 4vw, 48px);
-  padding: clamp(20px, 2.4vw, 30px);
-  border-radius: var(--r-24);
-  border: 1px solid var(--line);
-  background: #fff;
-  box-shadow: var(--shadow-1);
-}
-.sc__details-title {
-  margin: 0;
-}
-.sc__detail {
-  display: grid;
-  gap: 6px;
-  align-content: start;
-}
-.sc__detail h4 {
-  font-size: 1.0625rem;
-  letter-spacing: -0.02em;
-}
-.sc__detail-meta {
-  color: var(--accent-ink);
-  text-transform: none;
-}
-.sc__detail-status {
-  font-size: var(--fs-small);
-  color: var(--muted);
+  background: #e5484d;
+  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.16);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sc__detail {
-    animation: sc-detail var(--dur-micro) var(--ease-out);
+  .vt-sub__dot {
+    animation: vt-live 2.4s ease-in-out infinite;
   }
 }
-@keyframes sc-detail {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+@keyframes vt-live {
+  50% {
+    box-shadow: 0 0 0 7px rgba(229, 72, 77, 0);
   }
 }
-@media (min-width: 768px) {
-  .sc__details {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+
+.vt-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+  align-items: start;
+}
+.vt-card {
+  display: grid;
+  gap: 16px;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 1024px) {
+  .vt-card:nth-child(even) {
+    margin-top: clamp(32px, 4vw, 56px);
   }
 }
-/* Tablet: the heading is too wide to sit between the upper cards, so each row gets its own band; tilt eases off */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .sc__stage {
-    padding-top: calc(var(--sc-card-h) * 1.05 + 62px);
-    padding-bottom: calc(var(--sc-card-h) * 1.05 + 54px);
-  }
-  .sc-card--1 { left: 2%; --sc-tilt: -2.5deg; }
-  .sc-card--2 { right: 2%; top: 22px; --sc-tilt: 2deg; }
-  .sc-card--3 { left: 0; bottom: 24px; --sc-tilt: 2deg; }
-  .sc-card--4 { right: 0; bottom: 34px; --sc-tilt: -1.5deg; }
-  .sc-card--5 { left: calc(50% - var(--sc-card-w) * 0.475); --sc-tilt: 1deg; }
+/* While one plays, the others step back */
+.vt-grid:has([data-playing]) .vt-card:not([data-playing]) {
+  opacity: 0.55;
 }
-/* Phones: heading, pill and note, then the cards in a calm two-column set. Clarity first: one size, barely any tilt. */
-@media (max-width: 767px) {
-  .sc__stage {
-    padding-block: 0;
+
+.vt-frame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #0b0c10;
+  box-shadow:
+    0 0 0 1px rgba(11, 12, 16, 0.08),
+    0 0 0 6px #0b0c10,
+    0 0 0 7px rgba(255, 255, 255, 0.06),
+    0 28px 60px -24px rgba(11, 12, 16, 0.45);
+  margin: 7px; /* room for the bezel ring */
+  isolation: isolate;
+  transition: box-shadow 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .vt-card:hover .vt-frame {
+    transform: translateY(-6px);
+    box-shadow:
+      0 0 0 1px rgba(11, 12, 16, 0.08),
+      0 0 0 6px #0b0c10,
+      0 0 0 7px rgba(255, 255, 255, 0.06),
+      0 40px 70px -26px rgba(76, 92, 214, 0.45);
   }
-  .sc__assets {
-    display: grid;
+}
+.vt-card[data-playing] .vt-frame {
+  box-shadow:
+    0 0 0 1px rgba(11, 12, 16, 0.08),
+    0 0 0 6px #0b0c10,
+    0 0 0 8px rgba(110, 126, 236, 0.7),
+    0 40px 70px -26px rgba(76, 92, 214, 0.5);
+}
+.vt-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+/* Mutes the videos' own red frame at rest so the cards sit with the page; clears on play */
+.vt-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(8, 9, 14, 0.5) 0%, transparent 22%, transparent 58%, rgba(8, 9, 14, 0.72) 100%);
+  transition: opacity 0.4s ease;
+}
+.vt-card[data-playing] .vt-shade {
+  opacity: 0;
+}
+.vt-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(8, 9, 14, 0.62);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #f3f4f8;
+  font-size: 0.6875rem;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.vt-card[data-playing] .vt-chip {
+  opacity: 0;
+}
+.vt-play,
+.vt-mute {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #0b0c10;
+  background: rgba(255, 255, 255, 0.94);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, background 0.3s ease;
+}
+.vt-play {
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  translate: -50% -50%;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.18), 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+}
+.vt-play svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  stroke-width: 0;
+}
+.vt-play svg.lucide-play {
+  margin-left: 3px;
+}
+@media (hover: hover) {
+  .vt-card:hover .vt-play {
+    transform: scale(1.08);
+  }
+}
+/* Playing: the control shrinks into the corner, out of the speaker's face */
+.vt-card[data-playing] .vt-play {
+  left: auto;
+  top: auto;
+  right: 14px;
+  bottom: 18px;
+  width: 40px;
+  height: 40px;
+  translate: none;
+  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.6);
+  opacity: 0.85;
+}
+.vt-card[data-playing] .vt-play svg {
+  width: 16px;
+  height: 16px;
+}
+.vt-mute {
+  left: 14px;
+  bottom: 18px;
+  width: 40px;
+  height: 40px;
+  background: rgba(8, 9, 14, 0.62);
+  color: #f3f4f8;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.vt-mute svg {
+  width: 17px;
+  height: 17px;
+}
+.vt-play:focus-visible,
+.vt-mute:focus-visible {
+  outline: 3px solid var(--accent-soft);
+  outline-offset: 3px;
+}
+.vt-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.vt-card[data-playing] .vt-progress,
+.vt-card[data-active] .vt-progress {
+  opacity: 1;
+}
+.vt-progress i {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--neo-mint), var(--neo-green) 55%, #f0bedf);
+  transition: transform 0.25s linear;
+}
+
+.vt-meta {
+  padding-inline: 10px;
+}
+.vt-name {
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.vt-role {
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Tablet: two by two */
+@media (max-width: 1023.98px) {
+  .vt-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px 12px;
-    margin-top: 30px;
+    max-width: 640px;
+    margin-inline: auto;
+    row-gap: 36px;
   }
-  .sc-card {
-    position: relative;
-    inset: auto;
-    width: auto;
-    height: auto;
-    aspect-ratio: 3 / 2;
+}
+/* Phone: a swipeable row that peeks the next story */
+@media (max-width: 599.98px) {
+  .vt-grid {
+    display: flex;
+    max-width: none;
+    gap: 14px;
+    margin-inline: calc(-1 * var(--gutter, 16px));
+    padding: 4px var(--gutter, 16px) 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter, 16px);
+    scrollbar-width: none;
   }
-  .sc-card--1 { --sc-tilt: -1.2deg; }
-  .sc-card--2 { --sc-tilt: 1deg; }
-  .sc-card--3 { --sc-tilt: 0.8deg; }
-  .sc-card--4 { --sc-tilt: -1deg; }
-  .sc-card--5 { --sc-tilt: 0.6deg; }
-  .sc-card__aura {
-    width: 36%; /* cards are smaller here, so the glow shrinks to stay a corner accent */
-  }
-  .sc-card--5 {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: calc(50% - 6px);
-  }
-  .sc-card__face {
-    padding: 10px;
-    border-radius: 14px;
-  }
-  .sc-card__glyph {
-    width: 20px;
-  }
-  .sc-card__title {
-    font-size: 0.75rem;
-    line-height: 1.18;
-  }
-  /* Short status here; the details panel below carries the full wording */
-  .sc-card__status {
-    font-size: 0.6875rem;
-  }
-  .sc-card__kind {
+  .vt-grid::-webkit-scrollbar {
     display: none;
   }
-}
-@media (max-width: 359px) {
-  .sc-card {
-    aspect-ratio: 4 / 3; /* the longest title needs three lines at this width */
+  .vt-card {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+  .vt-frame {
+    border-radius: 24px;
   }
 }
 
@@ -2023,6 +2054,12 @@
     gap: 56px;
     align-items: start;
   }
+  /* The steps + P.S. column is much shorter than the form: it stays in view beside the form
+     while you scroll it, instead of ending early and leaving an empty area. */
+  .booking__side {
+    position: sticky;
+    top: 32px;
+  }
 }
 .booking__steps-title {
   color: var(--muted);
@@ -2087,8 +2124,10 @@
 .final {
   position: relative;
   isolation: isolate;
-  margin: var(--panel-gap) 0;
-  border-radius: var(--panel-r);
+  /* last panel on the page: rounded top like the other panels, flush to the page bottom
+     so no white strip shows under the footer */
+  margin: var(--panel-gap) 0 0;
+  border-radius: var(--panel-r) var(--panel-r) 0 0;
   background: var(--dark-panel);
   color: var(--night-text);
   padding-top: var(--section-y);
@@ -2149,70 +2188,41 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+/* Minimal ad-page footer: logo left, legal right, one row */
 .site-footer {
-  display: grid;
-  gap: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
   margin-top: clamp(64px, 8vw, 120px);
-  padding-top: 48px;
-  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  padding-top: 28px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line-dark);
-}
-@media (min-width: 768px) {
-  .site-footer {
-    grid-template-columns: 1.4fr 1fr 1fr 1fr;
-  }
 }
 .site-footer__logo {
   display: block;
-  width: clamp(170px, 18vw, 220px);
+  width: clamp(140px, 14vw, 180px);
   height: auto;
-  margin-left: -8px;
-}
-.site-footer__tag {
-  margin-top: 14px;
-  color: var(--night-muted);
-  max-width: 36ch;
-}
-.site-footer__tag strong {
-  color: #fff;
-}
-.site-footer__col h3 {
-  color: var(--accent-soft);
-  margin-bottom: 12px;
-}
-.site-footer__col a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  min-width: 44px;
-  color: var(--night-text);
-  text-decoration: none;
-}
-.site-footer__col a:hover {
-  color: var(--accent-soft);
-  text-decoration: underline;
-}
-.site-footer__col li {
-  color: var(--night-muted);
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
+  margin-left: -6px;
 }
 .site-footer__legal {
-  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line-dark);
+  align-items: center;
+  gap: 4px 20px;
   color: var(--night-muted);
   font-size: 0.875rem;
 }
-.site-footer__links a {
+.site-footer__legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--night-text);
+  text-underline-offset: 3px;
+}
+.site-footer__legal a:hover {
+  color: var(--accent-soft);
 }
 @media (max-width: 767px) {
   /* keep the floating CTA from covering the last footer line */

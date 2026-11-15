@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Thank you | Webchirpy AI Automation</title>
+    <meta name="theme-color" content="#07080c" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" />
+    <!-- Without JavaScript the browser still moves on after 5 seconds -->
+    <noscript><meta http-equiv="refresh" content="5;url=https://meet.brevo.com/webchirpy-ltd/lets-find-the-right-creative-support-for-your-business" /></noscript>
+    <link rel="stylesheet" href="./thank-you.css" />
+  </head>
+  <body>
+    <!--
+      Shown after either Tally form is submitted (TallyEmbed.jsx sends visitors here), then
+      forwards to the Brevo meeting page after 5 seconds. ?form=call | report picks the headline.
+      The destination is fixed here on purpose: the page never redirects to a URL from the query.
+    -->
+    <main class="ty">
+      <a class="ty__logo" href="/" aria-label="Webchirpy home">
+        <img src="/logo-footer.svg" alt="Webchirpy" width="164" height="42" />
+      </a>
+
+      <div class="ty__card">
+        <div class="ty__ring" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <defs>
+              <linearGradient id="ty-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#8ce6f0" />
+                <stop offset=".5" stop-color="#6e7eec" />
+                <stop offset="1" stop-color="#f0bedf" />
+              </linearGradient>
+            </defs>
+            <circle class="ty__track" cx="60" cy="60" r="54" />
+            <circle class="ty__arc" cx="60" cy="60" r="54" pathLength="1" />
+            <path class="ty__check" d="M41 61.5l12.5 12L80 47" pathLength="1" />
+          </svg>
+        </div>
+
+        <p class="ty__tag">Form received</p>
+        <h1 class="ty__title" id="ty-title">Thank you. We have your details.</h1>
+        <p class="ty__body" id="ty-body">Next, pick a time that suits you for your free discovery call.</p>
+
+        <p class="ty__count" role="status" aria-live="polite">
+          Taking you to the booking page in <b id="ty-sec">5</b>&nbsp;s
+        </p>
+        <div class="ty__bar" aria-hidden="true"><i></i></div>
+
+        <a class="ty__btn" id="ty-go" href="https://meet.brevo.com/webchirpy-ltd/lets-find-the-right-creative-support-for-your-business">
+          Book my time now <span aria-hidden="true">→</span>
+        </a>
+        <p class="ty__note">
+          <a href="/" id="ty-stay">Stay on this site instead</a>
+        </p>
+      </div>
+    </main>
+
+    <script>
+      ;(function () {
+        var DEST = "https://meet.brevo.com/webchirpy-ltd/lets-find-the-right-creative-support-for-your-business"
+        var SECONDS = 5
+        var form = new URLSearchParams(location.search).get("form")
+
+        if (form === "report") {
+          document.getElementById("ty-title").textContent = "Thank you. Your report request is in."
+          document.getElementById("ty-body").textContent =
+            "While we prepare it, pick a time for a free call to walk through your results."
+        }
+
+        var sec = document.getElementById("ty-sec")
+        var left = SECONDS
+        var timer = setInterval(function () {
+          left -= 1
+          if (left <= 0) {
+            clearInterval(timer)
+            sec.textContent = "0"
+            location.replace(DEST)
+            return
+          }
+          sec.textContent = String(left)
+        }, 1000)
+
+        // "Stay" cancels the countdown before leaving for the home page
+        document.getElementById("ty-stay").addEventListener("click", function () {
+          clearInterval(timer)
+        })
+      })()
+    </script>
+  </body>
+</html>

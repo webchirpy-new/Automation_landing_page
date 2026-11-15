@@ -249,13 +249,13 @@
    neutral glass. Four arrangements rotate between neighbours so no two side-by-side cards light
    the same corners in the same colours. Roughly 8–12% of the card. The card is its own layer
    (isolation), so the glint at z-index -1 paints over the card surface but under its content. */
-:is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room) {
+:is(.ptn-card, .ptn-week, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room) {
   isolation: isolate;
 }
-:is(.orbit-story, .diff, .dash__window, .decision, .lw-detail, .room) {
+:is(.ptn-week, .ptn-card, .diff, .dash__window, .decision, .lw-detail, .room) {
   position: relative;
 }
-:is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
+:is(.ptn-card, .ptn-week, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
 .fit__col::before {
   content: "";
   position: absolute;
@@ -270,20 +270,20 @@
     radial-gradient(26% 30% at 0% 100%, rgba(240, 190, 223, 0.3), rgba(201, 184, 245, 0.1) 50%, transparent 74%);
 }
 /* B: sapphire→cyan top-left · violet→rose bottom-right */
-:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 2)::after,
+:is(.ptn-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 2)::after,
 .fit__col:nth-child(even)::before {
   background:
     radial-gradient(30% 34% at 0% 0%, rgba(135, 186, 255, 0.36), rgba(140, 230, 240, 0.14) 48%, transparent 76%),
     radial-gradient(26% 30% at 100% 100%, rgba(183, 154, 238, 0.3), rgba(240, 190, 223, 0.12) 50%, transparent 74%);
 }
 /* C: rose→violet bottom-right · cyan top-left */
-:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 3)::after {
+:is(.ptn-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n + 3)::after {
   background:
     radial-gradient(30% 34% at 100% 100%, rgba(240, 190, 223, 0.34), rgba(183, 154, 238, 0.14) 48%, transparent 76%),
     radial-gradient(26% 30% at 0% 0%, rgba(140, 230, 240, 0.28), rgba(135, 186, 255, 0.1) 50%, transparent 74%);
 }
 /* D: lavender→sapphire bottom-left · rose→cyan top-right */
-:is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n)::after {
+:is(.ptn-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(4n)::after {
   background:
     radial-gradient(30% 34% at 0% 100%, rgba(201, 184, 245, 0.36), rgba(135, 186, 255, 0.14) 48%, transparent 76%),
     radial-gradient(26% 30% at 100% 0%, rgba(240, 190, 223, 0.28), rgba(140, 230, 240, 0.1) 50%, transparent 74%);
@@ -294,15 +294,15 @@
   --corner-o: 0.42;
 }
 @media (prefers-reduced-motion: no-preference) {
-  :is(.orbit-card, .orbit-story, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
+  :is(.ptn-card, .ptn-week, .diff, .glass, .dash__window, .decision, .lw-hub, .lw-detail, .hero__leaks li, .folder, .room)::after,
   .fit__col::before {
     animation: corner-breathe 18s ease-in-out infinite alternate;
   }
-  :is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n)::after {
+  :is(.ptn-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n)::after {
     animation-duration: 22s;
     animation-delay: -7s;
   }
-  :is(.orbit-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n + 2)::after {
+  :is(.ptn-card, .diff, .decision, .lw-hub, .hero__leaks li, .room):nth-child(3n + 2)::after {
     animation-duration: 15s;
     animation-delay: -4s;
   }
@@ -355,10 +355,6 @@
 .ambient--dark .ambient__bloom::after {
   background: radial-gradient(closest-side, rgba(130, 120, 236, 0.46), rgba(190, 120, 196, 0.24) 44%, rgba(36, 22, 66, 0.32) 72%, rgba(36, 22, 66, 0) 100%);
 }
-.orbit-glow {
-  background: radial-gradient(closest-side at 66% 36%, rgba(140, 230, 240, 0.14), rgba(183, 154, 238, 0.08) 48%, rgba(240, 190, 223, 0.04) 70%, transparent 100%);
-}
-
 /* Small marks */
 .eyebrow__dot {
   background: var(--spectral-fill);
@@ -488,22 +484,13 @@
 .decision__do[aria-expanded="true"] {
   background: linear-gradient(120deg, rgba(140, 230, 240, 0.18), rgba(150, 128, 238, 0.3) 50%, rgba(240, 190, 223, 0.2));
 }
-.sc-pill {
-  box-shadow: -8px 0 18px -6px rgba(140, 230, 240, 0.14), 8px 0 18px -6px rgba(240, 190, 223, 0.12), 0 12px 22px -14px rgba(5, 6, 10, 0.6);
-}
 @media (hover: hover) {
-  .sc-pill:hover {
-    box-shadow: var(--spectral-glow-sm), 0 16px 26px -14px rgba(5, 6, 10, 0.65);
-  }
   .diff:hover {
     border-color: rgba(201, 184, 245, 0.5);
   }
   .bc-card:not([aria-current]):hover .bc-card__face {
     border-color: rgba(201, 184, 245, 0.55);
   }
-}
-.sc-card__aura {
-  background: radial-gradient(closest-side, rgba(150, 128, 238, 0.42), rgba(240, 190, 223, 0.14) 58%, rgba(140, 230, 240, 0) 100%);
 }
 
 /* Large dark-card glows: each card takes a different pair, never one blue wash */

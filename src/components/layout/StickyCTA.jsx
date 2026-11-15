@@ -7,17 +7,20 @@ import PixelIcon from "../visuals/PixelIcon"
 /**
  * Desktop/tablet: slim glass sticky bar. Phones: compact floating button.
  * Appears only after the hero CTA leaves view; hides during the Pattern story (it's told first, with its own CTA at the end), and while the booking form,
- * the final CTA or a modal is on screen — so there is never a duplicate CTA
+ * the scorecard's report form, the final CTA or a modal is on screen — so there is never a duplicate CTA
  * covering the form's submit button.
  */
 export default function StickyCTA() {
-  const { modal } = useSite()
+  const { modal, summary } = useSite()
+  const resultShown = summary.complete
   const [pastHero, setPastHero] = useState(false)
   const [nearForm, setNearForm] = useState(false)
 
   useEffect(() => {
     const heroCta = document.getElementById("hero-cta")
-    const blockers = ["pattern", "book", "final"].map((id) => document.getElementById(id)).filter(Boolean)
+    // #score-result (the dummy report form) only exists once the scorecard is complete,
+    // so the observers re-attach when it appears
+    const blockers = ["pattern", "score-result", "book", "final"].map((id) => document.getElementById(id)).filter(Boolean)
     const visibleBlockers = new Set()
 
     const io1 = new IntersectionObserver(([e]) => setPastHero(!e.isIntersecting && e.boundingClientRect.top < 0))
@@ -32,7 +35,7 @@ export default function StickyCTA() {
       io1.disconnect()
       io2.disconnect()
     }
-  }, [])
+  }, [resultShown])
 
   const show = pastHero && !nearForm && !modal
 

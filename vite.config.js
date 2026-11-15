@@ -8,13 +8,25 @@ const root = import.meta.dirname
 // Multi-page build: index.html (landing page 1) plus one HTML entry per landing page 2–8
 // (vsl-0N-*.html). Every page renders the same app; only the hero copy changes, chosen by
 // the `data-page` attribute on #root (see src/data/landingPages.js).
-const pages = readdirSync(root).filter((f) => f === "index.html" || /^vsl-\d+-.+\.html$/.test(f))
+// Pages kept out of the production build until they are approved. They still open in the dev
+// server for review. vsl-05: Launch Kit 04 blocker — every claim depends on the client's written
+// confirmation of the "about 6 hours → about 2 minutes" result. Remove from this list once received.
+const UNPUBLISHED = new Set(["vsl-05-from-hours-to-minutes.html"])
+
+const pages = readdirSync(root).filter((f) => (f === "index.html" || /^vsl-\d+-.+\.html$/.test(f)) && !UNPUBLISHED.has(f))
 
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      input: Object.fromEntries(pages.map((f) => [f.replace(/\.html$/, ""), resolve(root, f)])),
+      input: {
+        ...Object.fromEntries(pages.map((f) => [f.replace(/\.html$/, ""), resolve(root, f)])),
+        // Launch Kit 03 privacy notice (draft). Built to dist/privacy/index.html, so /privacy
+        // works on Vercel with no config change.
+        privacy: resolve(root, "privacy/index.html"),
+        // Shown after a Tally form is submitted, then forwards to the Brevo meeting page (5 s).
+        "thank-you": resolve(root, "thank-you/index.html"),
+      },
     },
   },
 })

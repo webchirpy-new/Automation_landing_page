@@ -156,6 +156,16 @@
   background: #14162b;
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
+/* The tile layer sits under the copy (z 2 vs 4), so an open tooltip slid under the CTA and the
+   line below it. While a tile is hovered or focused, lift the whole layer above the copy.
+   The layer itself ignores the pointer, so the copy and CTA stay clickable. */
+.hero__fold .hero__tiles:has(.htile__btn:hover, .htile__btn:focus-visible) {
+  z-index: 6;
+}
+/* The hovered tile also sits above its neighbours, so its tooltip is never under another tile */
+.hero__fold .htile:has(.htile__btn:hover, .htile__btn:focus-visible) {
+  z-index: 1;
+}
 @media (max-width: 1279px) {
   .hero__fold .htile {
     width: calc(var(--s) * 0.82);
@@ -173,156 +183,6 @@
     width: 100%;
     height: 100%;
   }
-}
-
-/* ---------- Corner cubes (CSS 3D, matches the intro's WebGL camera) ---------- */
-.hv {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 420ms linear;
-}
-.hv.is-on {
-  opacity: 1;
-}
-.hv__cube {
-  position: absolute;
-  width: var(--vw);
-  height: var(--vh);
-  transform-style: preserve-3d;
-  transform: translateZ(calc(var(--vw) / -2));
-}
-.hv__spin {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-}
-.hv__f {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-}
-.hv__f--front {
-  background: linear-gradient(145deg, #fbfbfd, #e6e8ef);
-  box-shadow: inset 0 0 0 0.5px rgba(40, 44, 66, 0.2), inset 1px 1px 0 rgba(255, 255, 255, 0.85);
-  transform: translateZ(calc(var(--vw) / 2));
-}
-.hv__f--back {
-  background: linear-gradient(145deg, #2a2d3b, #15171f);
-  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.1), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
-  transform: rotateY(180deg) translateZ(calc(var(--vw) / 2));
-}
-.hv__f--top {
-  height: var(--vw);
-  background: #d9dbe5;
-  transform: rotateX(90deg) translateZ(calc(var(--vw) / 2));
-}
-.hv__f--bottom {
-  top: auto;
-  bottom: 0;
-  height: var(--vw);
-  background: #8f93a6;
-  transform: rotateX(-90deg) translateZ(calc(var(--vw) / 2));
-}
-.hv__f--left {
-  width: var(--vw);
-  background: #c6c9d6;
-  transform: rotateY(-90deg) translateZ(calc(var(--vw) / 2));
-}
-.hv__f--right {
-  left: auto;
-  right: 0;
-  width: var(--vw);
-  background: #a5a9bb;
-  transform: rotateY(90deg) translateZ(calc(var(--vw) / 2));
-}
-
-/* ---------- Intro stage ---------- */
-.hero__fold.is-intro {
-  z-index: 40;
-  isolation: isolate;
-}
-.hero__fold.is-intro .hero__tiles {
-  z-index: auto; /* lets a tile pass behind (1) or in front of (3) the canvas (2) */
-}
-/* During the flight tiles sit on their own layers, and nothing behind them needs blurring */
-.hero__fold.is-intro .htile {
-  will-change: transform, opacity;
-}
-.hero__fold.is-intro .htile .app-tile__face {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-.intro__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: var(--hd-bg);
-  pointer-events: none;
-  transition: opacity 420ms linear;
-}
-.intro__canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  transition: opacity 420ms linear;
-}
-/* Matches the wall until the first WebGL frame replaces it */
-.intro__veil {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  background: #eceef3;
-  pointer-events: none;
-  transition: opacity 320ms linear;
-}
-.intro__veil.is-gone {
-  transition-duration: 60ms;
-}
-.intro__canvas.is-gone,
-.intro__veil.is-gone,
-.intro__backdrop.is-gone {
-  opacity: 0;
-}
-.intro__skip {
-  position: fixed;
-  z-index: 6;
-  top: max(16px, env(safe-area-inset-top));
-  right: max(var(--gutter), env(safe-area-inset-right));
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: var(--r-pill);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(10, 12, 24, 0.74);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  color: var(--hd-white);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  transition: background 180ms, border-color 180ms;
-}
-/* On phones the app tiles land along the top band, so Skip sits at the bottom instead */
-@media (max-width: 767px) {
-  .intro__skip {
-    top: auto;
-    bottom: max(16px, env(safe-area-inset-bottom));
-  }
-}
-.intro__skip:hover {
-  background: rgba(24, 27, 48, 0.9);
-  border-color: rgba(255, 255, 255, 0.6);
-}
-.intro__skip:focus-visible {
-  outline: 2px solid var(--hd-white);
-  outline-offset: 3px;
 }
 
 /* ---------- Landing pages 2–8: longer headlines ----------

@@ -4,7 +4,7 @@ import { serviceModules, moduleByName } from "../../data/serviceModules"
 import PixelIcon from "../visuals/PixelIcon"
 import AppTile from "../visuals/AppTile"
 import FolderCard, { useFlipMorph } from "./FolderCard"
-import ServiceWorkflow from "./ServiceWorkflow"
+import AutomationDemo from "./AutomationDemo"
 import IntegrationShelf from "./IntegrationShelf"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK, REDUCED } from "../../lib/motionTokens"
@@ -143,9 +143,10 @@ function Detail({ m, onPick }) {
       <WorksWith list={m.worksWith} onPick={onPick} />
     </div>
   )
+  // A realistic demo of this automation working (plays once). key=id: each part plays its own.
   const flow = (
     <div className="detail__flow" data-folder-item>
-      <ServiceWorkflow flow={m.flow} steps={m.steps} />
+      <AutomationDemo key={m.id} id={m.id} />
     </div>
   )
   const shelf = (
@@ -154,62 +155,18 @@ function Detail({ m, onPick }) {
     </div>
   )
 
-  if (m.treatment === "bento") {
-    return (
-      <div className="detail detail--bento">
-        {head}
-        <div className="bento">
-          <div className="bento__flow">{flow}</div>
-          <div className="bento__cover">{cover}</div>
-          <div className="bento__produces">{produces}</div>
-          <div className="bento__works">{works}</div>
-          <div className="bento__shelf">{shelf}</div>
-        </div>
-      </div>
-    )
-  }
-  if (m.treatment === "sleeve") {
-    return (
-      <div className="detail detail--sleeve">
-        {head}
-        {flow}
-        <div className="detail__cols">
-          {cover}
-          <div>
-            {produces}
-            {works}
-          </div>
-        </div>
-        {shelf}
-      </div>
-    )
-  }
-  if (m.treatment === "stack") {
-    return (
-      <div className="detail detail--stack">
-        {head}
-        <div className="detail__cols">
-          <div className="detail__papers">{flow}</div>
-          <div>
-            {cover}
-            {produces}
-            {works}
-          </div>
-        </div>
-        {shelf}
-      </div>
-    )
-  }
+  // One layout for every part: the live demo is the centrepiece, the details sit beside it
+  // (stacked under it on phones).
   return (
-    <div className="detail detail--folder">
+    <div className="detail detail--demo">
       {head}
-      <div className="detail__cols">
-        <div>
+      <div className="detail__demo-grid">
+        {flow}
+        <div className="detail__facts">
           {cover}
           {produces}
           {works}
         </div>
-        {flow}
       </div>
       {shelf}
     </div>

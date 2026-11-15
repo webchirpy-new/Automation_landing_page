@@ -450,14 +450,19 @@
   }
   .floating-cta {
     position: fixed;
-    right: 12px;
+    /* Centred inside the same 16px side gutter as the page content */
+    left: 16px;
+    right: 16px;
+    width: fit-content;
+    margin-inline: auto;
     bottom: calc(12px + env(safe-area-inset-bottom));
     z-index: 40;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     min-height: 48px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(100vw - 32px);
     padding: 0 16px;
     border-radius: var(--r-pill);
     color: #fff;
@@ -499,6 +504,7 @@
 .modal__panel {
   position: relative;
   width: 100%;
+  max-height: calc(100vh - 32px); /* fallback: browsers / in-app WebViews without dvh */
   max-height: calc(100dvh - 32px);
   overflow: auto;
   overscroll-behavior: contain;
@@ -1573,4 +1579,49 @@
   text-transform: none;
   letter-spacing: 0.02em;
   margin-top: 6px;
+}
+
+/* ---------- Tally form embeds (TallyEmbed.jsx) ---------- */
+.tally {
+  position: relative;
+}
+.tally iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+/* Space is held only while loading; after that Tally sizes the frame to the form */
+.tally:not(.is-ready) iframe {
+  min-height: var(--tally-min, 420px);
+}
+/* Quiet shimmer until the form has loaded */
+.tally:not(.is-ready)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(100deg, rgba(76, 92, 214, 0.04) 20%, rgba(76, 92, 214, 0.1) 40%, rgba(76, 92, 214, 0.04) 60%) 0 0 / 200% 100%;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tally:not(.is-ready)::before {
+    animation: tally-shimmer 1.4s linear infinite;
+  }
+}
+@keyframes tally-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.tally__open {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tally__open:hover {
+  color: var(--accent-ink);
 }

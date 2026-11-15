@@ -2,24 +2,9 @@ import React from "react"
 import { trusted } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import BrandCarousel from "../interactions/BrandCarousel"
-import ClientStoryScatter from "../interactions/ClientStoryScatter"
+import VideoTestimonials from "../interactions/VideoTestimonials"
 import { Marked } from "../ui/Highlight"
-
-/**
- * Project assets. Only the YRE portal is described in the DOCX (the hero "Source"
- * line); every other slot is an explicit placeholder awaiting real screenshots.
- */
-const PROJECTS = [
-  {
-    title: "Young Reporters for the Environment 2026 portal",
-    meta: "Taylor’s University · GGAF · RTM",
-    body: "One automated platform runs registration, team invites, blind judging and verified certificates, with zero spreadsheets.",
-  },
-  { title: "Project slot 02" },
-  { title: "Project slot 03" },
-  { title: "Project slot 04" },
-  { title: "Project slot 05" },
-]
+import { siteConfig } from "../../config/site"
 
 export default function TrustedIndustries() {
   return (
@@ -35,13 +20,7 @@ export default function TrustedIndustries() {
 
       <BrandCarousel />
 
-      <ClientStoryScatter
-        heading={trusted.clientVoicesHeading}
-        phrase="clients say"
-        pendingNote="Client testimonials pending approval — no quotes are shown until real, permitted ones are supplied."
-        galleryHeading={trusted.galleryHeading}
-        projects={PROJECTS}
-      />
+      {siteConfig.showClientStories && <VideoTestimonials heading={trusted.clientVoicesHeading} phrase="clients say" />}
     </SectionShell>
   )
 }

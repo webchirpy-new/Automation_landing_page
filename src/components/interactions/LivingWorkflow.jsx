@@ -240,23 +240,6 @@ export default function LivingWorkflow() {
     { scope: root, dependencies: [ready] }
   )
 
-  const replay = () => {
-    setPreview(null)
-    if (build.current) {
-      tl.current?.kill()
-      played.current = true
-      setStep(READY)
-      tl.current = build.current()
-      tl.current.play()
-    } else {
-      gsap.fromTo(
-        root.current.querySelectorAll(".lw-stage"),
-        { autoAlpha: 0 },
-        { autoAlpha: 1, duration: 0.3, stagger: 0.06, clearProps: "opacity,visibility" }
-      )
-    }
-  }
-
   const select = (i) => {
     chosen.current = true
     setSelected(i)
@@ -285,12 +268,7 @@ export default function LivingWorkflow() {
             <i aria-hidden="true" />
             {engine.cycleNote}
           </span>
-          <button type="button" className="lw-replay" onClick={replay}>
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
-              <path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v3h-3" />
-            </svg>
-            {engine.cycleReplay}
-          </button>
+          {/* The workflow plays once, when it first scrolls into view (no replay control) */}
         </div>
 
         <div ref={graph} className="lw-graph">

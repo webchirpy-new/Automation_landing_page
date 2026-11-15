@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 import { pattern, persistent } from "../../data/automationContent"
 import { SectionShell, CTAButton } from "../ui/primitives"
-import WorkloadOrbit from "../interactions/WorkloadOrbit"
+import PatternScenes from "../interactions/PatternScenes"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
 import { goToBooking } from "../../lib/scroll"
@@ -53,7 +53,7 @@ export default function Pattern() {
   return (
     <SectionShell id="pattern" theme="night" labelledBy="pattern-title" className="pattern">
       <div ref={ref}>
-        <WorkloadOrbit />
+        <PatternScenes />
 
         <div className="pattern__end">
           <p className="pattern__core">

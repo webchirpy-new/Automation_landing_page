@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import AppTile from "../visuals/AppTile"
 import PixelIcon from "../visuals/PixelIcon"
 
@@ -192,17 +192,14 @@ function Insights() {
 const FLOWS = { merge: Merge, chat: Chat, schedule: Schedule, docs: Docs, timeline: Timeline, kanban: Kanban, loop: Loop, insights: Insights }
 
 export default function ServiceWorkflow({ flow, steps, title }) {
-  const [run, setRun] = useState(0)
   const Flow = FLOWS[flow]
   return (
     <figure className="workflow">
       <div className="workflow__head">
         <figcaption className="t-mono">{title || "Example workflow"}</figcaption>
-        <button type="button" className="workflow__replay" onClick={() => setRun((r) => r + 1)} aria-label="Replay workflow animation">
-          ↻
-        </button>
+        {/* Plays once (no replay control) */}
       </div>
-      <div key={run} className="workflow__stage is-playing" aria-hidden="true">
+      <div className="workflow__stage is-playing" aria-hidden="true">
         {Flow && <Flow />}
       </div>
       <ol className="workflow__steps">

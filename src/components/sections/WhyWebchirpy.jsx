@@ -1,5 +1,6 @@
 import React, { useRef } from "react"
-import { why, uiCopy } from "../../data/automationContent"
+import { why } from "../../data/automationContent"
+import { siteConfig } from "../../config/site"
 import { SectionShell, CTAButton } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
 import CountUp from "../visuals/CountUp"
@@ -150,16 +151,18 @@ export default function WhyWebchirpy() {
 
           <div className="founder">
             <div className="founder__frame">
-              <div className="founder__portrait" role="img" aria-label="Founder portrait placeholder — approved photo pending">
+              {/* Monogram until the approved photo arrives; no "pending" label on the live page */}
+              <div className="founder__portrait" role="img" aria-label={why.founderCard.name}>
                 <span className="founder__mono" aria-hidden="true">
                   VS
                 </span>
-                <span className="founder__pending t-mono">{uiCopy.assetPending} · portrait</span>
               </div>
-              <button type="button" className="founder__play" onClick={() => openModal("video:founder")}>
-                <PixelIcon name="play" size={16} />
-                {why.founderVideoButton}
-              </button>
+              {siteConfig.founderVideoUrl && (
+                <button type="button" className="founder__play" onClick={() => openModal("video:founder")}>
+                  <PixelIcon name="play" size={16} />
+                  {why.founderVideoButton}
+                </button>
+              )}
             </div>
             <div className="founder__card glass">
               <p className="founder__name">{why.founderCard.name}</p>

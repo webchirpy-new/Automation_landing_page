@@ -1,0 +1,116 @@
+/* Privacy notice — a plain document page in the site's typeface and colours (see src/design/tokens.css). */
+:root {
+  --ink: #0b0c10;
+  --ink-2: #282b33;
+  --muted: #5a5f6b;
+  --line: #e5e7ec;
+  --paper: #f6f7f9;
+  --accent-ink: #3a3fa8;
+  --accent-wash: #eef0fd;
+  --tbc-bg: #fff4c2;
+  --tbc-ink: #5c4500;
+  --gutter: clamp(16px, 2.4vw, 32px);
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  line-height: 1.6;
+}
+.draft-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px var(--gutter);
+  background: var(--tbc-bg);
+  color: var(--tbc-ink);
+  border-bottom: 1px solid #e8d48a;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.notice {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px var(--gutter) 64px;
+}
+.back a {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+h1 {
+  font-size: clamp(1.75rem, 1.2rem + 2.3vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 24px 0 8px;
+}
+h2 {
+  font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem);
+  margin: 40px 0 10px;
+}
+.meta {
+  color: var(--muted);
+}
+a {
+  color: var(--accent-ink);
+}
+mark.tbc {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--tbc-bg);
+  color: var(--tbc-ink);
+  font-weight: 600;
+}
+mark.tbc::before {
+  content: "{";
+}
+mark.tbc::after {
+  content: "}";
+}
+.review {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border-left: 3px solid #d4a72c;
+  border-radius: 0 10px 10px 0;
+  background: #fffbea;
+  color: var(--tbc-ink);
+  font-size: 0.9rem;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+th,
+td {
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--paper);
+  font-weight: 650;
+}
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+ul {
+  padding-left: 1.2em;
+}
+.legal {
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}

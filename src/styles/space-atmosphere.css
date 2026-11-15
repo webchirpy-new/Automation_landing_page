@@ -64,13 +64,13 @@
     --space-glass-blur: 4px;
   }
 }
-.section--night :is(.orbit-story, .orbit-card, .fit__col, .diff, .decision) {
+.section--night :is(.ptn-week, .ptn-card, .fit__col, .diff, .decision) {
   -webkit-backdrop-filter: blur(var(--space-glass-blur));
   backdrop-filter: blur(var(--space-glass-blur));
 }
 /* No backdrop-filter: a more solid surface, so stars never sit sharp behind copy */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .section--night :is(.orbit-story, .orbit-card, .fit__col, .diff, .decision) {
+  .section--night :is(.ptn-week, .ptn-card, .fit__col, .diff, .decision) {
     background-color: rgba(10, 11, 15, 0.82);
   }
 }

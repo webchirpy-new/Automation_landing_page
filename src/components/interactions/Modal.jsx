@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react"
+import { X } from "lucide-react"
 import { createPortal } from "react-dom"
 import { getLenis } from "../../lib/smoothScroll"
 
@@ -67,7 +68,7 @@ export default function Modal({ open, onClose, labelledBy, children, className =
         tabIndex={-1}
       >
         <button type="button" className="modal__close" onClick={onClose} aria-label="Close dialog">
-          <span aria-hidden="true">×</span>
+          <X size={20} strokeWidth={2.25} aria-hidden="true" />
         </button>
         {children}
       </div>

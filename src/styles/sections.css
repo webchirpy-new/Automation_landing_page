@@ -10,6 +10,7 @@
 .hero__fold {
   position: relative;
   overflow: hidden;
+  min-height: min(100vh, 940px); /* fallback: browsers / in-app WebViews without svh */
   min-height: min(100svh, 940px);
   display: grid;
   place-items: center;
@@ -303,10 +304,13 @@
     gap: 14px;
   }
 }
-/* Phones: compact 2×2 tiles, icon above text */
-@media (max-width: 599px) {
-  .hero__leaks-list li {
-    grid-template-columns: 1fr;
+/* Phones (incl. large phones and landscape, up to 767px): compact 2×2 tiles, icon above text.
+   Side-by-side icon + text left the text too narrow and long words ran past the card edge. */
+@media (max-width: 767px) {
+  /* .hero__leaks prefix: the base ".hero__leaks li" rule below has equal specificity and comes
+     later, so without it this phone layout never applied */
+  .hero__leaks .hero__leaks-list li {
+    grid-template-columns: minmax(0, 1fr);
     align-content: start;
     gap: 10px;
     padding: 14px;
@@ -344,7 +348,8 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 44px 1fr;
+  /* minmax(0, 1fr): the text column may shrink below its longest word, so it wraps instead of overflowing */
+  grid-template-columns: 44px minmax(0, 1fr);
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
@@ -535,6 +540,9 @@
     gap: 24px;
     align-items: stretch;
   }
+  .hero__proof-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .video-card {
   position: relative;
@@ -715,10 +723,9 @@
 }
 
 /* =========================================================
-   02 PATTERN — "Workload Orbit"
-   A tall track scrubs one GSAP timeline while the stage stays sticky.
-   Sticky applies only when there is motion and room for it; otherwise
-   the same stage sits in normal flow, stepped by its controls.
+   02 PATTERN — "Three scenes"
+   One illustrated mock per approved line, each playing once in view,
+   then a single bar for where the week goes. CSS animations only.
    ========================================================= */
 .pattern .section__panel {
   background:
@@ -727,104 +734,83 @@
     radial-gradient(60% 34% at 6% 62%, rgba(60, 40, 120, 0.1), transparent 72%),
     #0a0b0f;
 }
-.orbit {
-  --orbit-pad-y: clamp(16px, 3svh, 36px);
-  /* Vertical rhythm: wide between groups, tight within a group */
-  --orbit-gap: clamp(12px, 2.4svh, 28px); /* between groups */
-  --orbit-near: clamp(8px, 1.1svh, 12px); /* panel to its dots and note */
-  --orbit-clear: clamp(10px, 1.8svh, 20px); /* orbit to panel */
-  /* Story bar. Its old height is kept as a reference: whatever height the bar gives up goes
-     into the gap above it, so the orbit and everything below keep their exact positions. */
-  --line-fs: clamp(1.0625rem, 0.92rem + 0.6vw, 1.5rem);
-  --bar-new: 47px;
-  --bar-old: 54px;
+.ptn {
+  --cat-c: linear-gradient(135deg, #fbfaff, #cfd2f7 55%, #ad9fdc);
+  --cat-m: #e7a9cf;
+  --cat-r: #7fd6e2;
+  --cat-d: #a993e6;
+  --cat-f: #e9b77c;
+  --ptn-line: rgba(232, 230, 255, 0.1);
+  --ptn-line-2: rgba(232, 230, 255, 0.16);
+  --ptn-card: rgba(16, 17, 25, 0.7);
+  --ptn-inner: rgba(255, 255, 255, 0.035);
+  --ptn-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Two-line story text used to make the bar taller at these widths */
-@media (min-width: 1024px) and (max-width: 1040.98px) {
-  .orbit {
-    --bar-old: 64.2px;
-  }
-}
-@media (max-width: 1023.98px) {
-  .orbit {
-    --bar-new: 62px;
-    --bar-old: 72px;
-  }
-}
-@media (max-width: 501.98px) {
-  .orbit {
-    --bar-new: 76px;
-    --bar-old: 87.7px;
-  }
-}
-@media (max-width: 330.98px) {
-  .orbit {
-    --bar-old: 103.6px;
-  }
-}
-@media (max-width: 329.98px) {
-  .orbit {
-    --bar-old: 119.3px;
-  }
-}
-@media (max-width: 321.98px) {
-  .orbit {
-    --bar-old: 135px;
-  }
-}
-.orbit-stage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--orbit-gap);
-}
-.orbit-main {
-  display: grid;
-  gap: var(--orbit-gap);
-  min-height: 0;
+.ptn [data-cat="c"] { --cat: var(--cat-c); }
+.ptn [data-cat="m"] { --cat: var(--cat-m); }
+.ptn [data-cat="r"] { --cat: var(--cat-r); }
+.ptn [data-cat="d"] { --cat: var(--cat-d); }
+.ptn [data-cat="f"] { --cat: var(--cat-f); }
+.ptn-swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cat);
 }
 
-/* Copy */
-.orbit-h {
-  max-width: 15ch;
+/* ---------- Head ---------- */
+.ptn-head {
+  display: grid;
+  justify-items: center;
+  gap: clamp(22px, 3vw, 34px);
+  text-align: center;
+}
+.ptn-head .eyebrow {
+  justify-content: center;
+}
+.ptn-h {
+  max-width: 20ch;
+  margin-inline: auto;
   font-size: var(--fs-h2);
+  text-wrap: balance;
 }
-.orbit-h__lead {
-  display: inline;
-}
-.orbit-chips-desk .pattern__points {
-  margin-top: clamp(16px, 3.4svh, 40px);
-}
-.pattern__points {
-  border-top: 1px solid var(--line);
-}
-.pattern__points li {
+.ptn-chips {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.ptn-chips li {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: clamp(9px, 1.5svh, 14px) 0;
-  border-bottom: 1px solid var(--line);
-  font-size: clamp(0.9375rem, 0.88rem + 0.25vw, 1.0625rem);
+  gap: 10px;
+  padding: 7px 16px 7px 7px;
+  border: 1px solid var(--ptn-line-2);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: clamp(0.8125rem, 0.78rem + 0.2vw, 0.9375rem);
   font-weight: 550;
   line-height: 1.3;
   color: var(--ink-2);
+  text-align: left;
 }
-/* Small glass shell, faint two-hue corner light; the vector check itself stays near-white */
 .pattern__tick {
   flex: none;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(232, 230, 255, 0.16);
-  border-radius: 7px;
+  border-radius: 999px;
   background:
     radial-gradient(70% 70% at 100% 0%, rgba(240, 190, 223, 0.36), transparent 70%),
     radial-gradient(70% 70% at 0% 100%, rgba(140, 230, 240, 0.32), transparent 70%),
     rgba(183, 154, 238, 0.16);
 }
 .pattern__tick svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   fill: none;
   stroke: #f4f2ff;
   stroke-width: 2;
@@ -832,593 +818,460 @@
   stroke-linejoin: round;
 }
 
-/* Orbit */
-.orbit-visual {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  gap: var(--orbit-near);
-}
-.orbit-canvas {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  height: min(86vw, 460px);
-  margin-bottom: calc(var(--orbit-clear) - var(--orbit-near) + var(--bar-old) - var(--bar-new));
-  container-type: size;
-}
-.orbit-square {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: min(100cqw, 100cqh);
-  height: min(100cqw, 100cqh);
-}
-.orbit-glow {
-  position: absolute;
-  inset: -12%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side at 66% 36%, rgba(140, 230, 240, 0.18), rgba(110, 126, 236, 0.07) 56%, transparent 100%);
-  pointer-events: none;
-}
-.orbit-svg {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.orbit-halo {
-  transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0.45;
-}
-.orbit[data-live] .orbit-halo {
-  animation: orbit-pulse 3.6s ease-in-out infinite;
-}
-.orbit[data-live] .orbit-mark[data-m="1"] .orbit-halo {
-  animation-delay: 0.7s;
-}
-.orbit[data-live] .orbit-mark[data-m="2"] .orbit-halo {
-  animation-delay: 1.5s;
-}
-.orbit[data-live] .orbit-mark[data-m="3"] .orbit-halo {
-  animation-delay: 2.3s;
-}
-@keyframes orbit-pulse {
-  0%,
-  100% {
-    transform: scale(0.72);
-    opacity: 0.34;
-  }
-  45% {
-    transform: scale(1.22);
-    opacity: 0.95;
-  }
-}
-.orbit-tag,
-.orbit-fan {
-  position: absolute;
-  left: 0;
-  top: 0;
-  white-space: nowrap;
-  pointer-events: none;
-  will-change: transform;
-}
-.orbit-tag {
-  padding-bottom: clamp(7px, 1.4cqw, 13px);
-  font-size: clamp(0.6875rem, 0.55rem + 1.1cqw, 0.9375rem);
-  font-weight: 650;
-  letter-spacing: -0.005em;
-  color: #cdd2e2; /* emphasis changes colour, never opacity, so idle labels stay readable */
-  text-shadow: 0 1px 10px rgba(5, 6, 10, 0.75);
-  transition: color 240ms var(--ease-out);
-}
-.orbit-tag[data-active] {
-  color: #f8f7ff;
-}
-.orbit-fan {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  translate: -4px -50%;
-  font-size: clamp(0.6875rem, 0.55rem + 0.9cqw, 0.875rem);
-  color: #e6e6f6;
-  text-shadow: 0 1px 10px rgba(5, 6, 10, 0.9);
-  transition: opacity 120ms ease-out;
-}
-.orbit-fan[data-active] {
-  opacity: 1;
-  transition: opacity 240ms ease-out 80ms;
-}
-.orbit-fan--l {
-  flex-direction: row-reverse;
-  translate: calc(-100% + 4px) -50%;
-}
-.orbit-fan b {
-  font-weight: 500;
-}
-.orbit-fan--key b {
-  font-weight: 700;
-  color: #d4c6fa; /* lavender, 12:1 on the panel */
-}
-.orbit-fan i {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--spectral-fill-dark);
-  box-shadow: -2px 0 8px rgba(140, 230, 240, 0.6), 2px 0 8px rgba(240, 190, 223, 0.55);
-}
-
-/* Story line: all three lines stay in the DOM and in the a11y tree; only opacity changes */
-.orbit-story {
+/* ---------- Scene cards ---------- */
+.ptn-cards {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) 20px;
-  grid-template-rows: minmax(0, 1fr);
-  align-items: center;
-  width: 100%;
-  height: var(--bar-new);
-  margin-inline: auto;
-  position: relative;
-  border: 1px solid rgba(222, 228, 252, 0.1);
-  border-radius: var(--r-18);
-  /* Navigation, not a CTA: a quiet inner drift of three hues and a faint moving hairline */
-  background:
-    radial-gradient(28% 120% at 12% 50%, rgba(140, 230, 240, 0.12), transparent 70%),
-    radial-gradient(26% 120% at 50% 50%, rgba(183, 154, 238, 0.11), transparent 70%),
-    radial-gradient(26% 120% at 88% 50%, rgba(240, 190, 223, 0.1), transparent 70%),
-    rgba(240, 242, 255, 0.045);
-  background-size: 160% 100%, 160% 100%, 160% 100%, auto;
-  background-position: 0% 0, 50% 0, 100% 0, 0 0;
+  gap: clamp(14px, 1.6vw, 20px);
+  margin-top: clamp(40px, 5.5vw, 72px);
 }
-.orbit-story::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: linear-gradient(100deg, rgba(140, 230, 240, 0.55), rgba(255, 255, 255, 0.08) 22%, rgba(183, 154, 238, 0.5) 45%, rgba(255, 255, 255, 0.06) 66%, rgba(240, 190, 223, 0.55)) 0 0 / 220% 100%;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .orbit[data-live] .orbit-story {
-    animation: story-drift 17s ease-in-out infinite alternate;
+@media (min-width: 960px) {
+  /* Subgrid: every stage shares one height, so the three lines start on one baseline */
+  .ptn-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    row-gap: 0;
   }
-  .orbit[data-live] .orbit-story::before {
-    animation: cta-rim 12s ease-in-out infinite alternate;
+  .ptn-card {
+    grid-row: span 2;
+    grid-template-rows: subgrid;
   }
 }
-@keyframes story-drift {
-  from {
-    background-position: 0% 0, 50% 0, 100% 0, 0 0;
-  }
-  to {
-    background-position: 70% 0, 0% 0, 30% 0, 0 0;
-  }
-}
-.orbit-slot {
-  position: relative;
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  align-self: stretch;
-}
-/* Timed swap, independent of scroll: the old line clears before the new one arrives, so two
-   lines never overlap and the text is never left half-faded when the visitor stops. */
-.orbit-slot > :is(.orbit-line, .orbit-slotchips) {
-  grid-area: 1 / 1;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 130ms ease-out, transform 130ms ease-out;
-}
-.orbit-slot > :is(.orbit-line, .orbit-slotchips)[data-active] {
-  opacity: 1;
-  transform: none;
-  transition: opacity 240ms ease-out 120ms, transform 320ms var(--ease-out) 120ms;
-}
-.orbit-line {
-  font-size: calc(var(--line-fs) - 2.5px); /* --line-fs alone sets the bar's width */
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
-  text-align: center;
-  text-wrap: balance;
-  color: var(--ink);
-}
-.orbit-slotchips {
-  display: none;
-}
-.orbit-progress {
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: -1px;
-  height: 2px;
-  overflow: hidden;
-  border-radius: 2px;
-  background: rgba(222, 228, 252, 0.1);
-}
-.orbit-progress i {
-  display: block;
-  height: 100%;
-  background: var(--spectral-stroke);
-  transform-origin: 0 50%;
-}
-.orbit-arrow {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 44px;
-  border-radius: 12px;
-  color: #eceaff;
-  transition: background var(--dur-hover), color var(--dur-hover), opacity var(--dur-hover);
-}
-.orbit-arrow:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-}
-/* The visible slot is slim; the tap target stays 44px wide, reaching in over the text */
-.orbit-arrow::after {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  width: 44px;
-}
-.orbit-arrow:first-child::after {
-  left: 0;
-}
-.orbit-arrow:last-child::after {
-  right: 0;
-}
-.orbit-arrow svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.orbit-arrow:hover:not(:disabled) {
-  background: rgba(222, 228, 252, 0.1);
-}
-.orbit-arrow:disabled {
-  opacity: 0.32;
-  cursor: default;
-}
-.orbit-meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-.orbit-dots {
-  display: flex;
-  gap: 2px;
-}
-.orbit-dotbtn {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-}
-.orbit-dotbtn i {
-  width: 8px;
-  height: 8px;
-  border-radius: 99px;
-  background: rgba(222, 228, 252, 0.28);
-  transition: background var(--dur-hover), box-shadow var(--dur-hover), width var(--dur-hover) var(--ease-out);
-}
-.orbit-dotbtn:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 0;
-  border-radius: 8px;
-}
-.orbit-dotbtn:hover i {
-  background: rgba(222, 228, 252, 0.6);
-}
-/* Active stage: a longer pill as well as a colour, so it reads without colour */
-.orbit-dotbtn[aria-pressed="true"] i {
-  width: 18px;
-  background: var(--spectral-stroke);
-  box-shadow: -3px 0 8px rgba(140, 230, 240, 0.5), 3px 0 8px rgba(240, 190, 223, 0.45);
-}
-
-/* Supporting cards — secondary to the orbit, focused by it */
-.orbit-support__title {
-  margin-bottom: clamp(6px, 1svh, 10px);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.3;
-  color: var(--muted);
-}
-.orbit-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: 1fr; /* every card the same height, whichever label wraps */
-  gap: 8px;
-}
-@media (min-width: 768px) {
-  .orbit-cards {
-    gap: 12px;
-  }
-}
-/* Four across only when each card can hold its label without squeezing */
-@media (min-width: 1024px) {
-  .orbit-cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-/* Phones: the long label may break inside "Chasing follow-ups" rather than be clipped */
-@media (max-width: 479.98px) {
-  .orbit-cards .orbit-card {
-    column-gap: 8px;
-    padding: 10px 10px;
-  }
-  .orbit-cards .orbit-card__part {
-    white-space: normal;
-  }
-}
-/* Three tracks: leading icon | label | illustration. Grid, not absolute art, so the label can
-   never run under the picture; "Data entry / Chasing follow-ups" wraps on its separator. */
-.orbit-card {
-  --orbit-art: 0px;
-  --card-rim: 0;
-  position: relative;
-  display: grid;
-  grid-template-columns: 20px minmax(0, 1fr);
-  align-items: center;
-  column-gap: 10px;
-  min-height: 52px;
-  padding: 10px 12px;
-  overflow: hidden;
-  border: 1px solid rgba(222, 228, 252, 0.12);
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(240, 242, 255, 0.07), rgba(240, 242, 255, 0.018));
-  color: var(--muted);
-  text-align: left;
-  transition: border-color 420ms var(--ease-out), box-shadow 420ms var(--ease-out), color 420ms var(--ease-out), background 420ms var(--ease-out);
-}
-/* Spectral rim: hidden at rest, a hairline on hover, a full 1.5px edge when selected */
-.orbit-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  z-index: 1;
-  padding: var(--card-rim-w, 1px);
-  border-radius: inherit;
-  pointer-events: none;
-  background: var(--spectral-stroke);
-  opacity: var(--card-rim);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  transition: opacity 420ms var(--ease-out);
-}
-@media (hover: hover) {
-  .orbit-card:hover {
-    --card-rim: 0.5;
-    color: var(--ink-2);
-  }
-}
-.orbit-card:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 3px;
-}
-.orbit-card[data-active] {
-  --card-rim: 0.95;
-  --card-rim-w: 1.5px;
-  border-color: transparent;
-  background:
-    radial-gradient(60% 120% at 0% 0%, rgba(140, 230, 240, 0.12), transparent 70%),
-    radial-gradient(60% 120% at 100% 100%, rgba(240, 190, 223, 0.12), transparent 70%),
-    linear-gradient(135deg, rgba(150, 128, 238, 0.18), rgba(240, 242, 255, 0.03));
-  box-shadow: -8px 6px 26px -10px rgba(140, 230, 240, 0.28), 8px 10px 30px -10px rgba(214, 154, 208, 0.26);
-  color: var(--ink);
-}
-.orbit-card__icon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.82;
-  transition: opacity 420ms var(--ease-out);
-}
-.orbit-card[data-active] .orbit-card__icon,
-.orbit-card:hover .orbit-card__icon {
-  opacity: 1;
-}
-.orbit-card__label {
-  position: relative;
-  z-index: 1;
-  font-size: clamp(0.75rem, 0.7rem + 0.3vw, 1rem);
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-.orbit-card__part {
-  display: inline-block;
-  white-space: nowrap;
-}
-.orbit-card__word {
-  white-space: nowrap;
-}
-.orbit-card__sep {
-  color: var(--muted-2);
-}
-.orbit-card__art {
-  display: none;
-  justify-self: end;
-  height: var(--orbit-art);
-  width: auto;
-  opacity: 0.62;
-  overflow: visible;
-  transition: opacity 500ms var(--ease-out), transform 700ms var(--ease-out);
-}
-.orbit-card__art g {
-  transition: transform 700ms var(--ease-out);
-}
-.orbit-card[data-active] .orbit-card__art {
-  opacity: 1;
-  transform: translateY(-2px) scale(1.05);
-}
-.orbit-card[data-active] .orbit-art__b {
-  transform: translateY(-3px);
-}
-.orbit-card[data-active] .orbit-art__c {
-  transform: translateY(-7px);
-}
-@media (min-width: 768px) {
-  .orbit-card {
-    grid-template-columns: 22px minmax(0, 1fr);
-    column-gap: 12px;
-    min-height: 64px;
-    padding: 12px 16px;
-  }
-  .orbit-card__icon {
-    width: 22px;
-    height: 22px;
-  }
-}
-/* Desktop: room for the illustration in its own right-hand track */
-@media (min-width: 1280px) and (min-height: 700px) {
-  .orbit-card {
-    --orbit-art: clamp(40px, 5.2svh, 50px);
-    grid-template-columns: 24px minmax(0, 1fr) calc(var(--orbit-art) * 1.2);
-    column-gap: 14px;
-    min-height: clamp(72px, 9svh, 86px);
-    padding: 14px 18px 14px 20px;
-  }
-  .orbit-card__icon {
-    width: 24px;
-    height: 24px;
-  }
-  .orbit-card__art {
-    display: block;
-  }
-  .orbit-card__label {
-    font-size: clamp(0.875rem, 0.7rem + 0.25vw, 1rem);
-  }
-}
-
-/* Two-column composition */
-@media (min-width: 1024px) {
-  .orbit-main {
-    grid-template-columns: minmax(0, 39fr) minmax(0, 61fr);
-    gap: clamp(32px, 5vw, 80px);
-    align-items: center;
-  }
-  .orbit-canvas {
-    height: 500px;
-  }
-  .orbit-meta {
-    width: 100%;
-    max-width: 660px;
+@media (min-width: 640px) and (max-width: 959.98px) {
+  .ptn-cards {
+    max-width: 560px;
     margin-inline: auto;
   }
-  /* As narrow as the type allows: the longest story line stays on one line at its full size */
-  .orbit-story {
-    width: min(100%, calc(var(--line-fs) * 21.85 + 42px));
-  }
-  .orbit-line {
-    white-space: nowrap;
-  }
+}
+.ptn-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--ptn-line);
+  border-radius: var(--r-24);
+  background: var(--ptn-card);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s var(--ptn-ease) calc(var(--k) * 90ms), transform 0.7s var(--ptn-ease) calc(var(--k) * 90ms), border-color 0.3s ease;
+}
+.ptn-card.is-in {
+  opacity: 1;
+  transform: none;
+}
+.ptn-card:hover {
+  border-color: var(--ptn-line-2);
+}
+.ptn-card__stage {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 300px;
+  padding: clamp(18px, 2vw, 26px);
+  border-bottom: 1px solid var(--ptn-line);
+  background:
+    radial-gradient(80% 70% at 50% 0%, color-mix(in srgb, var(--cat) 9%, transparent), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 100% 24px;
+}
+.ptn-card__copy {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: clamp(18px, 2vw, 26px);
+}
+.ptn-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--night-muted);
+}
+.ptn-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+.ptn-card__line {
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.22;
+  color: var(--night-text);
+  text-wrap: balance;
+}
+.ptn-card__note {
+  justify-self: start;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--cat) 15%, transparent);
+  color: var(--cat);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+.ptn-card[data-cat="c"] .ptn-card__note {
+  color: #fff;
 }
 
-/* Stacked composition: the chips take the story slot until the first line arrives */
-@media (max-width: 1023.98px) {
-  .orbit-h {
-    max-width: none;
-  }
-  .orbit-chips-desk,
-  .orbit-line--core {
-    display: none;
-  }
-  .orbit-slotchips {
-    display: block;
-    width: 100%;
-    border-top: 0;
-    padding-inline: 2px;
-  }
-  .orbit-slotchips li {
-    gap: 8px;
-    padding: 1px 0;
-    border: 0;
-    font-size: 0.8125rem;
-    line-height: 1.22;
-  }
-  .orbit-slotchips .pattern__tick {
-    width: 16px;
-    height: 16px;
-    background: none;
-  }
-  .orbit-story {
-    grid-template-columns: 24px minmax(0, 1fr) 24px;
-    width: max(84%, 436px); /* the floor keeps all three chips on single lines */
-  }
-  .orbit-arrow {
-    width: 24px;
-  }
+/* ---------- Shared mock chrome ---------- */
+.ptn-mock {
+  width: 100%;
+  max-width: 360px;
+  margin-inline: auto;
+  border: 1px solid var(--ptn-line-2);
+  border-radius: 16px;
+  background: rgba(12, 13, 20, 0.86);
+  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
+  font-size: 0.8125rem;
+  color: var(--night-text);
+}
+.ptn-mock__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ptn-line);
+}
+.ptn-mock__who {
+  display: grid;
+  line-height: 1.2;
+}
+.ptn-mock__who b {
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+.ptn-mock__who small {
+  font-size: 0.6875rem;
+  color: var(--night-muted);
+}
+.ptn-avatar,
+.ptn-fileicon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat-r) 22%, transparent);
+  color: var(--cat-r);
+  font-size: 0.625rem;
+  font-weight: 750;
+}
+.ptn-fileicon {
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--cat-m) 18%, transparent);
+  color: var(--cat-m);
+}
+.ptn-fileicon--note {
+  background: color-mix(in srgb, var(--cat-f) 18%, transparent);
+  color: var(--cat-f);
+}
+.ptn-fileicon svg {
+  width: 15px;
+  height: 15px;
+}
 
+/* ---------- Scene 1: the enquiry that waits overnight ---------- */
+.ptn-chat__body {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
 }
-@media (max-width: 501.98px) {
-  .orbit-story {
-    width: max(84%, min(272px, 100%));
-  }
+.ptn-bubble {
+  position: relative;
+  max-width: 84%;
+  padding: 8px 11px 18px;
+  border-radius: 12px;
+  line-height: 1.38;
 }
-/* Small orbits keep only the marker labels and the one annotation that says what slipped */
-@media (max-width: 639.98px) {
-  .orbit-fan:not(.orbit-fan--key) {
-    display: none;
-  }
+.ptn-bubble time {
+  position: absolute;
+  right: 9px;
+  bottom: 4px;
+  font-size: 0.625rem;
+  color: var(--night-muted);
 }
-/* The smallest orbits show just the active ring's label once the story is moving */
-@container (max-height: 300px) {
-  .orbit[data-moment="1"] .orbit-tag:is([data-m="2"], [data-m="3"]),
-  .orbit[data-moment="2"] .orbit-tag:is([data-m="1"], [data-m="3"]),
-  .orbit[data-moment="3"] .orbit-tag:is([data-m="1"], [data-m="2"]) {
-    display: none;
-  }
+.ptn-bubble--in {
+  justify-self: start;
+  border-top-left-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.ptn-bubble--out {
+  justify-self: end;
+  border-top-right-radius: 4px;
+  background: color-mix(in srgb, var(--cat-r) 20%, rgba(12, 13, 20, 1));
+}
+.ptn-seen {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.6875rem;
+  color: var(--night-muted);
+}
+.ptn-seen svg {
+  width: 13px;
+  height: 13px;
+  color: var(--cat-r);
+}
+.ptn-night {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--night-muted);
+}
+.ptn-night svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.ptn-night__line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--ptn-line-2) 0 4px, transparent 4px 8px);
+}
+.ptn-night__gap {
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--cat-r) 14%, transparent);
+  color: var(--cat-r);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Sticky scrub */
-@media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
-  .orbit-track {
-    height: 240vh; /* keep in step with TIMELINE in data/workloadOrbit.js */
+/* ---------- Scene 2: the Friday report ---------- */
+.ptn-sheet__grid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 1px;
+  margin: 12px;
+  border: 1px solid var(--ptn-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ptn-line);
+}
+.ptn-sheet__grid i {
+  position: relative;
+  height: 20px;
+  background: rgba(12, 13, 20, 0.95);
+}
+.ptn-sheet__grid i::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  height: 4px;
+  width: 58%;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.ptn-sheet__grid i:nth-child(3n)::after { width: 44%; }
+.ptn-sheet__grid i:nth-child(4n + 1)::after { width: 72%; }
+.ptn-sheet__grid i:nth-child(5n)::after { width: 34%; }
+.ptn-sheet__grid i[data-head] {
+  background: rgba(255, 255, 255, 0.05);
+}
+.ptn-sheet__grid i[data-head]::after {
+  background: rgba(255, 255, 255, 0.4);
+  width: 36%;
+}
+.ptn-day {
+  padding: 0 12px 12px;
+}
+.ptn-day__track {
+  position: relative;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.ptn-day__fill {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  border-radius: 7px;
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--cat-m) 34%, transparent) 0 6px, color-mix(in srgb, var(--cat-m) 24%, transparent) 6px 12px);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  white-space: nowrap;
+  color: #fff;
+}
+.ptn-day__ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.625rem;
+  color: var(--night-muted);
+}
+
+/* ---------- Scene 3: follow-ups in someone's memory ---------- */
+.ptn-todo__list {
+  display: grid;
+  padding: 4px 12px 8px;
+}
+.ptn-todo__list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ptn-line);
+}
+.ptn-todo__list li:last-child {
+  border-bottom: 0;
+}
+.ptn-box {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--ptn-line-2);
+  border-radius: 4px;
+}
+.ptn-todo__text {
+  display: grid;
+  line-height: 1.25;
+  min-width: 0;
+}
+.ptn-todo__text b {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+.ptn-todo__text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  color: var(--night-muted);
+}
+.ptn-late {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--cat-f) 16%, transparent);
+  color: var(--cat-f);
+  font-size: 0.625rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------- Scene playback (once, when the card enters) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .ptn-card:not(.is-in) :is(.ptn-bubble, .ptn-seen, .ptn-night, .ptn-todo__list li, .ptn-late) {
+    opacity: 0;
   }
-  .orbit-stage {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100svh;
-    padding-block: var(--orbit-pad-y);
-    justify-content: space-between;
+  .ptn-card.is-in .ptn-bubble--in { animation: ptn-pop 0.5s var(--ptn-ease) 0.3s both; }
+  .ptn-card.is-in .ptn-seen { animation: ptn-fade 0.4s ease 0.8s both; }
+  .ptn-card.is-in .ptn-night { animation: ptn-fade 0.4s ease 1.1s both; }
+  .ptn-card.is-in .ptn-night__line { animation: ptn-grow 1.4s var(--ptn-ease) 1.2s both; transform-origin: 0 50%; }
+  .ptn-card.is-in .ptn-night__line + .ptn-night__gap + .ptn-night__line { animation-delay: 1.5s; }
+  .ptn-card.is-in .ptn-night__gap { animation: ptn-pop 0.45s var(--ptn-ease) 1.6s both; }
+  .ptn-card.is-in .ptn-night__sun { animation: ptn-fade 0.4s ease 2.4s both; }
+  .ptn-card.is-in .ptn-bubble--out { animation: ptn-pop 0.5s var(--ptn-ease) 2.6s both; }
+
+  .ptn-card.is-in .ptn-sheet__grid i::after { animation: ptn-type 0.35s ease both; animation-delay: calc(0.35s + var(--n) * 70ms); transform-origin: 0 50%; }
+  .ptn-card.is-in .ptn-day__fill { animation: ptn-wipe 2.4s var(--ptn-ease) 0.6s both; }
+
+  .ptn-card.is-in .ptn-todo__list li { animation: ptn-rise 0.5s var(--ptn-ease) both; animation-delay: calc(0.35s + var(--n) * 0.22s); }
+  .ptn-card.is-in .ptn-late { animation: ptn-pop 0.45s var(--ptn-ease) both; animation-delay: calc(1.3s + var(--n) * 0.25s); }
+}
+@keyframes ptn-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ptn-pop { from { opacity: 0; transform: translateY(6px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes ptn-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ptn-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes ptn-type { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes ptn-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* ---------- Where the week goes ---------- */
+.ptn-week {
+  margin: clamp(14px, 1.6vw, 20px) 0 0;
+  padding: clamp(20px, 2.6vw, 32px);
+  border: 1px solid var(--ptn-line);
+  border-radius: var(--r-24);
+  background: var(--ptn-card);
+}
+.ptn-week__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: clamp(16px, 2vw, 22px);
+}
+.ptn-week__title {
+  font-size: clamp(1.0625rem, 0.98rem + 0.4vw, 1.3125rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ptn-week__caption {
+  font-size: 0.6875rem;
+  color: var(--night-muted);
+}
+.ptn-week__bar {
+  display: flex;
+  gap: 4px;
+  height: clamp(44px, 5vw, 56px);
+}
+.ptn-week__seg {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-inline: 12px;
+  border-radius: 10px;
+  background: var(--cat);
+  overflow: hidden;
+  flex: var(--share) 1 0;
+  transition: flex-grow 1.4s var(--ptn-ease), opacity 0.6s ease;
+}
+.ptn-week__seg:not([data-cat="c"]) {
+  background:
+    repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0 6px, transparent 6px 12px),
+    var(--cat);
+}
+.ptn-week__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #121320;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Before it is in view the whole week is customer work; then the other work takes its share */
+  .ptn-week:not(.is-in) .ptn-week__seg:not([data-cat="c"]) {
+    flex-grow: 0;
+    opacity: 0;
+    padding-inline: 0;
   }
-  .orbit-main {
-    flex: 1 1 0;
+  .ptn-week:not(.is-in) .ptn-week__seg[data-cat="c"] {
+    flex-grow: 100;
   }
-  .orbit-canvas {
-    height: auto;
-  }
-  .orbit-visual {
-    height: 100%;
-  }
-  .orbit-copy {
-    align-self: center;
-  }
-  /* Stacked: rows are copy / visual, and the visual takes whatever height is left */
-  .orbit-main {
-    grid-template-rows: auto minmax(0, 1fr);
+  .ptn-week.is-in .ptn-week__seg {
+    transition-delay: 0.25s;
   }
 }
-@media (prefers-reduced-motion: no-preference) and (min-height: 600px) and (min-width: 1024px) {
-  .orbit-main {
-    grid-template-rows: minmax(0, 1fr);
+.ptn-week__legend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 14px;
+  font-size: 0.8125rem;
+  color: var(--night-muted);
+}
+.ptn-week__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Narrow screens: the bar keeps its colours and the names move to a legend */
+@media (max-width: 899.98px) {
+  .ptn-week__label {
+    display: none;
+  }
+  .ptn-week__legend {
+    display: flex;
   }
 }
 
@@ -1832,7 +1685,7 @@
   pointer-events: none;
   z-index: 0;
 }
-.auto-map__route polyline {
+.auto-map__route :is(polyline, line) {
   fill: none;
   stroke: var(--accent);
   stroke-width: 2;
@@ -2082,6 +1935,63 @@
 .score-area__toggle {
   min-height: 64px;
   padding-block: 14px;
+  /* Phones: status pill sits under the title so long labels ("Partly manual") never cover the text */
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon titles chev"
+    "icon badge chev";
+  gap: 8px 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.score-area__toggle .score-area__icon {
+  grid-area: icon;
+}
+.score-area__toggle .score-area__titles {
+  grid-area: titles;
+}
+.score-area__toggle .score-area__badge {
+  grid-area: badge;
+  justify-self: start;
+}
+.score-area__chev {
+  grid-area: chev;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--accent-ink);
+  transition: transform 300ms var(--ease-out), background 300ms;
+}
+.score-area.is-open .score-area__chev {
+  transform: rotate(180deg);
+}
+.score-area__toggle:active .score-area__chev {
+  background: var(--accent-wash);
+}
+/* Collapsed rows lift on tap so they read as buttons, not plain cards */
+.score-area:not(.is-open):has(.score-area__toggle:active) {
+  border-color: var(--accent);
+}
+
+/* Automation map: 2 per row on phones, with room for the labels and status pills */
+@media (max-width: 599px) {
+  .auto-map,
+  .scorecard .scorecard__summary .auto-map {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .auto-map .auto-map__cell,
+  .scorecard__summary .auto-map .auto-map__cell {
+    padding: 14px 10px 12px;
+  }
+  .auto-map .auto-map__name,
+  .scorecard__summary .auto-map .auto-map__name {
+    font-size: 0.875rem;
+  }
 }
 .score-area.is-open .score-area__toggle {
   padding-bottom: 10px;
@@ -2656,7 +2566,7 @@
   stroke-width: 6;
   opacity: 0;
 }
-/* Restrained idle: one light runs the main axis every 9s once the graph has settled. */
+/* Once the graph has settled, one light runs the main axis a single time (no loop). */
 .lw-pulse {
   display: none;
   fill: none;
@@ -2669,7 +2579,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .lw[data-phase="done"] .lw-pulse {
     display: inline;
-    animation: lw-pulse 9s linear var(--delay) infinite both;
+    animation: lw-pulse 9s linear var(--delay) 1 both;
   }
   .lw-detail__inner {
     animation: lw-fade 360ms var(--ease-out) both;

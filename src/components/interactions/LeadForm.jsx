@@ -54,7 +54,7 @@ export default function LeadForm({ idPrefix, compact = false }) {
   const scoreLine =
     summary.gapCount > 0 || summary.reviewedCount > 0
       ? `Scorecard: ${summary.gapCount} of 16 gaps · ${summary.reviewedCount} of 8 areas reviewed${
-          summary.priorities.length ? ` · priorities: ${summary.priorities.map((a) => a.area).join(", ")}` : ""
+          summary.top3.length ? ` · priorities: ${summary.top3.map((a) => a.area).join(", ")}` : ""
         }`
       : null
 
@@ -84,7 +84,7 @@ export default function LeadForm({ idPrefix, compact = false }) {
             reviewedAreas: summary.reviewedCount,
             complete: summary.complete,
             score: summary.score,
-            priorities: summary.priorities.map((a) => ({ area: a.area, gaps: a.gaps })),
+            priorities: summary.top3.map((a) => ({ area: a.area, gaps: a.gaps })),
           },
           // Page 1 keeps its original value; pages 2–8 append their id so leads can be traced to the page
           source: pageId === "vsl-01" ? "webchirpy-automation-landing" : `webchirpy-automation-landing:${pageId}`,
@@ -166,7 +166,14 @@ export default function LeadForm({ idPrefix, compact = false }) {
       <button type="submit" className="btn btn--primary btn--lg btn--block" disabled={status === "sending"}>
         <span className="btn__label">{status === "sending" ? "Sending…" : walk.form.button}</span>
       </button>
-      <p className="lead-form__privacy">{walk.form.privacy}</p>
+      {/* Replaces "Your details are only used to book your call." (Launch Kit 03): while this is a
+          dummy form, nothing is used at all. Kit 03 line N2 lands with Tally Form B. */}
+      <p className="lead-form__privacy">
+        {uiCopy.demoFormNote}{" "}
+        <a className="inline-link" href={siteConfig.privacyUrl}>
+          {uiCopy.privacyNotice}
+        </a>
+      </p>
 
       <div aria-live="polite">
         {status === "demo" && (

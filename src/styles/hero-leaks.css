@@ -452,3 +452,12 @@
   line-height: 1.1;
   overflow-wrap: anywhere;
 }
+
+/* Card text wraps inside its card at every size, including large system font settings
+   (in-app browsers on Android apply the phone's text scaling). */
+.hero__leaks li > span:not(.hero__leak-icon):not(.hero__leak-drip) {
+  min-width: 0;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}

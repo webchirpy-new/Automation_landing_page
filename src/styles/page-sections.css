@@ -1,0 +1,306 @@
+/* =========================================================
+   PAGE SECTIONS — landing pages vsl-05 to vsl-08 (Launch Kit 04)
+   Built only from existing tokens: white cards on the light canvas,
+   hairline borders, accent wash for the "after" / promise moments.
+   ========================================================= */
+
+.psec .section-head {
+  margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.psec__label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--accent-ink);
+}
+.psec__eyebrow {
+  margin-bottom: 10px;
+  color: var(--accent-ink);
+}
+.psec__note {
+  max-width: 68ch;
+  margin-top: 20px;
+  font-size: var(--fs-small);
+}
+.psec__note--center {
+  margin-inline: auto;
+  text-align: center;
+}
+.psec__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+.psec__cta {
+  margin-top: 8px;
+}
+
+/* Shared card */
+.psec-card {
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: var(--r-24);
+  padding: clamp(18px, 3vw, 28px);
+}
+.psec-card--accent {
+  background: var(--accent-wash);
+  border-color: rgba(76, 92, 214, 0.28);
+}
+
+/* ---------- #story ---------- */
+.psec-story {
+  display: grid;
+  gap: 16px;
+}
+.psec-story__steps {
+  display: grid;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 900px) {
+  .psec-story__steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.psec-story__foot {
+  margin-top: 24px;
+  text-align: center;
+}
+.psec-story__foot .psec__note {
+  margin-inline: auto;
+}
+
+/* ---------- Tables (#connects, #steps) ---------- */
+.psec-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: var(--r-24);
+  overflow: hidden;
+  text-align: left;
+}
+.psec-table thead th {
+  padding: 14px 20px;
+  background: var(--paper);
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+}
+.psec-table tbody th,
+.psec-table tbody td {
+  padding: 16px 20px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.psec-table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.psec-table tbody th {
+  font-weight: 600;
+  width: 38%;
+}
+.psec-table__arrow {
+  display: inline-flex;
+  margin-right: 8px;
+  vertical-align: -2px;
+  color: var(--accent-ink);
+}
+.psec-table__sub {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-small);
+  font-weight: 400;
+}
+.psec-table--steps tbody th {
+  width: 24%;
+}
+.psec-table__saving {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+
+/* Phones: each row becomes a card, with the column name above each cell */
+@media (max-width: 767px) {
+  .psec-table,
+  .psec-table tbody,
+  .psec-table tr,
+  .psec-table th,
+  .psec-table td {
+    display: block;
+    width: auto;
+  }
+  .psec-table {
+    background: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .psec-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .psec-table tbody tr {
+    margin-bottom: 12px;
+    background: var(--surface-solid);
+    border: 1px solid var(--line);
+    border-radius: var(--r-18);
+    overflow: hidden;
+  }
+  /* Same specificity as the desktop column widths (38% / 24%), or they win and squeeze the
+     stacked row header into a narrow strip */
+  .psec-table tbody th,
+  .psec-table tbody td,
+  .psec-table--steps tbody th {
+    width: auto;
+    padding: 12px 16px;
+  }
+  .psec-table tbody tr :is(th, td):not(:last-child) {
+    border-bottom: 1px solid var(--line);
+  }
+  .psec-table tbody tr :is(th, td):last-child {
+    border-bottom: 0;
+  }
+  .psec-table tbody :is(th, td)::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    font-size: var(--fs-mono);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .psec-table__saving {
+    white-space: normal;
+  }
+}
+
+.psec__promise {
+  max-width: 68ch;
+  margin: 20px auto 0;
+  text-align: center;
+}
+
+/* ---------- Tap-to-count (#repeats, #fits) and the 3-question test (#test) ---------- */
+.psec-counter,
+.psec-test {
+  max-width: 820px;
+  margin-inline: auto;
+}
+.psec-counter h2,
+.psec-test h2 {
+  margin-bottom: 8px;
+}
+.psec-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.psec-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px; /* touch target */
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  border-color: var(--muted-2);
+}
+.psec-chip.is-on .px-icon .px-accent {
+  fill: var(--accent);
+}
+.psec-counter__result {
+  min-height: 1.6em;
+  margin: 18px 0 6px;
+  font-size: var(--fs-lead);
+}
+
+.psec-test__list {
+  display: grid;
+  gap: 18px;
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+}
+.psec-test__q p {
+  margin-bottom: 10px;
+}
+.psec-test__answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.psec-test__result {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: var(--r-18);
+  background: var(--accent-wash);
+}
+
+/* ---------- #summary ---------- */
+.psec-split {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .psec-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+  }
+}
+.psec-list {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.psec-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+.psec-sample {
+  margin: 0;
+  border-left: 3px solid var(--accent);
+}
+
+/* ---------- #at-work ---------- */
+.psec-timeline {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.psec-timeline li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 18px;
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: var(--r-18);
+}
+.psec-timeline__n {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  font-size: 0.875rem;
+}

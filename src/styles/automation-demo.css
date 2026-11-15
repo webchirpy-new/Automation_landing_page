@@ -1,0 +1,616 @@
+/* =========================================================
+   ENGINE — live automation demos (AutomationDemo.jsx)
+   Light "screens" on the dark part panel. Fluid: every frame is 100% of its column,
+   capped for readability, so it fits a 320px phone. Rest state = final state.
+   ========================================================= */
+
+/* Part panel: the demo first, the facts under it; side by side only when the PANEL itself is
+   wide enough (a container query: the panel is ~700px even on a 1440px screen). */
+.detail--demo {
+  container-type: inline-size;
+}
+.detail--demo .detail__demo-grid {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+/* Grid items may shrink below their content's width, or a demo pushes past a phone screen */
+.detail--demo > *,
+.detail--demo .detail__demo-grid > *,
+.detail--demo .detail__flow,
+.demo,
+.demo__stage {
+  min-width: 0;
+}
+@container (min-width: 820px) {
+  .detail--demo .detail__demo-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+.demo {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: clamp(12px, 2vw, 16px);
+  border-radius: var(--r-18);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-dark);
+}
+.demo__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--night-muted);
+  white-space: normal; /* the mono label may wrap on a narrow phone instead of widening the panel */
+}
+.demo__label i {
+  flex: none;
+}
+.demo__label i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(32, 169, 133, 0.2);
+}
+.demo__stage {
+  display: grid;
+  justify-items: center;
+}
+/* Video-style progress bar: fills once over the scene's length */
+.demo__progress {
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.demo__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--spectral-stroke);
+  transform-origin: 0 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo.is-waiting .demo__progress span {
+    transform: scaleX(0);
+  }
+  .demo.is-playing .demo__progress span {
+    animation: demo-progress var(--demo-len, 5s) linear both;
+  }
+}
+@keyframes demo-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.demo__steps {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line-dark);
+  font-size: 0.875rem;
+  color: var(--night-muted);
+}
+.demo__steps .t-mono {
+  margin-right: 6px;
+  color: var(--accent-soft);
+}
+
+/* ---------- Shared screen surfaces ---------- */
+/* Light islands inside the dark panel: the night chapter redefines the ink tokens to light
+   tones, so the screens set the light-ground values back (same values as .on-light). */
+.demo-phone,
+.demo-app,
+.demo-sync__targets li {
+  --ink: #0b0c10;
+  --ink-2: #282b33;
+  --muted: #5a5f6b;
+  --muted-2: #888d99;
+  --line: #e5e7ec;
+  --accent-ink: #3a3fa8;
+  color: var(--ink);
+}
+.demo-phone,
+.demo-app,
+.demo-sync {
+  width: 100%;
+  max-width: 400px;
+  color: var(--ink);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-align: left;
+}
+.demo-phone,
+.demo-app {
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f4f5f8;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Phone chat */
+.demo-phone__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.demo-phone__bar strong {
+  display: block;
+  font-size: 0.8125rem;
+}
+.demo-phone__status {
+  display: block;
+  color: var(--muted);
+  font-size: 0.6875rem;
+}
+.demo-phone__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--spectral-fill-light);
+  color: #fff;
+  font-weight: 800;
+}
+.demo-phone__body {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  min-height: 260px;
+  align-content: start;
+}
+.demo-msg {
+  display: grid;
+  gap: 4px;
+  max-width: 82%;
+  padding: 8px 10px 6px;
+  border-radius: 12px;
+  box-shadow: 0 1px 1px rgba(17, 20, 25, 0.06);
+  overflow-wrap: break-word;
+}
+.demo-msg p {
+  margin: 0;
+}
+.demo-msg--in {
+  justify-self: start;
+  background: #fff;
+  border-top-left-radius: 4px;
+}
+.demo-msg--out {
+  justify-self: end;
+  background: var(--accent-wash);
+  border-top-right-radius: 4px;
+}
+.demo-msg--wide {
+  max-width: 100%;
+  margin-top: 4px;
+}
+.demo-msg__lines {
+  display: grid;
+  gap: 3px;
+}
+.demo-msg__attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--accent-ink);
+  font-weight: 650;
+  font-size: 0.75rem;
+}
+.demo-msg__time {
+  justify-self: end;
+  color: var(--muted);
+  font-size: 0.625rem;
+}
+.demo-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: center;
+  margin: 2px 0;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  text-align: center;
+}
+.demo-note--day {
+  background: #e4e6ee;
+  color: var(--ink-2);
+}
+.demo-note--sys {
+  background: #e8f6f1;
+  color: var(--success-ink);
+}
+.demo-typing {
+  display: inline-flex;
+  gap: 4px;
+  justify-self: start;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff;
+}
+.demo-typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-2);
+}
+
+/* App window */
+.demo-app__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8125rem;
+}
+.demo-app__dots {
+  display: inline-flex;
+  gap: 4px;
+}
+.demo-app__dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d5d8e0;
+}
+.demo-app__body {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+.demo-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.demo-tag--won {
+  background: #e8f6f1;
+  color: var(--success-ink);
+}
+.demo-foot,
+.demo-toast {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--success-ink);
+}
+.demo-toast {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff6e0;
+  color: #7a5200;
+}
+
+/* Lead list */
+.demo-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-list li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.demo-list__main {
+  display: grid;
+  min-width: 0;
+}
+.demo-list__main span {
+  color: var(--muted);
+  overflow-wrap: break-word;
+}
+.demo-list__meta {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+}
+
+/* Pipeline board */
+.demo-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.demo-board__col {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 150px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #e9ebf1;
+}
+.demo-board__head {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.demo-card {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.75rem;
+  overflow-wrap: break-word;
+}
+.demo-card--muted {
+  color: var(--muted);
+}
+.demo-card--deal {
+  box-shadow: 0 0 0 1.5px var(--accent), 0 6px 14px -8px rgba(76, 92, 214, 0.6);
+}
+.demo-card--deal span {
+  color: var(--muted);
+}
+
+/* Order stages */
+.demo-order {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 10px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.demo-order p {
+  margin: 0;
+}
+.demo-stages {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.demo-stages li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: var(--r-pill);
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.demo-stages__dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--success);
+}
+.demo-stages__dot .px-accent,
+.demo-stages__dot .px-base {
+  fill: #fff;
+}
+
+/* Back-office sync */
+.demo-sync {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+.demo-sync__source {
+  width: 100%;
+}
+.demo-fields {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px;
+}
+.demo-fields div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--line);
+}
+.demo-fields dt {
+  color: var(--muted);
+}
+.demo-fields dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+.demo-sync__arrow {
+  color: var(--accent-soft);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.demo-sync__targets {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-sync__targets li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+}
+.demo-sync__targets li > span {
+  display: grid;
+  min-width: 0;
+}
+.demo-sync__targets li > span span {
+  color: var(--muted);
+}
+.demo-sync .demo-foot {
+  color: var(--night-muted);
+}
+
+/* Narrow phones: tighter frames, the list meta drops under the text */
+@media (max-width: 400px) {
+  .demo-phone__body {
+    padding: 10px;
+    min-height: 0;
+  }
+  .demo-msg {
+    max-width: 90%;
+  }
+  .demo-list li {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .demo-list__meta {
+    grid-column: 2;
+    grid-auto-flow: column;
+    justify-content: start;
+    justify-items: start;
+    gap: 8px;
+  }
+  .demo-board {
+    gap: 5px;
+  }
+  .demo-board__col {
+    padding: 6px;
+    min-height: 130px;
+  }
+  .demo-card {
+    font-size: 0.6875rem;
+  }
+}
+
+/* ---------- Motion: plays once, when the demo scrolls into view ---------- */
+/* Without motion (or before JS), the finished scene shows: earlier pipeline stops and the
+   typing dots are hidden, everything else is visible. */
+.demo-pass,
+.demo-typing {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo-pass,
+  .demo-typing {
+    display: inline-flex;
+  }
+  .demo-pass {
+    display: grid;
+  }
+  .demo.is-waiting :is(.demo-in, .demo-pass, .demo-typing) {
+    opacity: 0;
+  }
+  .demo.is-playing .demo-in {
+    animation: demo-in 420ms var(--ease-out) var(--d, 0s) both;
+  }
+  /* A pipeline stop: the deal arrives, then moves on (fades and folds away) */
+  .demo.is-playing .demo-pass {
+    animation:
+      demo-in 420ms var(--ease-out) var(--d, 0s) both,
+      demo-leave 360ms var(--ease-out) var(--d2, 0s) forwards;
+  }
+  /* Typing dots show, then give way to the reply */
+  .demo.is-playing .demo-typing {
+    animation: demo-typing 1s linear var(--d, 0s) both;
+  }
+  .demo.is-playing .demo-typing i {
+    animation: demo-dot 0.9s ease-in-out infinite;
+  }
+  .demo.is-playing .demo-typing i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .demo.is-playing .demo-typing i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+}
+@keyframes demo-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes demo-leave {
+  to {
+    opacity: 0;
+    max-height: 0;
+    padding-block: 0;
+    margin: 0;
+    transform: translateX(14px);
+  }
+}
+@keyframes demo-typing {
+  0% {
+    opacity: 0;
+  }
+  12%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    max-height: 0;
+    padding-block: 0;
+    margin: 0;
+  }
+}
+@keyframes demo-dot {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react"
 import Modal from "../interactions/Modal"
-import LeadForm from "../interactions/LeadForm"
+import TallyEmbed from "../interactions/TallyEmbed"
+import { scorecardPayload } from "../../lib/scoring"
 import PixelIcon from "../visuals/PixelIcon"
-import { persistent, uiCopy } from "../../data/automationContent"
-import { pageHero as hero } from "../../data/landingPages"
+import { persistent, uiCopy, reportForm } from "../../data/automationContent"
+import { pageHero as hero, pageId } from "../../data/landingPages"
 import { siteConfig } from "../../config/site"
 import { useSite } from "../../context/SiteContext"
 import { goToBooking } from "../../lib/scroll"
@@ -32,7 +33,7 @@ function VideoBody({ url, title, label, caption }) {
 }
 
 export default function SiteModals() {
-  const { modal, openModal, closeModal, formSubmitted } = useSite()
+  const { modal, openModal, closeModal, formSubmitted, summary } = useSite()
 
   // Exit-intent popup: desktop + fine pointer only, after 20s, once per session,
   // never when another modal is open or after the form was sent.
@@ -75,7 +76,16 @@ export default function SiteModals() {
         <h2 id="lead-modal-title" className="t-h3 modal__title">
           {persistent.leadModal.title}
         </h2>
-        <LeadForm idPrefix="modal" compact />
+        <TallyEmbed url={siteConfig.tallyBookingUrl} title={persistent.leadModal.title} fields={{ page: pageId, ...scorecardPayload(summary) }} minHeight={520} thankYou="call" />
+      </Modal>
+
+      {/* Scorecard report request (Tally), opened from the scorecard result's CTA */}
+      <Modal open={modal === "report"} onClose={closeModal} labelledBy="report-modal-title" size="md">
+        <h2 id="report-modal-title" className="t-h3 modal__title">
+          {reportForm.heading}
+        </h2>
+        <p className="t-muted report-modal__body">{reportForm.body}</p>
+        <TallyEmbed url={siteConfig.tallyReportUrl} title={reportForm.heading} fields={{ page: pageId, ...scorecardPayload(summary) }} minHeight={520} thankYou="report" />
       </Modal>
 
       <Modal open={modal === "video:founder"} onClose={closeModal} labelledBy="video-title" size="lg">

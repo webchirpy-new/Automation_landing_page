@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react"
 import { finalCta, footer } from "../../data/automationContent"
-import { serviceModules } from "../../data/serviceModules"
-import { siteConfig, phoneHref, whatsappHref } from "../../config/site"
+import { siteConfig } from "../../config/site"
 import { CTAButton } from "../ui/primitives"
 import { useSite } from "../../context/SiteContext"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -46,9 +45,6 @@ export default function FinalCTA() {
     { scope: ref }
   )
 
-  const tel = phoneHref()
-  const wa = whatsappHref()
-
   return (
     <footer id="final" ref={ref} className={`final ${resolved ? "is-resolved" : ""}`} aria-labelledby="final-title">
       <SectionAmbient blooms={ambient.final} tone="dark" fadeTop="0%" fadeBottom="48%" />
@@ -78,68 +74,15 @@ export default function FinalCTA() {
           </svg>
         </div>
       </div>
-
+      {/* Ad landing page: a minimal footer (logo + legal) so nothing competes with the CTA above */}
       <div className="container site-footer">
-        <div className="site-footer__brand">
-          <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" />
-          <p className="site-footer__tag">
-            <strong>{footer.brand}</strong> {footer.tagline}
-          </p>
-        </div>
-        <nav className="site-footer__col" aria-labelledby="ft-explore">
-          <h3 id="ft-explore" className="t-mono">
-            {footer.exploreTitle}
-          </h3>
-          <ul>
-            {footer.explore.map((l) => (
-              <li key={l.href}>
-                <a href={l.href}>{l.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <nav className="site-footer__col" aria-labelledby="ft-covers">
-          <h3 id="ft-covers" className="t-mono">
-            {footer.coversTitle}
-          </h3>
-          <ul>
-            {serviceModules
-              .slice()
-              .sort((a, b) => footer.covers.indexOf(a.part) - footer.covers.indexOf(b.part))
-              .map((m) => (
-                <li key={m.id}>
-                  <a href={`#engine-${m.id}`}>{m.part}</a>
-                </li>
-              ))}
-          </ul>
-        </nav>
-        <div className="site-footer__col">
-          <h3 className="t-mono">Contact</h3>
-          <ul>
-            <li>
-              {footer.contact.phoneLabel}:{" "}
-              {tel ? <a href={tel}>{siteConfig.phone}</a> : <span className="pending">to be confirmed</span>}
-            </li>
-            <li>
-              {footer.contact.whatsappLabel}:{" "}
-              {wa ? (
-                <a href={wa} target="_blank" rel="noopener noreferrer">
-                  Chat on WhatsApp
-                </a>
-              ) : (
-                <span className="pending">to be confirmed</span>
-              )}
-            </li>
-          </ul>
-        </div>
-        <div className="site-footer__legal">
-          <p>{footer.legal}</p>
-          <p className="site-footer__links">
-            {siteConfig.privacyUrl ? <a href={siteConfig.privacyUrl}>{footer.privacy}</a> : <span className="pending" title="Policy URL pending">{footer.privacy}</span>}
-            <span aria-hidden="true"> · </span>
-            {siteConfig.termsUrl ? <a href={siteConfig.termsUrl}>{footer.terms}</a> : <span className="pending" title="Terms URL pending">{footer.terms}</span>}
-          </p>
-        </div>
+        <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" loading="lazy" />
+        <p className="site-footer__legal">
+          <span>
+            © {new Date().getFullYear()} {footer.legal}
+          </span>
+          {siteConfig.termsUrl && <a href={siteConfig.termsUrl}>{footer.terms}</a>}
+        </p>
       </div>
     </footer>
   )

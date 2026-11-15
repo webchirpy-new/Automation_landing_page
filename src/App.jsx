@@ -17,6 +17,8 @@ import FAQ from "./components/sections/FAQ"
 import AuditOffer from "./components/sections/AuditOffer"
 import WalkIn from "./components/sections/WalkIn"
 import FinalCTA from "./components/sections/FinalCTA"
+import PageSections from "./components/page-sections/PageSections"
+import { landOnHash } from "./lib/scroll"
 
 /**
  * 14 sections in the exact DOCX order, alternating light chapters with
@@ -24,6 +26,8 @@ import FinalCTA from "./components/sections/FinalCTA"
  */
 export default function App() {
   useEffect(() => initSmoothScroll(), [])
+  // Ad deep links (#story, #test, #connects …) land on their section once the page has rendered
+  useEffect(() => landOnHash(), [])
   return (
     <SiteProvider>
       <a className="skip-link" href="#main">
@@ -31,6 +35,8 @@ export default function App() {
       </a>
       <main id="main">
         <Hero />
+        {/* Landing pages 5–8: the page's own section(s) from Launch Kit 04 */}
+        <PageSections />
         <Pattern />
         <Comparison />
         <ScorecardSection />

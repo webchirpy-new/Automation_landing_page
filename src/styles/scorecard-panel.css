@@ -1,0 +1,264 @@
+/* =========================================================
+   SCORECARD SUMMARY PANEL — redesign (score ring, automation map, top 3)
+   Status colours come from the spectral palette, each paired with a text label,
+   so status is never shown by colour alone. All text ≥ 4.5:1 on its ground.
+   ========================================================= */
+
+.scorecard__summary {
+  /* Running: success green · Partly manual: brand indigo · Leaking: spectral pink · To review: neutral */
+  --st-running: var(--success-ink); /* #137a5f */
+  --st-running-bg: #e8f6f1;
+  --st-partly: var(--accent-ink); /* #3a3fa8 */
+  --st-partly-bg: var(--accent-wash);
+  --st-leaking: var(--spectral-pink-deep); /* #a3387f */
+  --st-leaking-bg: #fbeef6;
+  --st-todo: var(--muted);
+  --st-todo-bg: var(--paper);
+}
+
+/* ---------- Score ring: spectral gradient stroke, softer track ---------- */
+.scorecard__summary .score-ring__track {
+  stroke: #eceef4;
+}
+.scorecard__summary .score-ring__fill {
+  stroke-width: 9;
+  filter: drop-shadow(0 2px 6px rgba(100, 64, 200, 0.25));
+}
+
+/* ---------- Automation map ---------- */
+.scorecard__summary .auto-map {
+  gap: 10px;
+}
+.scorecard__summary .auto-map__route :is(polyline, line) {
+  stroke: var(--spectral-violet-deep);
+  stroke-width: 2;
+  stroke-dasharray: 3 5;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.scorecard__summary .auto-map__cell {
+  --st: var(--st-todo);
+  --st-bg: var(--st-todo-bg);
+  gap: 6px;
+  padding: 14px 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--st) 28%, #fff);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--st-bg) 0%, #fff 78%);
+  box-shadow: 0 1px 2px rgba(17, 19, 25, 0.04);
+  transition: border-color 300ms, background 300ms, box-shadow 300ms, transform 200ms var(--ease-out);
+}
+.scorecard__summary .auto-map__cell[data-status="running"] {
+  --st: var(--st-running);
+  --st-bg: var(--st-running-bg);
+}
+.scorecard__summary .auto-map__cell[data-status="partly"] {
+  --st: var(--st-partly);
+  --st-bg: var(--st-partly-bg);
+}
+.scorecard__summary .auto-map__cell[data-status="leaking"] {
+  --st: var(--st-leaking);
+  --st-bg: var(--st-leaking-bg);
+  box-shadow: 0 6px 16px -8px rgba(163, 56, 127, 0.45);
+}
+.scorecard__summary .auto-map__cell[data-status="todo"] {
+  border-style: dashed;
+  border-color: var(--line);
+  background: #fff;
+  box-shadow: none;
+}
+.scorecard__summary .auto-map__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--st) 18%, #fff);
+  color: var(--ink);
+}
+.scorecard__summary .auto-map__cell[data-status="todo"] .auto-map__icon {
+  opacity: 0.6;
+}
+.scorecard__summary .auto-map__name {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+/* Each cell is a size container, so the pill adapts to the cell, not the screen */
+.scorecard__summary .auto-map__cell {
+  container-type: inline-size;
+  min-width: 0;
+}
+.scorecard__summary .auto-map__state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: calc(100% - 8px);
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--st-bg);
+  color: var(--st);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+  white-space: nowrap;
+}
+/* Narrow cells (phones): same specificity as the base rules above, or they never apply.
+   First drop the dot, then let the pill and the area name wrap; names may hyphenate
+   ("Opera-tions") rather than be cut off. */
+@container (max-width: 132px) {
+  .scorecard__summary .auto-map__dot {
+    display: none;
+  }
+  .scorecard__summary .auto-map__state {
+    padding-inline: 6px;
+  }
+}
+@container (max-width: 112px) {
+  .scorecard__summary .auto-map__state {
+    white-space: normal;
+    max-width: 100%;
+  }
+  .scorecard__summary .auto-map__name {
+    max-width: 100%;
+    font-size: 0.6875rem;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+}
+@container (max-width: 76px) {
+  .scorecard__summary .auto-map__name,
+  .scorecard__summary .auto-map__state {
+    font-size: 0.625rem;
+  }
+  .scorecard__summary .auto-map__state {
+    padding-inline: 4px;
+  }
+}
+
+.scorecard__summary .auto-map__cell[data-status="todo"] .auto-map__state {
+  background: none;
+  font-weight: 600;
+}
+.scorecard__summary .auto-map__dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.scorecard__summary .auto-map__cell[data-status="todo"] .auto-map__dot {
+  background: none;
+  border: 1.5px solid currentColor;
+}
+/* Narrow phones: the pill may wrap inside its cell rather than overflow */
+@media (max-width: 430px) {
+  .scorecard__summary .auto-map {
+    gap: 6px;
+  }
+  /* Keep the original phone padding: wider side padding squeezed the labels */
+  .scorecard__summary .auto-map__cell {
+    padding: 10px 3px 8px;
+  }
+  .scorecard__summary .auto-map__icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ---------- Your 3 biggest gaps: ranked cards ---------- */
+.scorecard__summary .scorecard__priorities ol {
+  gap: 8px;
+}
+.scorecard__summary .scorecard__priorities li {
+  --st: var(--st-partly);
+  --st-bg: var(--st-partly-bg);
+  display: grid;
+  grid-template-columns: 26px 30px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  font-weight: 650;
+}
+.scorecard__summary .scorecard__priorities li[data-status="leaking"] {
+  --st: var(--st-leaking);
+  --st-bg: var(--st-leaking-bg);
+  border-color: color-mix(in srgb, var(--st-leaking) 25%, #fff);
+}
+.scorecard__summary .scorecard__priorities li::before {
+  content: none;
+}
+.pri__rank {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--spectral-fill-light);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+.pri__icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--st-bg);
+  color: var(--ink);
+}
+.pri__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pri__pips {
+  display: inline-flex;
+  gap: 3px;
+}
+.pri__pips i {
+  width: 14px;
+  height: 5px;
+  border-radius: 3px;
+  background: #e4e6ee;
+}
+.pri__pips i.is-on {
+  background: var(--st);
+}
+.pri__status {
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  background: var(--st-bg);
+  color: var(--st);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width: 430px) {
+  .scorecard__summary .scorecard__priorities li {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .pri__icon,
+  .pri__pips {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scorecard__summary .auto-map__cell {
+    transition: none;
+  }
+}
+
+/* "Book a free call" under the main scorecard button: a real secondary CTA, not a text link */
+.scorecard__summary .scorecard__book-btn {
+  margin-top: 2px;
+}

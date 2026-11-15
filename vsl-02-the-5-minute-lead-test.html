@@ -14,19 +14,8 @@
       content="The business that replies first usually wins the customer. Time your own reply, and see how AI automation answers every enquiry in seconds, day or night."
     />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" /><!-- summary_large_image once an approved og:image exists (D13) -->
     <meta name="theme-color" content="#ffffff" />
-    <script>
-      // Hero intro: a reload of the homepage replays the cinematic from the top, so the browser
-      // must not restore the old scroll position (it would land mid-page and cancel the intro).
-      // Deep links and reduced-motion visits keep normal restoration. See introConfig.js.
-      try {
-        if (!location.hash && "scrollRestoration" in history && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          history.scrollRestoration = "manual"
-          window.__wcIntroScrollReset = true
-        }
-      } catch (e) {}
-    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

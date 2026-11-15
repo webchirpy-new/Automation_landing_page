@@ -1,0 +1,417 @@
+/* =========================================================
+   ENGINE EXPLORER — the eight parts (EngineExplorer.jsx)
+   Desktop ≥1024: stage-grouped navigator left, dark showcase panel right.
+   Tablet 640–1023: 4×2 tiles above the panel. Phone <640: 2-column tiles.
+   Built from the existing tokens: spectral accents, night panel, light islands.
+   ========================================================= */
+
+.ex {
+  display: grid;
+  gap: 16px;
+}
+.ex__hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-ink);
+}
+.ex__hint i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--spectral-fill-light);
+}
+.ex__grid {
+  display: grid;
+  gap: clamp(16px, 2.4vw, 28px);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .ex__grid {
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  }
+}
+
+/* ---------- Navigator ---------- */
+.ex-nav {
+  display: grid;
+  gap: 18px;
+}
+.ex-nav__group {
+  display: grid;
+  gap: 8px;
+}
+.ex-nav__stage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+}
+.ex-nav__stage span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.ex-nav__items {
+  display: grid;
+  gap: 8px;
+}
+
+.ex-tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  transition: border-color var(--dur-hover), box-shadow var(--dur-hover), transform var(--dur-hover) var(--ease-out);
+}
+.ex-tab:hover {
+  border-color: rgba(76, 92, 214, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -16px rgba(22, 22, 66, 0.4);
+}
+.ex-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Selected: spectral gradient border + soft glow */
+.ex-tab.is-on {
+  border-color: transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--spectral-stroke-light) border-box;
+  box-shadow: 0 14px 30px -16px rgba(100, 64, 200, 0.55);
+}
+.ex-tab__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  transition: background var(--dur-hover);
+}
+.ex-tab.is-on .ex-tab__icon {
+  background: var(--accent-wash);
+}
+.ex-tab__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.ex-tab__name {
+  font-weight: 750;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.ex-tab__promise {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+.ex-tab__arrow {
+  color: var(--accent-ink);
+  font-weight: 700;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--dur-hover), transform var(--dur-hover) var(--ease-out);
+}
+.ex-tab.is-on .ex-tab__arrow,
+.ex-tab:hover .ex-tab__arrow {
+  opacity: 1;
+  transform: none;
+}
+
+/* Tablet: stages flow as a 4×2 tile grid (two parts per stage row → one row of 8 tiles in stage order) */
+@media (max-width: 1023px) {
+  .ex-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ex-nav__group,
+  .ex-nav__items {
+    display: contents;
+  }
+  .ex-nav__stage {
+    display: none;
+  }
+  .ex-tab {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+    min-height: 0;
+    padding: 14px 8px 12px;
+    text-align: center;
+  }
+  .ex-tab__promise,
+  .ex-tab__arrow {
+    display: none;
+  }
+  .ex-tab__name {
+    font-size: 0.875rem;
+  }
+}
+/* Phone: two columns, icon beside the name */
+@media (max-width: 639px) {
+  .ex-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .ex-tab {
+    grid-template-columns: 36px minmax(0, 1fr);
+    justify-items: start;
+    gap: 10px;
+    min-height: 56px;
+    padding: 8px 10px;
+    text-align: left;
+    border-radius: 14px;
+  }
+  .ex-tab__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+  .ex-tab__name {
+    font-size: 0.8125rem;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* ---------- Showcase panel (light) ----------
+   A white card with a soft spectral edge and washes, so it sits naturally on the light Engine
+   chapter. The demo plays on a pale lavender stage. */
+.ex-panel {
+  min-width: 0;
+  scroll-margin-top: 16px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-32);
+  background:
+    radial-gradient(70% 55% at 100% 0%, rgba(240, 190, 223, 0.22), transparent 60%) padding-box,
+    radial-gradient(60% 50% at 0% 100%, rgba(140, 230, 240, 0.18), transparent 60%) padding-box,
+    linear-gradient(#fff, #fff) padding-box,
+    var(--spectral-stroke-light) border-box;
+  color: var(--ink);
+  box-shadow: 0 30px 70px -36px rgba(76, 64, 160, 0.45);
+  overflow: hidden;
+  container-type: inline-size;
+}
+.ex-panel:focus {
+  outline: none;
+}
+.ex-panel__inner {
+  display: grid;
+  gap: clamp(18px, 2.6vw, 26px);
+  padding: clamp(18px, 3.4vw, 36px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ex-panel__inner {
+    animation: ex-swap 260ms var(--ease-out) both;
+  }
+}
+@keyframes ex-swap {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ex-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+.ex-head__icon {
+  display: grid;
+  place-items: center;
+  width: clamp(52px, 8vw, 64px);
+  height: clamp(52px, 8vw, 64px);
+  border-radius: 18px;
+  background: var(--spectral-fill-light);
+  box-shadow: 0 12px 26px -12px rgba(100, 64, 200, 0.6);
+}
+.ex-head__icon .px-icon :is(.px-base, .px-muted, .px-accent) {
+  fill: #fff;
+}
+.ex-head__meta {
+  margin: 0 0 4px;
+  color: var(--accent-ink);
+}
+.ex-head__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.ex-head__promise {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: var(--fs-lead);
+}
+
+/* Demo + explanation: side by side only when the panel itself is wide enough */
+.ex-body {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+.ex-body > * {
+  min-width: 0;
+}
+@container (min-width: 780px) {
+  .ex-body {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+  }
+}
+/* The demo's stage: pale lavender, so the white phone / app screens stand out */
+.ex-panel .demo {
+  background: linear-gradient(160deg, #eef0fd 0%, #f6eefa 100%);
+  border: 1px solid rgba(76, 92, 214, 0.14);
+}
+.ex-panel .demo__label {
+  color: var(--accent-ink);
+}
+.ex-panel .demo__progress {
+  background: rgba(76, 92, 214, 0.14);
+}
+.ex-panel .demo__progress span {
+  background: var(--spectral-stroke-light);
+}
+.ex-panel :is(.demo-phone, .demo-app) {
+  box-shadow: 0 18px 36px -22px rgba(40, 40, 90, 0.45), 0 0 0 1px rgba(76, 92, 214, 0.1);
+}
+
+/* How it works: three numbered steps + one result line */
+.ex-explain {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.ex-explain__label {
+  margin: 0;
+  color: var(--muted);
+}
+.ex-steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ex-steps li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.ex-steps__n {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--spectral-fill-light);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.ex-produces {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--accent-wash);
+  border: 1px solid rgba(76, 92, 214, 0.18);
+}
+.ex-produces p:last-child {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 750;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* Previous / next */
+.ex-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 4px;
+}
+.ex-pager__btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  text-align: left;
+  transition: border-color var(--dur-hover), box-shadow var(--dur-hover), transform var(--dur-hover) var(--ease-out);
+}
+.ex-pager__btn:hover {
+  border-color: rgba(76, 92, 214, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -16px rgba(76, 92, 214, 0.55);
+}
+.ex-pager__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ex-pager__btn--next {
+  justify-content: flex-end;
+  text-align: right;
+}
+.ex-pager__label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+@media (max-width: 399px) {
+  .ex-pager__btn {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-tab,
+  .ex-tab__arrow {
+    transition: none;
+  }
+}

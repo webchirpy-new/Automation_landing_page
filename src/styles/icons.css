@@ -1,0 +1,63 @@
+/* =========================================================
+   ICONS — Lucide (lucide-react), drawn in currentColor.
+   The old pixel glyphs were coloured through fill rules on their layers (.px-base/.px-accent);
+   those rules no longer match anything. These rules carry the same colour intent over.
+   ========================================================= */
+.px-icon {
+  flex: none;
+  color: inherit;
+  vertical-align: middle;
+}
+
+/* Ticks: the brand indigo, as the old glyph's accent */
+.px-icon--check {
+  color: var(--accent);
+}
+.section--night .px-icon--check,
+.final .px-icon--check,
+.dash .px-icon--check {
+  color: var(--accent-soft);
+}
+.section--night :is(.on-light, .scorecard__summary, .scorecard__mini, .score-area, .ticket__sheet, .founder__frame, .founder__card) .px-icon--check {
+  color: var(--accent);
+}
+
+/* Ticks inside checked checkboxes: white on the indigo box. More specific than the light-island
+   tick rule above, which otherwise painted them indigo on indigo (invisible). */
+.check__box .px-icon--check,
+.section--night .score-area .check__box .px-icon--check {
+  color: #fff;
+}
+
+/* White icons on coloured or dark fills */
+.check__box .px-icon,
+.floating-cta .px-icon,
+.founder__play .px-icon,
+.demo-stages__dot .px-icon,
+.ex-head__icon .px-icon,
+.ex-steps__n .px-icon,
+.btn--primary .px-icon {
+  color: #fff;
+}
+
+/* Context colours kept from the pixel set */
+#top .hero__below .hero__leak-icon .px-icon {
+  color: var(--spectral-violet-deep);
+}
+#top .hero__below .video-card__play .px-icon {
+  color: var(--spectral-pink-deep);
+}
+.video-modal__pending .px-icon {
+  color: var(--accent-soft);
+}
+.lw-stage.is-active .lw-hub .px-icon {
+  color: #b4bdf9;
+}
+.psec-chip.is-on .px-icon {
+  color: var(--accent);
+}
+/* Selected part tiles in the Engine and the scorecard: the icon takes the brand ink */
+.ex-tab.is-on .ex-tab__icon .px-icon,
+.score-area.is-reviewed .score-area__icon .px-icon {
+  color: var(--accent-ink);
+}

@@ -107,8 +107,9 @@ export const comparison = {
 export const scorecard = {
   label: "Free 60-second automation scorecard",
   headline: "Score your business. Find your gaps.",
+  // Launch Kit 01 §02.1 intro copy
   sub:
-    "Tick what sounds like your week. Watch your automation map take shape, and see exactly where AI will win back the most leads and hours.",
+    "Tick what sounds like your week. Be honest; nobody sees this but you. At the end you get your score, your 3 biggest gaps and what to fix first.",
   counter: {
     title: "Automation scorecard",
     areas: "8 areas",
@@ -159,7 +160,7 @@ export const scorecard = {
       area: "Operations",
       promise: "Run bookings and tasks smoothly",
       checks: [
-        "Bookings and schedules live in chats, calls and notebooks.",
+        "Bookings, orders and schedules live in chats, calls and notebooks.", // Kit 01: "+ orders"
         "Tasks get lost when they pass from one person to another.",
       ],
     },
@@ -193,6 +194,180 @@ export const scorecard = {
   ],
   button: "GET MY FREE AUTOMATION PLAN",
   underButton: "Free 15–30 minute call. We walk you through your scorecard.",
+
+  /* Launch Kit 01 §02.3 — one tap each, after the 8 areas. They never change the score. */
+  context: [
+    {
+      id: "aiUse",
+      question: "How does your business use AI today?",
+      options: [
+        { id: "none", label: "Not at all" },
+        { id: "writing", label: "Staff use AI chat tools for writing, like posts or emails" },
+        { id: "tried", label: "We tried a chatbot or AI tool, it did not stick" },
+        { id: "real", label: "AI already does some real daily work for us" },
+      ],
+    },
+    {
+      id: "enquiries",
+      question: "Roughly how many enquiries do you get in a month?",
+      options: [
+        { id: "under-50", label: "Under 50" },
+        { id: "50-200", label: "50 to 200" },
+        { id: "200-1000", label: "200 to 1,000" },
+        { id: "over-1000", label: "Over 1,000" },
+        { id: "not-sure", label: "Not sure" }, // Kit 01: itself a Lead Capture gap (report text)
+      ],
+    },
+  ],
+
+  /* Launch Kit 01 §03.2 — bands and on-screen message */
+  bands: [
+    {
+      minGaps: 0,
+      maxGaps: 3,
+      name: "Running on systems",
+      message:
+        "Most of your business already runs without someone having to remember. The gains left are smaller and specific. Your report shows the one or two worth fixing.",
+    },
+    {
+      minGaps: 4,
+      maxGaps: 8,
+      name: "Leaking in places",
+      message:
+        "Your team covers the gaps with effort. That works until the busiest week of the month. Your report shows the 3 leaks to fix first, and which one usually pays back fastest.",
+    },
+    {
+      minGaps: 9,
+      maxGaps: 12,
+      name: "Running on effort",
+      message:
+        "A large share of your week depends on people typing, chasing and remembering. That is not a team problem. It is a system problem, and it can be fixed one step at a time.",
+    },
+    {
+      minGaps: 13,
+      maxGaps: 16,
+      name: "Running on memory",
+      message:
+        "Almost everything depends on someone remembering. Do not start with a big project. Start with one quick win. Your report shows which one.",
+    },
+  ],
+
+  /* Launch Kit 01 §03.3 — result screen (shown free, before any form) */
+  result: {
+    label: "Your automation score",
+    gapsLine: (gaps, total) => `You ticked ${gaps} of ${total} gaps.`,
+    biggestLine: "Your biggest gap is",
+    topTitle: "Your 3 biggest gaps",
+    contextTitle: "Two quick questions",
+    contextNote: "One tap each. They do not change your score.",
+    seeResult: "See my result",
+    seeResultLeft: (n) => `See my result · ${n} ${n === 1 ? "area" : "areas"} left`,
+  },
+}
+
+/*
+ * Launch Kit 01 §04.2 — opportunity library, one block per area. Only `meaning` is shown on the
+ * page today. `automateFirst`, `effort` and `firstResult` are for the WhatsApp report (Phase 4)
+ * and must be confirmed by the delivery team before they are shown anywhere (D16).
+ */
+export const opportunityLibrary = {
+  "lead-capture": {
+    meaning: "Some enquiries are never seen, and nobody knows the real number.",
+    automateFirst: "One lead list: WhatsApp Business, website forms, email and missed calls logged automatically, with the source of each.",
+    effort: "Medium",
+    firstResult: "2 to 3 wks",
+  },
+  "instant-reply": {
+    meaning: "Enquiries that arrive after hours wait, and some buy elsewhere first.",
+    automateFirst:
+      "An instant first reply on WhatsApp and the website that answers common questions, captures the requirement and hands over to the team.",
+    effort: "Low to Medium",
+    firstResult: "1 to 2 wks",
+  },
+  "follow-up": {
+    meaning: "Interested customers go quiet and nobody notices.",
+    automateFirst: "Automatic follow-ups on day 1, 3 and 7 that stop the moment the customer replies.",
+    effort: "Low",
+    firstResult: "1 to 2 wks",
+  },
+  "sales-pipeline": {
+    meaning: "You cannot see which leads became sales, or which quotes went cold.",
+    automateFirst: "Simple pipeline stages, quote tracking, and a reminder when a quote gets no reply in 3 days.",
+    effort: "Medium",
+    firstResult: "3 to 4 wks",
+  },
+  operations: {
+    meaning: "Orders and tasks get lost between people.",
+    automateFirst: "Orders and bookings captured in one place, assigned automatically, with status updates sent to the customer.",
+    effort: "Medium",
+    firstResult: "3 to 4 wks",
+  },
+  "back-office": {
+    meaning: "Skilled people spend hours retyping and building reports.",
+    automateFirst: "Enter details once and they flow to the sheet, CRM and invoice. Month-end report built on a schedule.",
+    effort: "Medium",
+    firstResult: "2 to 4 wks",
+  },
+  retention: {
+    meaning: "Payments, renewals and repeat orders slip, and happy customers are never asked for a review.",
+    automateFirst: "Payment and renewal reminders on schedule, and a review request after delivery.",
+    effort: "Low",
+    firstResult: "1 to 2 wks",
+  },
+  insights: {
+    meaning: "You find out how the business is doing by calling people.",
+    automateFirst: "A short WhatsApp summary every morning, and one dashboard for leads, follow-ups and payments.",
+    effort: "Medium to High",
+    firstResult: "3 to 6 wks",
+  },
+}
+
+/*
+ * Dummy report form (Kit 01 §03.3, Kit 02 Form A). DEMO ONLY until Tally Form A replaces it
+ * (Phase 4): it validates, then confirms that nothing was sent or stored.
+ */
+export const reportForm = {
+  // Client change (15 Nov 2026): the team reaches out instead of a WhatsApp report (was Kit 01:
+  // "Get your full report on WhatsApp." / "…Free. No call needed.")
+  heading: "Fill in the form and our team will reach out to you.",
+  body: "We will walk you through your top 3 gaps and what we would automate first in each. Free. No obligation.",
+  demoBadge: "Demo form",
+  demoNote: "This is a demo form. Nothing you enter is sent or stored.",
+  fields: {
+    name: "Your name",
+    phone: "WhatsApp number",
+    business: "Business name",
+    years: "Years in business",
+    team: "Team size",
+  },
+  yearsOptions: ["Less than 2", "2 to 5", "5 to 10", "10 to 20", "More than 20"],
+  teamOptions: ["Just me", "2 to 4", "5 to 15", "16 to 50", "51 to 200", "More than 200"],
+  selectPlaceholder: "Choose one",
+  // Launch Kit 03 §03 — C1 v1.0 (required) and M1 v1.0 (optional). Draft wording pending legal review.
+  consent: {
+    version: "C1 v1.0",
+    before: "I agree to Webchirpy using these details to send my report, book my call and contact me about it on WhatsApp, phone and email, as described in the ",
+    link: "Privacy Notice",
+    after: ".",
+  },
+  marketing: { version: "M1 v1.0", text: "Also send me occasional tips and updates on WhatsApp and email. I can stop anytime by replying STOP." },
+  button: "ASK OUR TEAM TO REACH OUT →",
+  errors: {
+    name: "Please enter your name (2 to 60 characters).",
+    phone: "Please enter a 10-digit mobile number. Our team will reach you here.", // Kit 02 wording, adapted
+    business: "Please enter your business name (2 to 80 characters).",
+    years: "Please choose how long you have been in business.",
+    team: "Please choose your team size.",
+    consent: "Please tick the box so our team can contact you.",
+  },
+  demoResult: {
+    title: "Demo only: your request was not sent.",
+    body: "Your details were checked but not sent or stored anywhere. Once this form is connected, our team will reach out to you.",
+    callLine: "Want someone to walk you through it? Book 15 minutes with Vasanth.",
+    callButton: "BOOK MY 15-MINUTE CALL →",
+  },
+  bookLink: "Or book a free call →",
+  bookButton: "BOOK A FREE CALL →",
 }
 
 /* 05 — THE AI AUTOMATION ENGINE */
@@ -657,23 +832,9 @@ export const finalCta = {
   button: "BOOK MY FREE AUTOMATION AUDIT →",
 }
 
+/* Ad landing page footer: brand + legal only. No nav links that pull visitors off the CTA. */
 export const footer = {
-  brand: "WEBCHIRPY.",
-  tagline: "The AI Automation Engine. Every customer answered. Every task automated. Hours back every week.",
-  exploreTitle: "Explore",
-  explore: [
-    { label: "Automation scorecard", href: "#scorecard" },
-    { label: "The engine", href: "#engine" },
-    { label: "The dashboard", href: "#dashboard" },
-    { label: "Proof", href: "#proof" },
-    { label: "Why Webchirpy", href: "#why" },
-    { label: "FAQ", href: "#faq" },
-  ],
-  coversTitle: "What the engine covers",
-  covers: ["Lead Capture", "Instant Reply", "Follow-up", "Sales Pipeline", "Operations", "Back Office", "Retention", "Insights"],
-  contact: { phoneLabel: "Phone", whatsappLabel: "WhatsApp" },
-  legal: "© Webchirpy. All rights reserved. Built for growing businesses",
-  privacy: "Privacy Policy",
+  legal: "Webchirpy. All rights reserved.",
   terms: "Terms",
 }
 
@@ -721,21 +882,52 @@ export const uiCopy = {
   formSuccess: "Request received. We'll contact you on the number you gave to schedule your call.",
   formError: "We couldn't send your request. Please try again in a moment.",
   consent: "I agree to be contacted about my free audit call.",
+  demoFormNote: "Demo form: nothing you enter is sent or stored.",
+  privacyNotice: "Privacy Notice",
   assetPending: "Asset pending",
-  // Workload Orbit (02 — The pattern). Orbit annotations reuse words from the approved chips.
-  orbit: {
-    disclaimer: "Illustration · not measured data",
+  // 09 — Client video testimonials
+  testimonials: {
+    count: "4 client stories · in their own words",
+    listLabel: "Client video testimonials",
+    play: "Play testimonial",
+    pause: "Pause testimonial",
+    mute: "Mute",
+    unmute: "Unmute",
+  },
+  // 02 — The pattern: three illustrated scenes and the week bar. Sample data only.
+  scenes: {
+    disclaimer: "Illustration · sample data, not measured",
     note:
       "Illustration, not measured data: the team stays the same size while manual work, repeat replies, data entry and chasing follow-ups take a growing share of the week away from customer work.",
-    groupLabel: "Where work slips through",
     pointsLabel: "What you already have",
-    prev: "Previous moment",
-    next: "Next moment",
     waitsOvernight: "waits overnight",
     manualAllDay: "manual all day",
     dependsOnMemory: "depends on memory",
-    channelWebsite: "Website",
-    channelWhatsApp: "WhatsApp",
-    channelSheets: "sheets",
+    chat: {
+      app: "WhatsApp",
+      contact: "Anand Traders",
+      incoming: "Hi, what is the price for 200 units? Need them this week.",
+      inTime: "9:47 pm",
+      seen: "Seen · no reply",
+      gap: "11 h 25 m",
+      reply: "Good morning! Sharing the price list now.",
+      outTime: "9:12 am",
+    },
+    sheet: {
+      file: "Weekly report.xlsx",
+      day: "Friday",
+      start: "9 am",
+      end: "5 pm",
+      task: "Copying numbers from sheets",
+    },
+    todo: {
+      title: "Follow-ups",
+      source: "notes on someone's phone",
+      items: [
+        { who: "Kavya Interiors", what: "Send the office fit-out quote", late: "3 days late" },
+        { who: "Sri Ganesh Stores", what: "Call back about the March order", late: "2 days late" },
+        { who: "+91 98xxx xx210", what: "Missed call: who was this?", late: "Not logged" },
+      ],
+    },
   },
 }

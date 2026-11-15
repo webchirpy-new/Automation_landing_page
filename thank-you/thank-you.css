@@ -1,0 +1,202 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+:root {
+  --night: #07080c;
+  --text: #f3f4f8;
+  --muted: #b6bccb;
+  --line: rgba(232, 230, 255, 0.12);
+  --accent: #6e7eec;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  background:
+    radial-gradient(60% 50% at 80% 0%, rgba(110, 126, 236, 0.18), transparent 70%),
+    radial-gradient(50% 40% at 0% 100%, rgba(240, 190, 223, 0.1), transparent 70%),
+    radial-gradient(40% 40% at 100% 90%, rgba(140, 230, 240, 0.08), transparent 70%),
+    var(--night);
+  color: var(--text);
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.ty {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 32px;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 40px 16px;
+}
+.ty__logo img {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+.ty__card {
+  width: min(100%, 520px);
+  padding: clamp(28px, 6vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(16, 17, 25, 0.72);
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+/* Check mark inside a ring that empties over the 5 seconds */
+.ty__ring {
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 24px;
+}
+.ty__ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.ty__track {
+  fill: rgba(110, 126, 236, 0.08);
+  stroke: rgba(232, 230, 255, 0.1);
+  stroke-width: 4;
+}
+.ty__arc {
+  fill: none;
+  stroke: url(#ty-g);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  animation: ty-drain 5s linear forwards;
+}
+.ty__check {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  transform: rotate(90deg);
+  transform-origin: 60px 60px;
+  animation: ty-draw 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+@keyframes ty-drain {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes ty-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ty__tag {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #87baff;
+}
+.ty__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.375rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.ty__body {
+  margin: 14px auto 0;
+  max-width: 36ch;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.ty__count {
+  margin: 28px 0 10px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.ty__count b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ty__bar {
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.ty__bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #8ce6f0, #6e7eec 55%, #f0bedf);
+  transform-origin: 0 50%;
+  animation: ty-fill 5s linear forwards;
+}
+@keyframes ty-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.ty__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 24px;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #3b5fd0, #4c5cd6 45%, #8a4fc8);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 16px 34px -16px rgba(76, 92, 214, 0.8);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ty__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -16px rgba(76, 92, 214, 0.95);
+}
+.ty__btn:focus-visible,
+.ty__note a:focus-visible,
+.ty__logo:focus-visible {
+  outline: 3px solid #87baff;
+  outline-offset: 3px;
+}
+.ty__note {
+  margin: 16px 0 0;
+  font-size: 0.8125rem;
+}
+.ty__note a {
+  color: var(--muted);
+  text-underline-offset: 3px;
+}
+.ty__note a:hover {
+  color: var(--text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ty__check {
+    animation: none;
+  }
+}

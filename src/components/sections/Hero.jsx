@@ -3,9 +3,7 @@ import { uiCopy, trusted } from "../../data/automationContent"
 import { pageHero as hero } from "../../data/landingPages"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
-import HeroVoxels from "../hero-intro/HeroVoxels"
 import SpaceAtmosphere from "../atmosphere/SpaceAtmosphere"
-import { useHeroIntro } from "../hero-intro/useHeroIntro"
 import { floatFor } from "../hero-intro/introConfig"
 import markUrl from "../../assets/arrowcraft-mark.png"
 import PixelIcon from "../visuals/PixelIcon"
@@ -53,14 +51,6 @@ export default function Hero() {
   const root = useRef(null)
   const foldRef = useRef(null)
   const { openModal } = useSite()
-  const intro = useHeroIntro({ foldRef })
-  const inIntro = intro.phase === "intro"
-  const introPhase = useRef(intro.phase)
-  useEffect(() => {
-    introPhase.current = intro.phase
-  }, [intro.phase])
-  // Floats start once, when the tiles have landed (or straight away without the intro)
-  const floatOn = !inIntro
 
   // Collision guard: any tile whose box would touch the copy column, CTA or the
   // footnote row is hidden — at every viewport, before and after font load.
@@ -94,9 +84,8 @@ export default function Hero() {
     () => {
       const mm = gsap.matchMedia()
 
-      // Returning visits skip the cinematic and keep the short entrance
+      // Short entrance
       mm.add(MOTION_OK, () => {
-        if (intro.played) return
         // Opacity, not autoAlpha: the copy and CTA are live from the first frame, the fade is only visual
         gsap.from(".hero__center > *", { y: 18, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.09 })
         const tiles = gsap.utils.shuffle(gsap.utils.toArray(".htile", root.current))
@@ -119,7 +108,6 @@ export default function Hero() {
         }))
         const fold = foldRef.current
         const onMove = (e) => {
-          if (introPhase.current === "intro") return
           movers.forEach((m) => {
             const b = m.el.getBoundingClientRect()
             const dx = e.clientX - (b.left + b.width / 2)
@@ -152,7 +140,6 @@ export default function Hero() {
   // amplitudes and periods (4.5–9 s) and is never in step with its neighbours.
   useGSAP(
     () => {
-      if (!floatOn) return undefined
       const mm = gsap.matchMedia()
       mm.add({ motion: MOTION_OK, small: "(max-width: 1024px)", phone: "(max-width: 767px)" }, (ctx) => {
         if (!ctx.conditions.motion) return undefined
@@ -192,10 +179,12 @@ export default function Hero() {
       })
       return () => mm.revert()
     },
-    { scope: root, dependencies: [floatOn], revertOnUpdate: true }
+    { scope: root }
   )
 
   const list = hero.list
+  const showVideo = true // shows "Asset pending" until VITE_FOUNDER_VIDEO_URL is set
+  const showResults = Array.isArray(hero.results) && hero.results.length > 0
   const ListTag = list?.ordered ? "ol" : "ul"
 
   const openPart = (id) => {
@@ -207,30 +196,8 @@ export default function Hero() {
   return (
     <section ref={root} id="top" className="hero" aria-labelledby="hero-title">
       {/* First fold: centred copy, floating tiles, reactive pixel grid */}
-      <div ref={foldRef} className={`hero__fold ${intro.stageMounted ? "is-intro" : ""}`}>
-        {/* Under the corner cubes. Hidden through the intro; fades in only after it played to the end */}
-        <SpaceAtmosphere
-          preset="hero"
-          seed="hero"
-          pinned={false}
-          className="space-atmo--hero"
-          visible={intro.phase === "ready"}
-          fadeMs={intro.endedBy === "complete" ? 1100 : 0}
-        />
-        <HeroVoxels foldRef={foldRef} active={intro.phase === "ready"} />
-
-        {intro.stageMounted && (
-          <>
-            <div ref={intro.backdropRef} className="intro__backdrop" aria-hidden="true" />
-            <canvas ref={intro.canvasRef} className="intro__canvas" aria-hidden="true" />
-            <div ref={intro.veilRef} className="intro__veil" aria-hidden="true" />
-            {intro.phase !== "ready" && (
-              <button ref={intro.skipBtnRef} type="button" className="intro__skip" onClick={intro.skip}>
-                Skip intro
-              </button>
-            )}
-          </>
-        )}
+      <div ref={foldRef} className="hero__fold">
+        <SpaceAtmosphere preset="hero" seed="hero" pinned={false} className="space-atmo--hero" visible fadeMs={0} />
 
         <div className="hero__tiles" role="group" aria-label={uiCopy.toolsDisclaimer}>
           {TILES.map((t) => {
@@ -281,7 +248,7 @@ export default function Hero() {
 
         <div className="hero__center">
           <Eyebrow dot={false} className="hero__eyebrow">
-            {/* The intro's aircraft, at rest. Replaces the two pixel markers; its slot is reserved */}
+            {/* Brand mark beside the eyebrow */}
             <span className="hero__mark" aria-hidden="true">
               <img src={markUrl} alt="" width="22" height="22" decoding="async" />
             </span>
@@ -336,18 +303,22 @@ export default function Hero() {
           </aside>
         )}
 
-        <div className="hero__proof-grid">
-          <button type="button" className="video-card" onClick={() => openModal("video:founder")}>
-            <span className="video-card__screen" aria-hidden="true">
-              <span className="video-card__mono">VS</span>
-              <span className="video-card__play">
-                <PixelIcon name="play" size={22} />
+        {(showVideo || showResults) && (
+        <div className={`hero__proof-grid${showVideo && showResults ? "" : " hero__proof-grid--single"}`}>
+          {showVideo && (
+            <button type="button" className="video-card" onClick={() => openModal("video:founder")}>
+              <span className="video-card__screen" aria-hidden="true">
+                <span className="video-card__mono">VS</span>
+                <span className="video-card__play">
+                  <PixelIcon name="play" size={22} />
+                </span>
+                {!siteConfig.founderVideoUrl && <span className="video-card__pending t-mono">{uiCopy.assetPending}</span>}
               </span>
-              {!siteConfig.founderVideoUrl && <span className="video-card__pending t-mono">{uiCopy.assetPending}</span>}
-            </span>
-            <span className="video-card__caption">{hero.videoCaption}</span>
-          </button>
+              <span className="video-card__caption">{hero.videoCaption}</span>
+            </button>
+          )}
 
+          {showResults && (
           <div className="results" aria-labelledby="results-title">
             <h2 id="results-title" className="results__title t-h3">
               {hero.resultsHeading}
@@ -369,7 +340,9 @@ export default function Hero() {
             </ul>
             <p className={`results__source${hero.footnote.mono ? " t-mono" : ""}`}>{hero.footnote.text}</p>
           </div>
+          )}
         </div>
+        )}
       </div>
 
       {/* Businesses that trust Webchirpy — its own light band, the bridge into the first dark chapter */}

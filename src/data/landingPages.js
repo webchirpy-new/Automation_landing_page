@@ -22,7 +22,9 @@ const UNDER_BUTTON = "Free automation audit · 15–30 minutes · No obligation"
 const page1 = {
   ...heroPage1,
   list: { title: heroPage1.listTitle, ordered: false, items: heroPage1.leaks, icons: ["form", "chat", "clock", "chart"] },
-  // The DOCX source line for page 1 does not cite the figures, so it stays behind a flag
+  // The 7x / 60x / 23% figures show with a "citation pending confirmation" note until the client
+  // confirms a source and turns VITE_SHOW_HERO_SOURCE_LINE on.
+  results: heroPage1.results,
   footnote: siteConfig.showHeroSourceLine ? { text: heroPage1.sourceLine, mono: false } : { text: uiCopy.statsNote, mono: true },
 }
 

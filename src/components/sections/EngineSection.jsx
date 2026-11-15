@@ -1,7 +1,7 @@
 import React from "react"
 import { engine } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
-import AutomationEngine from "../interactions/AutomationEngine"
+import EngineExplorer from "../interactions/EngineExplorer"
 import LivingWorkflow from "../interactions/LivingWorkflow"
 import { Marked } from "../ui/Highlight"
 
@@ -17,7 +17,7 @@ export default function EngineSection() {
         </p>
       </header>
 
-      <AutomationEngine />
+      <EngineExplorer />
 
       <div className="cycle">
         <header className="cycle__head">

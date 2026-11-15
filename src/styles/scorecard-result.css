@@ -1,0 +1,315 @@
+/* =========================================================
+   SCORECARD — context questions, free result, dummy report form
+   (Launch Kit 01 §02.3, §03.3; Kit 02 Form A). Existing tokens only.
+   ========================================================= */
+
+/* Selects share the input styling (first select on the site) */
+.field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 40px 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-12);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235a5f6b' stroke-width='2'/%3E%3C/svg%3E")
+      no-repeat right 14px center,
+    #fff;
+  font-size: 1rem; /* ≥16px: no iOS zoom */
+  color: var(--ink);
+  appearance: none;
+  transition: border-color var(--dur-hover), box-shadow var(--dur-hover);
+}
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(76, 92, 214, 0.14);
+}
+.field--error select {
+  border-color: var(--danger);
+}
+
+/* ---------- Context questions (a card in the areas column) ---------- */
+.score-context {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 2.4vw, 26px);
+}
+.score-context__title {
+  font-size: var(--fs-h3);
+}
+.score-context__note {
+  margin-top: -8px;
+  font-size: var(--fs-small);
+}
+.score-context__question {
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.score-context__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.score-context__opt {
+  min-height: 44px;
+  text-align: left;
+  color: var(--ink-2);
+  border-color: var(--muted-2);
+}
+
+/* ---------- Result ---------- */
+.score-result {
+  display: grid;
+  gap: clamp(20px, 3vw, 28px);
+  margin-top: clamp(24px, 4vw, 40px);
+  padding: clamp(20px, 3.4vw, 40px);
+  border-radius: var(--r-32);
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+.score-result:focus {
+  outline: none;
+}
+.score-result__label {
+  margin-bottom: 8px;
+  color: var(--accent-ink);
+}
+.score-result__score {
+  font-size: var(--fs-h3);
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+.score-result__score strong {
+  font-size: 1.35em;
+}
+.score-result__message {
+  max-width: 70ch;
+  margin-bottom: 10px;
+  color: var(--ink-2);
+}
+.score-result__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 900px) {
+  .score-result__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.score-result__list li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-18);
+  background: var(--paper);
+}
+.score-result__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-12);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+.score-result__status {
+  margin-left: 4px;
+  color: var(--danger-ink);
+}
+.score-result__meaning {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--fs-small);
+}
+.score-result__report {
+  display: grid;
+  gap: 10px;
+  padding-top: clamp(20px, 3vw, 28px);
+  border-top: 1px solid var(--line);
+}
+.score-result__book {
+  justify-self: center;
+  margin-top: 4px;
+}
+.scorecard__book {
+  display: block;
+  margin: 10px auto 0;
+}
+
+/* ---------- Dummy report form ---------- */
+.report-form {
+  margin-top: 8px;
+}
+.report-form__grid {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .report-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.report-form__demo {
+  padding: 10px 12px;
+  border: 1px dashed var(--muted-2);
+  border-radius: var(--r-12);
+  background: var(--paper);
+  font-size: var(--fs-small);
+}
+.report-form__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-right: 4px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: #fff;
+}
+.report-form__phone {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.report-form__prefix {
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: var(--r-12) 0 0 var(--r-12);
+  background: var(--paper);
+  font-weight: 600;
+}
+.field .report-form__phone input {
+  border-radius: 0 var(--r-12) var(--r-12) 0;
+}
+.report-form__done {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 18px;
+  border: 1px dashed var(--muted-2);
+  border-radius: var(--r-18);
+  background: var(--paper);
+}
+.report-form__done:focus {
+  outline: none;
+}
+.report-form__done-title {
+  font-weight: 700;
+}
+
+/* A link inside running text (consent line, privacy note): no 44px box, just an underline */
+.inline-link {
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* "Neither applies to us" — same checkbox row as the two checks, set apart by a hairline */
+.check--none {
+  margin-top: 4px;
+  border-top: 1px dashed var(--line);
+  border-radius: 0 0 var(--r-12) var(--r-12);
+}
+.check--none .check__text {
+  color: var(--muted);
+}
+.score-area__foot:empty {
+  display: none;
+}
+
+/* Result: closing CTA panel (the report form opens in a modal from the primary button) */
+.score-result .score-result__report {
+  display: grid;
+  gap: 20px;
+  margin-top: 4px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(76, 92, 214, 0.18);
+  border-radius: var(--r-24);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(240, 190, 223, 0.35), transparent 55%),
+    radial-gradient(120% 140% at 0% 100%, rgba(140, 230, 240, 0.28), transparent 55%),
+    var(--accent-wash);
+}
+.score-result__report-copy {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.score-result__report-copy h3 {
+  margin-bottom: 6px;
+}
+.score-result__report-copy p {
+  margin: 0;
+  max-width: 56ch;
+}
+.score-result__report-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 16px -10px rgba(76, 92, 214, 0.6);
+  color: var(--ink);
+}
+.score-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.score-result__actions .btn {
+  flex: 1 1 240px;
+}
+/* Secondary CTA: white, outlined in the brand indigo, same size and type as the primary */
+.score-result__book-btn {
+  --btn-bg: #fff;
+  --btn-fg: var(--accent-ink);
+  border: 1.5px solid rgba(76, 92, 214, 0.45);
+  box-shadow: 0 1px 2px rgba(17, 20, 25, 0.05);
+}
+.score-result__book-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 22px -12px rgba(76, 92, 214, 0.55);
+}
+.score-result__book-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* Wide cards: copy on the left, the two buttons stacked on the right */
+@media (min-width: 900px) {
+  .score-result .score-result__report {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    align-items: center;
+    gap: 28px;
+  }
+  .score-result__actions {
+    flex-direction: column;
+  }
+  .score-result__actions .btn {
+    flex: none;
+    width: 100%;
+  }
+}
+/* Phones: the icon sits above the copy, the buttons go full width */
+@media (max-width: 479px) {
+  .score-result__report-copy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .score-result__actions .btn {
+    flex-basis: 100%;
+  }
+}
+.report-modal__body {
+  margin: -4px 0 14px;
+}

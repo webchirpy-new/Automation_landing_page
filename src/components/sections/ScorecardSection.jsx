@@ -2,6 +2,7 @@ import React from "react"
 import { scorecard } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import Scorecard from "../interactions/Scorecard"
+import ScoreResult from "../interactions/ScoreResult"
 import { Marked } from "../ui/Highlight"
 
 export default function ScorecardSection() {
@@ -16,6 +17,8 @@ export default function ScorecardSection() {
         </p>
       </header>
       <Scorecard />
+      {/* Free result + dummy report form, once all 8 areas are reviewed (Kit 01 §03.3) */}
+      <ScoreResult />
     </SectionShell>
   )
 }

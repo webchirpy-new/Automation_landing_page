@@ -18,3 +18,32 @@ export function goTo(hash, { focusSelector } = {}) {
 }
 
 export const goToBooking = () => goTo("#book", { focusSelector: "input" })
+
+/**
+ * Deep links from ads (e.g. `vsl-07-…html#test`): the browser tries to jump to the hash before
+ * React has rendered the section, so the jump is lost. Once the page has loaded and laid out,
+ * jump straight to the target (no animation: the visitor expects to land there).
+ */
+export function landOnHash() {
+  if (typeof window === "undefined") return () => {}
+  const hash = window.location.hash
+  if (!hash || hash.length < 2) return () => {}
+  let cancelled = false
+  const jump = () =>
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (cancelled) return
+        const el = document.getElementById(decodeURIComponent(hash.slice(1)))
+        if (!el) return
+        const lenis = getLenis()
+        if (lenis) lenis.scrollTo(el, { offset: -12, immediate: true, force: true })
+        else el.scrollIntoView({ block: "start" })
+      })
+    )
+  if (document.readyState === "complete") jump()
+  else window.addEventListener("load", jump, { once: true })
+  return () => {
+    cancelled = true
+    window.removeEventListener("load", jump)
+  }
+}

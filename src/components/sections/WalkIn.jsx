@@ -2,10 +2,15 @@ import React from "react"
 import { walk } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import PixelIcon from "../visuals/PixelIcon"
-import LeadForm from "../interactions/LeadForm"
+import TallyEmbed from "../interactions/TallyEmbed"
+import { siteConfig } from "../../config/site"
+import { useSite } from "../../context/SiteContext"
+import { scorecardPayload } from "../../lib/scoring"
+import { pageId } from "../../data/landingPages"
 import { Marked } from "../ui/Highlight"
 
 export default function WalkIn() {
+  const { summary } = useSite()
   return (
     <SectionShell id="decide" theme="light" labelledBy="walk-title" className="walk">
       <header className="section-head section-head--center">
@@ -94,7 +99,7 @@ export default function WalkIn() {
             {walk.form.heading}
           </h3>
           <p className="t-muted booking__sub">{walk.form.sub}</p>
-          <LeadForm idPrefix="book" />
+          <TallyEmbed url={siteConfig.tallyBookingUrl} title={walk.form.heading} fields={{ page: pageId, ...scorecardPayload(summary) }} minHeight={560} thankYou="call" />
         </div>
       </div>
     </SectionShell>
