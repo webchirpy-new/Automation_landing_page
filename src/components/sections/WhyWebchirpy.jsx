@@ -151,11 +151,8 @@ export default function WhyWebchirpy() {
 
           <div className="founder">
             <div className="founder__frame">
-              {/* Monogram until the approved photo arrives; no "pending" label on the live page */}
-              <div className="founder__portrait" role="img" aria-label={why.founderCard.name}>
-                <span className="founder__mono" aria-hidden="true">
-                  VS
-                </span>
+              <div className="founder__portrait">
+                <img className="founder__photo" src="/founder-photo.jpg" alt={why.founderCard.name} width="1536" height="1024" loading="lazy" decoding="async" />
               </div>
               {siteConfig.founderVideoUrl && (
                 <button type="button" className="founder__play" onClick={() => openModal("video:founder")}>

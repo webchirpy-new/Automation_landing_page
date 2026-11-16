@@ -18,7 +18,9 @@ export const siteConfig = {
 
   // Contact — DOCX ships PLACEHOLDER_PHONE / PLACEHOLDER_WHATSAPP_NUMBER.
   phone: env("VITE_CONTACT_PHONE"), // e.g. "+91 98xxxxxxx"
-  whatsapp: env("VITE_CONTACT_WHATSAPP"), // digits only, e.g. "9198xxxxxxxx"
+  // The WhatsApp Business (Cloud API) number the audit CTA opens a chat with. Digits only,
+  // country code first. n8n listens on this number and replies with the approved template.
+  whatsapp: env("VITE_CONTACT_WHATSAPP") || "919385295862",
 
   // Tally forms. Report: the scorecard report request. Booking: the free discovery call
   // (the #book form, the lead modal and every "book" CTA that scrolls to it).

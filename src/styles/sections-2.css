@@ -985,6 +985,14 @@
   place-items: center;
   background: linear-gradient(90deg, var(--paper) 50%, var(--accent-wash) 50%);
 }
+/* Founder photo: landscape studio shot cropped into the 4:5 frame, centred on Vasanth */
+.founder__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 46% 40%;
+  background: #fff;
+}
 .founder__mono {
   font-size: clamp(6rem, 14vw, 11rem);
   font-weight: 800;

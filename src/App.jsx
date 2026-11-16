@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { initSmoothScroll } from "./lib/smoothScroll"
 import { SiteProvider } from "./context/SiteContext"
-import StickyCTA from "./components/layout/StickyCTA"
+import WhatsAppButton from "./components/layout/WhatsAppButton"
 import SiteModals from "./components/layout/SiteModals"
 import Hero from "./components/sections/Hero"
 import Pattern from "./components/sections/Pattern"
@@ -51,7 +51,7 @@ export default function App() {
         <WalkIn />
       </main>
       <FinalCTA />
-      <StickyCTA />
+      <WhatsAppButton />
       <SiteModals />
     </SiteProvider>
   )

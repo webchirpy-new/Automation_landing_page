@@ -1625,3 +1625,223 @@
 .tally__open:hover {
   color: var(--accent-ink);
 }
+
+/* =========================================================
+   WHATSAPP FLOATING CHAT — bottom-right on every screen
+   A card (icon + pitch + "Tap to get details") beside a round button. Both open WhatsApp.
+   The group slides up on entrance; two thin rings ripple behind the button and it gives a
+   soft hop every few seconds. Only transform and opacity animate.
+   ========================================================= */
+.wa-fab {
+  position: fixed;
+  right: clamp(16px, 2vw, 28px);
+  bottom: calc(clamp(16px, 2vw, 28px) + env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 400ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s 500ms;
+}
+.wa-fab.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 400ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+}
+.wa-fab.is-visible .wa-fab__link,
+.wa-fab.has-card .wa-fab__card {
+  pointer-events: auto;
+}
+
+/* Round button */
+.wa-fab__link {
+  position: relative;
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+.wa-fab__btn {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2fe07a, #1fb457);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(18, 140, 70, 0.55), 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+}
+.wa-fab__link:hover .wa-fab__btn,
+.wa-fab__link:focus-visible .wa-fab__btn {
+  transform: scale(1.06);
+  box-shadow: 0 12px 26px -6px rgba(18, 140, 70, 0.65), 0 2px 4px rgba(0, 0, 0, 0.14);
+}
+.wa-fab__link:focus-visible,
+.wa-fab__card-link:focus-visible,
+.wa-fab__close:focus-visible {
+  outline: 3px solid #25d366;
+  outline-offset: 3px;
+}
+.wa-fab__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 211, 102, 0.7);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Card */
+.wa-fab__card {
+  position: relative;
+  opacity: 0;
+  transform: translateX(12px) scale(0.96);
+  transform-origin: 100% 50%;
+  transition: opacity 300ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wa-fab.has-card .wa-fab__card {
+  opacity: 1;
+  transform: none;
+}
+.wa-fab__card-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 120px));
+  padding: 12px 30px 12px 12px;
+  border-radius: 16px 16px 4px 16px;
+  background: #fff;
+  color: #111419;
+  text-decoration: none;
+  box-shadow: 0 14px 34px -12px rgba(17, 20, 25, 0.4), 0 1px 3px rgba(17, 20, 25, 0.12);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+}
+.wa-fab__card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px -12px rgba(17, 20, 25, 0.45), 0 1px 3px rgba(17, 20, 25, 0.12);
+}
+.wa-fab__card-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+}
+.wa-fab__card-body {
+  display: grid;
+  gap: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+.wa-fab__card-body strong {
+  font-weight: 750;
+}
+.wa-fab__card-body > span {
+  color: #5f6368;
+}
+.wa-fab__card-body > .wa-fab__card-cta {
+  margin-top: 4px;
+  color: #128c4b;
+  font-weight: 700;
+}
+.wa-fab__close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #8a8f98;
+  background: transparent;
+  transition: background 160ms ease, color 160ms ease;
+}
+.wa-fab__close:hover {
+  background: #f1f2f4;
+  color: #111419;
+}
+
+@media (max-width: 767px) {
+  .wa-fab {
+    gap: 10px;
+  }
+  .wa-fab__link {
+    width: 54px;
+    height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Two staggered rings ripple out, like a gentle "live" signal */
+  .wa-fab.is-visible .wa-fab__ring {
+    animation: wa-ripple 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  .wa-fab.is-visible .wa-fab__ring + .wa-fab__ring {
+    animation-delay: 1.4s;
+  }
+  /* Every few seconds the button gives one soft hop */
+  .wa-fab.is-visible .wa-fab__btn {
+    animation: wa-hop 5s ease-in-out 2s infinite;
+  }
+  .wa-fab__link:hover .wa-fab__btn,
+  .wa-fab__link:focus-visible .wa-fab__btn {
+    animation: none;
+  }
+  /* The card's icon gives a small wave when the card arrives */
+  .wa-fab.has-card .wa-fab__card-icon {
+    animation: wa-wave 900ms ease-in-out 450ms 1;
+  }
+}
+@keyframes wa-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+@keyframes wa-hop {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  86% {
+    transform: translateY(-7px);
+  }
+  92% {
+    transform: translateY(0);
+  }
+  96% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes wa-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-4deg);
+  }
+}
