@@ -1,8 +1,8 @@
-import React, { useEffect, useId, useRef, useState } from "react"
+import React, { useEffect, useId, useRef } from "react"
 import { scorecard, uiCopy, reportForm } from "../../data/automationContent"
 import { moduleById } from "../../data/serviceModules"
 import { useSite } from "../../context/SiteContext"
-import { useIsMobile, useMediaQuery } from "../../hooks/useMediaQuery"
+import { useMediaQuery } from "../../hooks/useMediaQuery"
 import PixelIcon from "../visuals/PixelIcon"
 import { goTo, goToBooking } from "../../lib/scroll"
 import ContextQuestions from "./ContextQuestions"
@@ -15,7 +15,9 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`
 function ScoreRing({ summary, compact = false }) {
   const { complete, score, reviewedCount, gapCount, totalAreas, totalChecks } = summary
   // While areas are open the ring shows completion; once all are reviewed it shows the score.
-  const frac = complete ? score / 100 : reviewedCount / totalAreas
+  const raw = complete ? score / 100 : reviewedCount / totalAreas
+  // The small phone ring keeps a short start arc at 0%, so it still reads as a progress ring.
+  const frac = compact ? Math.max(raw, 0.04) : raw
   const gradId = `ring-${useId().replace(/:/g, "")}`
   return (
     <div className={`score-ring ${complete ? "is-complete" : ""} ${compact ? "score-ring--compact" : ""}`}>
@@ -105,14 +107,10 @@ function AutomationMap({ summary }) {
 
 export default function Scorecard() {
   const { score, summary, toggleCheck, clearArea, resetScore } = useSite()
-  const isMobile = useIsMobile()
-  const [openId, setOpenId] = useState(scorecard.areas[0].id)
-
-  /** Opens (on phones) and scrolls to the first area not yet reviewed. */
+  /** Scrolls to the first area not yet reviewed. */
   const goToNextArea = () => {
     const next = summary.areas.find((a) => !a.reviewed)
     if (!next) return
-    setOpenId(next.id)
     goTo(`#score-h-${next.id}`, { focusSelector: "button, input" })
   }
   const areasRef = useRef(null)
@@ -225,7 +223,6 @@ export default function Scorecard() {
       <div ref={areasRef} className="scorecard__areas">
         <p className="scorecard__helper">{scorecard.helper}</p>
         {summary.areas.map((a, ai) => {
-          const open = !isMobile || openId === a.id
           const panelId = `score-panel-${a.id}`
           const head = (
             <>
@@ -240,23 +237,11 @@ export default function Scorecard() {
             </>
           )
           return (
-            <section key={a.id} className={`score-area ${a.reviewed ? "is-reviewed" : ""} ${open ? "is-open" : ""}`} data-corner={CORNERS[ai % CORNERS.length]} aria-labelledby={`score-h-${a.id}`}>
+            <section key={a.id} className={`score-area is-open ${a.reviewed ? "is-reviewed" : ""}`} data-corner={CORNERS[ai % CORNERS.length]} aria-labelledby={`score-h-${a.id}`}>
               <h3 id={`score-h-${a.id}`} className="score-area__head">
-                {isMobile ? (
-                  <button type="button" className="score-area__toggle" aria-expanded={open} aria-controls={panelId} onClick={() => setOpenId(open ? null : a.id)}>
-                    {head}
-                    {/* Tap affordance: rows read as plain cards without it */}
-                    <span className="score-area__chev" aria-hidden="true">
-                      <svg viewBox="0 0 16 16" width="16" height="16">
-                        <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                  </button>
-                ) : (
-                  <span className="score-area__static">{head}</span>
-                )}
+                <span className="score-area__static">{head}</span>
               </h3>
-              <div id={panelId} className="score-area__panel" hidden={!open}>
+              <div id={panelId} className="score-area__panel">
                 {a.checks.map((c, i) => {
                   const id = `chk-${a.id}-${i}`
                   const checked = !!score.checked[`${a.id}:${i}`]
@@ -286,13 +271,6 @@ export default function Scorecard() {
                   </span>
                   <span className="check__text">{uiCopy.noneApply}</span>
                 </label>
-                <div className="score-area__foot">
-                  {isMobile && ai < summary.areas.length - 1 && (
-                    <button type="button" className="text-link" onClick={() => setOpenId(summary.areas[ai + 1].id)}>
-                      Next: {summary.areas[ai + 1].area} →
-                    </button>
-                  )}
-                </div>
               </div>
             </section>
           )

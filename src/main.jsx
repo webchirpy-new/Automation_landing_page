@@ -16,6 +16,7 @@ import "./styles/scorecard-panel.css"
 import "./styles/automation-demo.css"
 import "./styles/engine-explorer.css"
 import "./styles/icons.css"
+import "./styles/mobile-cta.css"
 import App from "./App.jsx"
 
 createRoot(document.getElementById("root")).render(

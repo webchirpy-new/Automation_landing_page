@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
 import { dashboard, uiCopy } from "../../data/automationContent"
-import { dashboardTabs } from "../../data/dashboardData"
+import { dashboardTabs, decisionDetails } from "../../data/dashboardData"
 import { moduleByName } from "../../data/serviceModules"
 import CountUp from "../visuals/CountUp"
 import PixelIcon from "../visuals/PixelIcon"
@@ -116,24 +116,72 @@ function Trend({ months }) {
   )
 }
 
-function Decision({ part, text, onDo, openId, id }) {
+function Decision({ part, text, onDo, openId, id, panelId }) {
   const m = moduleByName[part]
   const isOpen = openId === id
   return (
-    <li className="decision">
+    <li className={`decision ${isOpen ? "is-open" : ""}`}>
       {m && (
         <span className="decision__part t-mono">
           <PixelIcon name={m.icon} size={12} animate={false} /> {part}
         </span>
       )}
       <span className="decision__text">{text}</span>
-      <button type="button" className="decision__do" aria-expanded={isOpen} aria-controls={`${id}-note`} onClick={() => onDo(isOpen ? null : id)}>
-        {dashboard.doIt}
+      <button
+        type="button"
+        className="decision__do"
+        aria-label={`${dashboard.doItLabel}: ${text}`}
+        title={dashboard.doItLabel}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        onClick={() => {
+          onDo(isOpen ? null : id)
+          // Phones: the panel sits under the whole list, so bring it into view if it is off-screen.
+          if (!isOpen) {
+            const panel = document.getElementById(panelId)
+            const r = panel?.getBoundingClientRect()
+            if (r && (r.top < 0 || r.bottom > window.innerHeight)) {
+              const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+              panel.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest" })
+            }
+          }
+        }}
+      >
+        <svg className="decision__arrow" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+          <path d="M4 10h11M10.5 5.5 15 10l-4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
-      <p id={`${id}-note`} className="decision__note" hidden={!isOpen}>
-        <span className="badge badge--dark t-mono">{uiCopy.illustrative}</span> {uiCopy.demoAction}
-      </p>
     </li>
+  )
+}
+
+/**
+ * One detail area under the decision cards. Every note sits in the same grid cell, so the
+ * area is always as tall as the longest note: opening or switching a decision never moves
+ * the cards or anything below them.
+ */
+function DecisionPanel({ id, items, openId }) {
+  const active = items.some((d) => d.id === openId)
+  return (
+    <div id={id} className={`decision-panel ${active ? "is-active" : ""}`} aria-live="polite">
+      <p className={`decision-panel__item decision-panel__hint ${active ? "" : "is-on"}`} aria-hidden={active}>
+        {dashboard.doItHint}
+      </p>
+      {items.map((d) => {
+        const detail = decisionDetails[d.text]
+        const on = d.id === openId
+        return (
+          <div key={d.id} className={`decision-panel__item ${on ? "is-on" : ""}`} aria-hidden={!on}>
+            <p className="decision-panel__title">
+              <span className="decision-panel__part t-mono">{d.part}</span>
+              {d.text}
+            </p>
+            <p>{detail ? detail.does : uiCopy.demoAction}</p>
+            {detail?.result && <p className="decision-panel__result">{detail.result}</p>}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
@@ -197,9 +245,10 @@ function Panel({ t, openNote, setOpenNote }) {
           <h4 className="dcell__title t-mono">{t.decisionsTitle}</h4>
           <ul className="decisions">
             {t.decisions.map((d, i) => (
-              <Decision key={d.text} id={`ov-dec-${i}`} part={d.part} text={d.text} openId={openNote} onDo={setOpenNote} />
+              <Decision key={d.text} id={`ov-dec-${i}`} panelId="ov-dec-panel" part={d.part} text={d.text} openId={openNote} onDo={setOpenNote} />
             ))}
           </ul>
+          <DecisionPanel id="ov-dec-panel" openId={openNote} items={t.decisions.map((d, i) => ({ ...d, id: `ov-dec-${i}` }))} />
         </div>
       </div>
     )
@@ -232,8 +281,9 @@ function Panel({ t, openNote, setOpenNote }) {
       <div className="dcell dcell--decision">
         <h4 className="dcell__title t-mono">Decision</h4>
         <ul className="decisions">
-          <Decision id={`${t.id}-dec`} part={t.tab} text={t.decision} openId={openNote} onDo={setOpenNote} />
+          <Decision id={`${t.id}-dec`} panelId={`${t.id}-dec-panel`} part={t.tab} text={t.decision} openId={openNote} onDo={setOpenNote} />
         </ul>
+        <DecisionPanel id={`${t.id}-dec-panel`} openId={openNote} items={[{ id: `${t.id}-dec`, part: t.tab, text: t.decision }]} />
       </div>
     </div>
   )

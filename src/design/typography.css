@@ -34,7 +34,12 @@ h4 {
   font-size: var(--fs-h2);
   font-weight: 750;
   letter-spacing: -0.025em;
-  line-height: 1.02;
+  line-height: 1.1; /* room for g/y/p descenders between lines */
+  text-wrap: balance;
+}
+/* Sentence breaks from <Marked>: a new line only inside big headings */
+:is(.t-h2, .t-display) .sent-br {
+  display: block;
 }
 
 .t-h3 {

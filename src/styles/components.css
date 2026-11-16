@@ -455,7 +455,7 @@
     right: 16px;
     width: fit-content;
     margin-inline: auto;
-    bottom: calc(12px + env(safe-area-inset-bottom));
+    bottom: calc(24px + env(safe-area-inset-bottom));
     z-index: 40;
     display: inline-flex;
     align-items: center;

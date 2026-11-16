@@ -23,7 +23,7 @@ export default function FinalCTA() {
       mm.add(MOTION_OK, () => {
         setResolved(false)
         gsap.set(".final__loop, .final__check", { drawSVG: "0%" })
-        const tl = gsap.timeline({ paused: true, onComplete: () => setResolved(true) })
+        const tl = gsap.timeline({ paused: true, onComplete: () => setResolved(true) }).timeScale(1.8)
         tl.to(".final__loop", { drawSVG: "100%", duration: 1.2, ease: "power2.inOut" }).to(".final__check", { drawSVG: "100%", duration: 0.7, ease: "power2.out" }, "-=0.35")
         const io = new IntersectionObserver(
           ([e]) => {
@@ -32,7 +32,7 @@ export default function FinalCTA() {
               io.disconnect()
             }
           },
-          { threshold: 0.35 }
+          { threshold: 0.15 }
         )
         io.observe(ref.current.querySelector(".final__art"))
         return () => {
@@ -76,7 +76,10 @@ export default function FinalCTA() {
       </div>
       {/* Ad landing page: a minimal footer (logo + legal) so nothing competes with the CTA above */}
       <div className="container site-footer">
-        <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" loading="lazy" />
+        <div className="site-footer__brand">
+          <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" loading="lazy" />
+          <span className="site-footer__tag">Automation</span>
+        </div>
         <p className="site-footer__legal">
           <span>
             © {new Date().getFullYear()} {footer.legal}

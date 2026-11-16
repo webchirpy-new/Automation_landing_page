@@ -17,7 +17,7 @@ export default function AuditOffer() {
     () => {
       const mm = gsap.matchMedia()
       mm.add(MOTION_OK, () => {
-        const tl = gsap.timeline({ scrollTrigger: { trigger: ".ticket", start: "top 75%", once: true } })
+        const tl = gsap.timeline({ scrollTrigger: { trigger: ".ticket", start: "top 92%", once: true } }).timeScale(1.8)
         tl.from(".ticket__sheet", { rotateX: -88, transformOrigin: "50% 0%", duration: 0.9, ease: "power3.out" })
           .from(".ticket__item", { autoAlpha: 0, y: 10, stagger: 0.08, duration: 0.4 }, "-=0.35")
           .from(".ticket__seal", { scale: 1.6, autoAlpha: 0, rotate: -20, duration: 0.45, ease: "back.out(2)" }, "-=0.2")

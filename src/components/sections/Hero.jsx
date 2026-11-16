@@ -87,14 +87,14 @@ export default function Hero() {
       // Short entrance
       mm.add(MOTION_OK, () => {
         // Opacity, not autoAlpha: the copy and CTA are live from the first frame, the fade is only visual
-        gsap.from(".hero__center > *", { y: 18, opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.09 })
+        gsap.from(".hero__center > *", { y: 14, opacity: 0, duration: 0.5, ease: "power2.out", stagger: 0.05 })
         const tiles = gsap.utils.shuffle(gsap.utils.toArray(".htile", root.current))
         tiles.forEach((t, i) => {
           const [fx, fy] = (t.dataset.from || "0,0").split(",").map(Number)
           gsap.fromTo(
             t,
             { x: fx, y: fy, autoAlpha: 0, scale: 0.86 },
-            { x: 0, y: 0, autoAlpha: 1, scale: 1, duration: 0.9, ease: "power3.out", delay: 0.3 + i * 0.1 }
+            { x: 0, y: 0, autoAlpha: 1, scale: 1, duration: 0.6, ease: "power3.out", delay: 0.1 + i * 0.04 }
           )
         })
       })

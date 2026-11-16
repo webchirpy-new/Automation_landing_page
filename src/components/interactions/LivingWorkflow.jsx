@@ -23,7 +23,7 @@ const READY = -1
 const FLOW = 4 // every hub lit while one signal runs the whole route
 const DONE = 5
 const WIDE = "(min-width: 1024px)"
-const ANIMATED = ".lw-hub, .lw-stage__title, .lw-chip, .lw-wire, .lw-signal, .lw-status"
+const ANIMATED = ".lw-hub, .lw-chip, .lw-wire, .lw-signal, .lw-status"
 const pad = (i) => String(i + 1).padStart(2, "0")
 const r1 = (n) => Math.round(n * 10) / 10
 
@@ -166,20 +166,19 @@ export default function LivingWorkflow() {
           const [dot, ...dots] = q(".lw-signal")
 
           gsap.set(live(q(".lw-wire")), { drawSVG: "0%" })
-          gsap.set([...q(".lw-stage__title"), ...q(".lw-stages .lw-chip"), ...q(".lw-status")], { autoAlpha: 0, y: 8 })
+          gsap.set([...q(".lw-stages .lw-chip"), ...q(".lw-status")], { autoAlpha: 0, y: 8 })
           gsap.set(q(".lw-signal"), { autoAlpha: 0 })
 
-          const t = gsap.timeline({ paused: true, onComplete: complete })
-          const travel = (el, path, at, d) =>
+          const t = gsap.timeline({ paused: true, onComplete: complete, defaults: { force3D: true } }).timeScale(2.6)
+          const travel = (el, path, at, d, ease = "sine.inOut") =>
             t
               .set(el, { autoAlpha: 1 }, at)
-              .to(el, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, duration: d, ease: "power1.inOut" }, at)
+              .to(el, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, duration: d, ease }, at)
               .set(el, { autoAlpha: 0 }, at + d)
           const node = (i, at) =>
             t
               .call(setStep, [i], at)
-              .fromTo(pick(i, ".lw-hub"), { scale: 0.86, y: 6 }, { scale: 1, y: 0, duration: 0.55, ease: "back.out(1.7)" }, at)
-              .to(pick(i, ".lw-stage__title"), { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" }, at + 0.1)
+              .fromTo(pick(i, ".lw-hub"), { scale: 0.92, y: 4 }, { scale: 1, y: 0, duration: 0.6, ease: "power3.out" }, at)
           const serve = (i, at, gap = 0.12) => {
             links(i).forEach((p, j) => t.to(p, { drawSVG: "100%", duration: 0.45, ease: "power1.out" }, at + j * gap))
             t.to(pick(i, ".lw-chip"), { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: gap }, at + 0.2)
@@ -208,7 +207,7 @@ export default function LivingWorkflow() {
           serve(3, 6.8)
           // One signal runs the assembled graph, then the results route back once.
           t.call(setStep, [FLOW], 7.4)
-          main.forEach((p, j) => travel(dot, p, 7.4 + j * 0.45, 0.45))
+          main.forEach((p, j) => travel(dot, p, 7.4 + j * 0.45, 0.45, j === 0 ? "sine.in" : j === main.length - 1 ? "sine.out" : "none"))
           t.to(feedback, { drawSVG: "100%", duration: 1.1, ease: "power1.inOut" }, 8.65)
           travel(dot, feedback, 8.7, 1.05)
           t.to(feedback, { opacity: 0.4, duration: 0.5 }, 9.8)
@@ -222,7 +221,7 @@ export default function LivingWorkflow() {
           tl.current = build.current()
           ScrollTrigger.create({
             trigger: graph.current,
-            start: "top 62%",
+            start: "top 88%",
             once: true,
             onEnter: () => {
               played.current = true
@@ -235,7 +234,12 @@ export default function LivingWorkflow() {
           if (tl.current) complete()
         }
       })
-      return () => mm.revert()
+      return () => {
+        mm.revert()
+        // Reverting can restore the hidden start state (e.g. after a hot reload); the finished
+        // graph is the CSS default, so make sure nothing is left invisible.
+        if (root.current) gsap.set(root.current.querySelectorAll(ANIMATED), { clearProps: "all" })
+      }
     },
     { scope: root, dependencies: [ready] }
   )

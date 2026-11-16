@@ -531,7 +531,8 @@ export const dashboard = {
   tryIt: "↓ Try it: click each tab to see the data behind every part",
   header: { title: "AI Automation Dashboard", period: "This month", note: "Illustrative view" },
   footerLabel: "Illustrative dashboard. Your real numbers will differ.",
-  doIt: "Do it",
+  doItLabel: "See what this switches on",
+  doItHint: "Tap the arrow on any decision to see what it switches on and what changes for you.",
 }
 
 /* 07 — PROOF */

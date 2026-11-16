@@ -601,23 +601,34 @@
   line-height: 1.4;
 }
 .decision__do {
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: 1px solid rgba(110, 126, 236, 0.5);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.8125rem;
+  transition: background var(--dur-hover), border-color var(--dur-hover);
+}
+.decision__arrow {
+  transition: transform 260ms var(--ease-out);
+}
+@media (hover: hover) {
+  .decision__do:hover .decision__arrow {
+    transform: translateX(2px);
+  }
+}
+/* Open: the arrow turns to point at the detail panel below */
+.decision__do[aria-expanded="true"] .decision__arrow {
+  transform: rotate(90deg);
+}
+.decision__do:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 3px;
 }
 .decision__do:hover,
 .decision__do[aria-expanded="true"] {
   background: rgba(76, 92, 214, 0.35);
-}
-.decision__note {
-  grid-column: 1 / -1;
-  font-size: 0.8125rem;
-  color: var(--night-muted);
-  line-height: 1.5;
 }
 @media (min-width: 900px) {
   .dcell--decisions .decisions {
@@ -1724,7 +1735,7 @@
   transition: transform 300ms var(--ease-out), background 300ms;
 }
 .faq-item.is-open .faq-item__icon {
-  transform: rotate(45deg);
+  transform: rotate(180deg);
   background: var(--accent-wash);
   color: var(--accent-ink);
 }
@@ -2147,27 +2158,25 @@
 .final .t-lead {
   color: var(--night-muted);
 }
+/* One centred column: small tick on top, then the headline, line and button */
 .final__hero {
   display: grid;
-  gap: 32px;
-  align-items: center;
-}
-@media (min-width: 900px) {
-  .final__hero {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    gap: 48px;
-  }
+  justify-items: center;
+  gap: clamp(20px, 2.4vw, 28px);
+  text-align: center;
 }
 .final__copy {
   display: grid;
   gap: 20px;
-  justify-items: start;
+  justify-items: center;
+  max-width: 46rem;
 }
 .final__cta {
   margin-top: 8px;
 }
 .final__art {
-  width: min(440px, 100%);
+  order: -1;
+  width: clamp(88px, 9vw, 120px);
   margin-inline: auto;
 }
 .final__art svg {
@@ -2178,7 +2187,7 @@
 .final__loop {
   fill: none;
   stroke: var(--accent-soft);
-  stroke-width: 1.5;
+  stroke-width: 5; /* drawn small now, so a thicker stroke keeps the ring visible */
   opacity: 0.8;
 }
 .final__check {
@@ -2206,6 +2215,18 @@
   height: auto;
   margin-left: -6px;
 }
+.site-footer__brand {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+.site-footer__tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--night-muted);
+}
 .site-footer__legal {
   display: flex;
   flex-wrap: wrap;
@@ -2227,7 +2248,20 @@
 @media (max-width: 767px) {
   /* keep the floating CTA from covering the last footer line */
   .site-footer {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    /* Phones: logo, "Automation" and the legal line stacked and centred */
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+  .site-footer__brand {
+    justify-items: center;
+  }
+  .site-footer__logo {
+    margin-left: 0;
+  }
+  .site-footer__legal {
+    justify-content: center;
   }
 }
 
@@ -2276,4 +2310,62 @@
     opacity: 0;
     transform: translateY(-6px);
   }
+}
+
+/* "Do it" detail panel under the decision cards. All notes share one grid cell, so the panel
+   is always as tall as the longest note and nothing around it moves when you switch. */
+.decision.is-open {
+  border-color: rgba(201, 184, 245, 0.55);
+}
+.decision-panel {
+  display: grid;
+  margin-top: 12px;
+  padding: 16px 18px;
+  border-radius: var(--r-12);
+  border: 1px dashed var(--line-dark);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 200ms, background 200ms;
+}
+.decision-panel.is-active {
+  border-style: solid;
+  border-color: rgba(201, 184, 245, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+}
+.decision-panel__item {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--night-muted);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms ease, visibility 0s 180ms;
+}
+.decision-panel__item.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 180ms ease;
+}
+.decision-panel__hint {
+  align-self: center;
+}
+.decision-panel__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+.decision-panel__part {
+  color: var(--accent-soft);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.decision-panel__result {
+  color: #fff;
+  font-weight: 600;
 }

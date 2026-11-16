@@ -11,16 +11,34 @@ import React, { useEffect, useRef } from "react"
  * flows on every line. The flow runs only while the phrase is near the viewport, and is a
  * static gradient under reduced motion (see `.hl-flow` in global.css).
  */
+const SENTENCE_GAP = /(?<=[.?!])\s+(?=\S)/
+
 export function Marked({ text, phrase, tone = "light" }) {
-  const i = text.indexOf(phrase)
-  if (i < 0) return text
-  return (
-    <>
-      {text.slice(0, i)}
-      <FlowText tone={tone}>{phrase}</FlowText>
-      {text.slice(i + phrase.length)}
-    </>
-  )
+  if (!text.includes(phrase)) return text
+  // Each sentence of a heading starts on its own line (`.sent-br` is a line break only inside
+  // .t-h2/.t-display), so two-sentence headings never split mid-phrase on narrow screens.
+  return text.split(SENTENCE_GAP).map((s, k) => {
+    const i = s.indexOf(phrase)
+    return (
+      <React.Fragment key={k}>
+        {k > 0 && (
+          <>
+            {" "}
+            <span className="sent-br" aria-hidden="true" />
+          </>
+        )}
+        {i < 0 ? (
+          s
+        ) : (
+          <>
+            {s.slice(0, i)}
+            <FlowText tone={tone}>{phrase}</FlowText>
+            {s.slice(i + phrase.length)}
+          </>
+        )}
+      </React.Fragment>
+    )
+  })
 }
 
 /** A highlighted phrase in the shared spectral material (styles/spectral.css). */

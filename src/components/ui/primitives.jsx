@@ -25,11 +25,11 @@ export function SectionShell({ id, theme = "light", className = "", labelledBy, 
         // panel never shows side gutters mid-animation.
         if (inset) {
           gsap.from(ref.current.querySelector(".section__panel"), {
-            y: 24,
+            y: 16,
             autoAlpha: 0,
-            duration: 0.9,
+            duration: 0.5,
             ease: ease.out,
-            scrollTrigger: { trigger: ref.current, start: "top 92%", once: true },
+            scrollTrigger: { trigger: ref.current, start: "top 98%", once: true },
           })
         }
         // [data-stagger] lists: items cascade in once, and their marks (checks, icons,
@@ -37,26 +37,26 @@ export function SectionShell({ id, theme = "light", className = "", labelledBy, 
         gsap.utils.toArray("[data-stagger]", ref.current).forEach((list) => {
           const items = [...list.children]
           const marks = list.querySelectorAll(":scope > * :is(.px-icon, .mark, .fit__dash, .promises__n)")
-          gsap.set(items, { autoAlpha: 0, y: 14 })
+          gsap.set(items, { autoAlpha: 0, y: 10 })
           ScrollTrigger.create({
             trigger: list,
-            start: "top 85%",
+            start: "top 95%",
             once: true,
             onEnter: () => {
-              gsap.to(items, { autoAlpha: 1, y: 0, duration: 0.5, ease: ease.out, stagger: 0.08 })
+              gsap.to(items, { autoAlpha: 1, y: 0, duration: 0.35, ease: ease.out, stagger: 0.04 })
               if (marks.length)
-                gsap.from(marks, { scale: 0, transformOrigin: "50% 50%", duration: 0.45, ease: "back.out(2.2)", stagger: 0.08, delay: 0.18 })
+                gsap.from(marks, { scale: 0, transformOrigin: "50% 50%", duration: 0.3, ease: "back.out(2.2)", stagger: 0.04, delay: 0.08 })
             },
           })
         })
         const els = gsap.utils.toArray("[data-reveal]", ref.current)
         if (!els.length) return
-        gsap.set(els, { autoAlpha: 0, y: 24 })
+        gsap.set(els, { autoAlpha: 0, y: 14 })
         ScrollTrigger.batch(els, {
-          start: "top 90%",
+          start: "top 97%",
           once: true,
           onEnter: (batch) =>
-            gsap.to(batch, { autoAlpha: 1, y: 0, duration: dur.reveal, ease: ease.out, stagger: 0.08, overwrite: true }),
+            gsap.to(batch, { autoAlpha: 1, y: 0, duration: dur.reveal, ease: ease.out, stagger: 0.04, overwrite: true }),
         })
       })
       return () => mm.revert()

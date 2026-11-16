@@ -36,11 +36,12 @@ export default function Pattern() {
         gsap.fromTo(
           q(".pattern__word, .pattern__core-accent"),
           { opacity: 0 },
-          { opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out", scrollTrigger: { trigger: end, start: "top 86%", once: true } }
+          { opacity: 1, duration: 0.5, stagger: 0.03, ease: "power2.out", scrollTrigger: { trigger: end, start: "top 94%", once: true } }
         )
         // …then the reasoning and the CTA settle in once, after the whole story.
         gsap
-          .timeline({ scrollTrigger: { trigger: q(".pattern__end-row")[0], start: "top 86%", once: true } })
+          .timeline({ scrollTrigger: { trigger: q(".pattern__end-row")[0], start: "top 94%", once: true } })
+          .timeScale(1.8)
           .from(q(".pattern__closing"), { autoAlpha: 0, y: 15, duration: 0.7, ease: "power2.out" }, 0)
           .from(q(".pattern__final"), { autoAlpha: 0, y: 15, duration: 0.7, ease: "power2.out" }, 0.14)
           .from(q(".pattern__cta"), { autoAlpha: 0, y: 12, duration: 0.6, ease: "power2.out" }, 0.45)

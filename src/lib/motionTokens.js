@@ -2,7 +2,7 @@
 export const dur = {
   hover: 0.22,
   micro: 0.42,
-  reveal: 0.7,
+  reveal: 0.45,
   path: 1.1,
   idle: 3.6,
 }

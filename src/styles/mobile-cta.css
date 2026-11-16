@@ -1,0 +1,113 @@
+/* =========================================================
+   MOBILE CTA ALIGNMENT
+   Phones: every in-page call to action sits centred on its own line,
+   whatever layout (block, grid or flex) its section uses.
+   Loaded last so it wins over the per-section desktop alignment.
+   ========================================================= */
+@media (max-width: 767px) {
+  .hero__cta > .btn,
+  .pattern__cta > .btn,
+  .audit__cta > .btn,
+  .why__close > .btn,
+  .psec__cta,
+  .fit__cta,
+  .final__cta,
+  .book__btn,
+  .book__cover .book__btn,
+  .report-form__done > .btn {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    justify-self: center;
+    align-self: center;
+  }
+}
+
+/* =========================================================
+   MOBILE TEXT ALIGNMENT
+   Phones: where the heading is centred, the content under it is centred too, so a block
+   never mixes a centred title with left-aligned copy. (Timelines with a left rail, lists
+   with ticks and form fields stay left-aligned on purpose.)
+   ========================================================= */
+@media (max-width: 767px) {
+  /* 02 Pattern: closing lines under "Same team. Same effort." */
+  .pattern__end-row {
+    text-align: center;
+  }
+  /* Why Webchirpy: difference cards, founder copy and the closing line */
+  .diff,
+  .why__founder-copy,
+  .why__close {
+    text-align: center;
+    justify-items: center;
+  }
+  .diff__icon {
+    margin-inline: auto;
+  }
+  .why__close {
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* Proof: scenario book covers */
+  .book__cover {
+    align-items: center;
+    text-align: center;
+  }
+  .book__cover-doubt {
+    margin-inline: auto;
+  }
+}
+
+/* Client stories ("What our clients say"): heading, count line and each name/role centred */
+@media (max-width: 767px) {
+  .vt-head {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .vt-title {
+    max-width: none;
+  }
+  .vt-meta {
+    text-align: center;
+  }
+}
+/* Client stories on phones: each card snaps to the centre, with the neighbours peeking on both sides */
+@media (max-width: 599.98px) {
+  .vt-grid {
+    padding-inline: 14vw;
+    scroll-padding-inline: 0;
+  }
+  .vt-card {
+    flex-basis: 72vw;
+    scroll-snap-align: center;
+  }
+}
+
+/* Section intros on phones: heading + supporting line centred, like every other section head.
+   (Card titles, FAQ questions, scorecard areas and tick lists stay left-aligned on purpose.) */
+@media (max-width: 767px) {
+  .cycle__head,
+  .results__title,
+  .booking__tag,
+  #book-title,
+  .booking__sub {
+    text-align: center;
+  }
+  .cycle__head {
+    display: grid;
+    justify-items: center;
+  }
+  .cycle__head .t-muted,
+  .booking__sub {
+    margin-inline: auto;
+  }
+}
+/* Response-time stats under "Why every minute decides who wins the lead" */
+@media (max-width: 767px) {
+  .results__list li,
+  .results > p {
+    text-align: center;
+  }
+}

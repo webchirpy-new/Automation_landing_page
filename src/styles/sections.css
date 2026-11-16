@@ -795,6 +795,19 @@
   color: var(--ink-2);
   text-align: left;
 }
+/* Phones: one column of equal-width pills, so the ticks and text line up down the left */
+@media (max-width: 767px) {
+  .ptn-chips {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100%, 22rem);
+    margin-inline: auto;
+    justify-items: stretch;
+  }
+  .ptn-chips li {
+    display: flex;
+  }
+}
 .pattern__tick {
   flex: none;
   width: 22px;
@@ -1656,6 +1669,10 @@
 }
 .score-ring--compact circle {
   stroke-width: 12;
+}
+/* The phone pill is near-white: the default light-grey track vanished into it */
+.score-ring--compact .score-ring__track {
+  stroke: rgba(76, 92, 214, 0.22);
 }
 .score-ring--compact .score-ring__center {
   display: none;
@@ -2917,4 +2934,17 @@
   margin-top: clamp(40px, 5vw, 64px);
   text-align: center;
   color: var(--ink);
+}
+
+/* Living workflow: smooth build. While the graph assembles, the hubs drop their backdrop blur
+   (re-blurring a scaling element every frame is what caused the stutter) and the moving parts
+   get their own compositor layers. The finished graph keeps the glass look. */
+.lw[data-phase="ready"] .lw-hub,
+.lw[data-phase="build"] .lw-hub {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(255, 255, 255, 0.96);
+}
+.lw[data-phase="build"] :is(.lw-hub, .lw-chip, .lw-signal) {
+  will-change: transform, opacity;
 }

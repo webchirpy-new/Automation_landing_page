@@ -13,7 +13,7 @@ export default function AudienceFit() {
     () => {
       const mm = gsap.matchMedia()
       mm.add(MOTION_OK, () => {
-        const tl = gsap.timeline({ scrollTrigger: { trigger: ".branch", start: "top 80%", once: true } })
+        const tl = gsap.timeline({ scrollTrigger: { trigger: ".branch", start: "top 92%", once: true } }).timeScale(1.8)
         tl.fromTo(".branch__stem", { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.5, ease: "power1.in" })
           .fromTo([".branch__good", ".branch__other"], { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.9, ease: "power2.out" })
           .to(".branch__dot--good", { motionPath: { path: ".branch__good", align: ".branch__good", alignOrigin: [0.5, 0.5] }, duration: 1, ease: "power2.inOut" }, "<")

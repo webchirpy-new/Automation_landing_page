@@ -96,7 +96,9 @@
   --font-sans: var(--font-primary);
   --font-mono: var(--font-primary);
   --fs-display: clamp(2.35rem, 1.2rem + 5.1vw, 5.5rem); /* 38 → 88px */
-  --fs-h2: clamp(1.75rem, 1.2rem + 2.3vw, 3.5rem); /* 28 → 56px; ~38 at 768 */
+  /* 28 → 56px; ~38 at 768. Below ~390px it shrinks with the screen (≈12.5em per line fits
+     the longest heading sentence, e.g. "Everything we promise.") instead of breaking mid-phrase. */
+  --fs-h2: min(clamp(1.75rem, 1.2rem + 2.3vw, 3.5rem), calc((100vw - 32px) / 12.5));
   --fs-h3: clamp(1.35rem, 1.1rem + 1vw, 1.875rem);
   --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
   --fs-body: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
@@ -132,7 +134,7 @@
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-hover: 220ms;
   --dur-micro: 420ms;
-  --dur-reveal: 700ms;
+  --dur-reveal: 450ms;
 }
 
 /* Dark chapters re-scope the light tokens, so shared components read correctly on charcoal. */

@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import PixelIcon from "../visuals/PixelIcon"
 
 /**
  * Multi-open accordion (deliberate: owners compare answers side by side).
@@ -24,7 +23,9 @@ export default function FAQAccordion({ items }) {
               <button type="button" id={`faq-q-${i}`} aria-expanded={isOpen} aria-controls={`faq-a-${i}`} onClick={() => toggle(i)}>
                 <span className="faq-item__q">{it.q}</span>
                 <span className="faq-item__icon" aria-hidden="true">
-                  <PixelIcon name="help" size={14} animate={false} />
+                  <svg viewBox="0 0 20 20" width="16" height="16">
+                    <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </span>
               </button>
             </h3>

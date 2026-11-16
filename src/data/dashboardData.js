@@ -214,3 +214,46 @@ export const dashboardTabs = [
     decision: "Automate the month-end stock and sales report.",
   },
 ]
+
+/**
+ * What each "Do it" decision switches on, shown when the button is pressed.
+ * Keyed by the decision sentence used above. `does` = the automation, `result` = what changes.
+ */
+export const decisionDetails = {
+  "Turn on the AI assistant for weekend enquiries.": {
+    does: "The AI assistant answers WhatsApp, website and Instagram messages from Friday 7 pm to Monday 9 am, using your prices, timings and FAQs. Anything it can't answer is tagged for your team first thing Monday.",
+    result: "Weekend leads get a reply in seconds instead of waiting two days.",
+  },
+  "Add a third follow-up for quotes not answered in 3 days.": {
+    does: "Any quote with no reply after 3 days gets a short, personal check-in message automatically. If the customer replies, the follow-ups stop and the lead moves back to your pipeline.",
+    result: "Fewer quotes go cold just because nobody chased them.",
+  },
+  "Send reminders 2 hours before each booking.": {
+    does: "Every confirmed booking gets a WhatsApp or SMS reminder 2 hours before the slot, with one-tap options to confirm or reschedule. Changes update your calendar on their own.",
+    result: "Fewer no-shows, and free slots you can refill on the same day.",
+  },
+  "Automate the month-end stock and sales report.": {
+    does: "On the last day of each month, stock levels and sales are pulled from your sheets and billing tool into one report, then emailed to you as a PDF with the top movers highlighted.",
+    result: "No more late nights building the report by hand.",
+  },
+  "Automate the weekly sales report.": {
+    does: "Every Monday at 9 am, last week's sales, quotes and new customers are compiled into one summary and sent to your inbox and team chat.",
+    result: "Everyone starts the week with the same numbers, no copy-paste.",
+  },
+  "Send payment reminders to the 5 pending invoices.": {
+    does: "Each unpaid invoice gets a polite reminder with a payment link, then a second nudge 3 days later. Paid invoices drop off the list on their own.",
+    result: "Cash comes in faster without awkward chasing calls.",
+  },
+  "Connect Instagram messages to the shared inbox.": {
+    does: "Instagram DMs join WhatsApp, website, email and calls in one inbox. Each new message is captured as a lead, tagged with its source and assigned to the right person.",
+    result: "No enquiry gets lost in a separate app.",
+  },
+  "Call the 12 hot leads today.": {
+    does: "The 12 leads scoring above 80 are added to today's call list with their history, last message and quote attached, and a reminder goes to the assigned salesperson.",
+    result: "Your team spends the day on the leads most likely to buy.",
+  },
+  "Send review requests to customers served this week.": {
+    does: "Customers whose job was completed this week get a thank-you message with a direct link to leave a Google review. Unhappy replies are routed to you privately first.",
+    result: "More reviews, and problems caught before they go public.",
+  },
+}
