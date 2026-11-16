@@ -1,0 +1,27 @@
+# Auto-deploys to https://campaigns.webchirpy.com/automation-growth-engine/ on every push to main.
+# The server pulls main, builds with base /automation-growth-engine/ and publishes (see _source/deploy.sh on the server).
+name: Deploy to campaigns.webchirpy.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Run deploy script on server
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          echo "45.199.139.25 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILOVpyq/sDGRbv01vcCkTxLc0MTt3z5qXi9+7SNWJbF9" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -p 22 webchirp1@45.199.139.25 \
+            'campaigns.webchirpy.com/automation-growth-engine/_source/deploy.sh'
