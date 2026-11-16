@@ -2246,9 +2246,13 @@
   color: var(--accent-soft);
 }
 @media (max-width: 767px) {
-  /* keep the floating CTA from covering the last footer line */
+  /* The floating CTA hides while #final (this footer's section) is on screen, so the footer
+     needs only its normal bottom padding here. */
   .site-footer {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    gap: 12px;
+    margin-top: 48px;
+    padding-top: 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
     /* Phones: logo, "Automation" and the legal line stacked and centred */
     flex-direction: column;
     justify-content: center;
