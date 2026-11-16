@@ -34,7 +34,7 @@ export const siteConfig = {
 
   // Legal pages — never point to invented policies. /privacy is the Launch Kit 03 draft built
   // from privacy/index.html; it carries a visible "pending legal review" banner until signed off.
-  privacyUrl: env("VITE_PRIVACY_URL") || "/privacy",
+  privacyUrl: env("VITE_PRIVACY_URL") || "/privacy/",
   termsUrl: env("VITE_TERMS_URL"),
 
   // Feature flags

@@ -837,6 +837,7 @@ export const finalCta = {
 export const footer = {
   legal: "Webchirpy. All rights reserved.",
   terms: "Terms",
+  privacy: "Privacy Policy",
 }
 
 /* PERSISTENT ELEMENTS */

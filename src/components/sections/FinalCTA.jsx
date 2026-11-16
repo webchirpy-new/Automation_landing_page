@@ -84,6 +84,7 @@ export default function FinalCTA() {
           <span>
             © {new Date().getFullYear()} {footer.legal}
           </span>
+          {siteConfig.privacyUrl && <a href={siteConfig.privacyUrl}>{footer.privacy}</a>}
           {siteConfig.termsUrl && <a href={siteConfig.termsUrl}>{footer.terms}</a>}
         </p>
       </div>
