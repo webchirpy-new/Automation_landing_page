@@ -1,209 +1,165 @@
-import React, { useRef, useState } from "react"
+import React, { useCallback, useRef } from "react"
+import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from "motion/react"
 import { comparison, uiCopy } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
-import PixelIcon from "../visuals/PixelIcon"
-import { gsap, useGSAP } from "../../lib/gsap"
-import { MOTION_OK } from "../../lib/motionTokens"
-import { goTo } from "../../lib/scroll"
 import { Marked } from "../ui/Highlight"
+import { goTo } from "../../lib/scroll"
+import { useStoryClock } from "../../hooks/useStoryClock"
+import { AutoScene, ManualScene } from "../interactions/TwoRooms"
 
-const AUTO_STEPS = ["leadCapture", "instantReply", "followUp", "backOffice", "insights"]
+/**
+ * 03 — TWO TYPES OF BUSINESSES: "Two rooms. Two realities."
+ *
+ * The same business in two 2.5D rooms, played through the five approved moments of the day
+ * (comparison.rows) in sync, about 5 s each, then a short final beat, then back to moment 1.
+ * Only the current moment's two lines are on screen; the full comparison is in the page for
+ * assistive tech (sr-only list below the header).
+ * No playback buttons: it plays on its own while on screen, pauses off screen, and does not
+ * auto-play under reduced motion. The five progress bars jump to a moment and keep playing.
+ */
+const EASE = [0.22, 1, 0.36, 1]
+const PHASE_MS = 5000
+const VERDICT_MS = 4200
+const ROWS = comparison.rows
+const DURATIONS = [...ROWS.map(() => PHASE_MS), VERDICT_MS]
+const S = uiCopy.stories.compare
+
+function Caption({ k, tone, text, verdict }) {
+  const manual = tone === "manual"
+  return (
+    <div className={`rx-caption rx-caption--${tone} ${verdict ? "is-verdict" : ""}`} aria-hidden="true">
+      <AnimatePresence mode="wait" initial={false}>
+        <m.p key={k} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.3, ease: EASE }}>
+          <span className={`mark ${manual ? "mark--x" : "mark--ok"}`}>{manual ? "✗" : "✓"}</span>
+          <span>{text}</span>
+        </m.p>
+      </AnimatePresence>
+    </div>
+  )
+}
 
 export default function Comparison() {
-  const ref = useRef(null)
-  const [active, setActive] = useState(0)
-  const [run, setRun] = useState(0) // bump to replay
-  const rows = comparison.rows
+  const rootRef = useRef(null)
+  const stepsRef = useRef(null)
+  const onProgress = useCallback((p) => stepsRef.current?.style.setProperty("--p", p.toFixed(4)), [])
+  const story = useStoryClock({ durations: DURATIONS, rootRef, onProgress })
 
-  // Packet animation: manual packet crawls and stalls; automated packet glides
-  // through each row to the selected one, then completes.
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia()
-      mm.add(MOTION_OK, () => {
-        const manual = ref.current.querySelector(".room--manual .room__packet")
-        const auto = ref.current.querySelector(".room--auto .room__packet")
-        const target = ref.current.querySelector(`.room--auto .room__row[data-i="${active}"]`)
-        const mTarget = ref.current.querySelector(`.room--manual .room__row[data-i="${active}"]`)
-        if (!manual || !auto || !target || !mTarget) return
-        const y = target.offsetTop + target.offsetHeight / 2 - 6
-        const my = mTarget.offsetTop + mTarget.offsetHeight / 2 - 6
-        const tl = gsap.timeline()
-        tl.set([manual, auto], { y: 0, opacity: 1 })
-          .to(manual, { y: my * 0.6, duration: 1.2, ease: "steps(5)" }, 0)
-          .to(manual, { y: my, duration: 1.4, ease: "power1.inOut" }, 1.2)
-          .to(manual, { opacity: 0.35, repeat: 3, yoyo: true, duration: 0.35 }, 2.6)
-          .to(auto, { y, duration: 0.9, ease: "power3.inOut" }, 0.1)
-          .to(auto, { scale: 1.6, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, 1)
-      })
-      return () => mm.revert()
-    },
-    { scope: ref, dependencies: [active, run], revertOnUpdate: true }
-  )
+  // Actors start the first time the rooms are actually seen, so phase 1 never plays to an empty screen.
+  const live = story.epoch > 0 || story.reduced
 
-  const select = (i) => {
-    setActive(i)
-    setRun((r) => r + 1)
-  }
-
-  const onKey = (e) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-      e.preventDefault()
-      const n = (active + 1) % rows.length
-      select(n)
-      ref.current.querySelector(`[data-sel="${n}"]`)?.focus()
-    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-      e.preventDefault()
-      const n = (active - 1 + rows.length) % rows.length
-      select(n)
-      ref.current.querySelector(`[data-sel="${n}"]`)?.focus()
-    }
-  }
+  const verdict = story.index === ROWS.length
+  const phase = Math.min(story.index, ROWS.length - 1)
+  const row = ROWS[phase]
 
   return (
     <SectionShell id="compare" theme="light" labelledBy="compare-title" className="compare">
-      <div ref={ref}>
-        <header className="section-head section-head--center">
-          <h2 id="compare-title" className="t-h2" data-reveal>
-            <Marked text={comparison.headline} phrase="Which one are you?" tone="light" />
-          </h2>
-          <p className="t-lead" data-reveal>
-            {comparison.sub}
-          </p>
-        </header>
+      <header className="section-head section-head--center">
+        <h2 id="compare-title" className="t-h2" data-reveal>
+          <Marked text={comparison.headline} phrase="Which one are you?" tone="light" />
+        </h2>
+        <p className="t-lead" data-reveal>
+          {comparison.sub}
+        </p>
+      </header>
 
-        <div className="compare__controls" data-reveal>
-          <div className="row-select" role="radiogroup" aria-label="Compare a moment" onKeyDown={onKey}>
-            {rows.map((r, i) => (
-              <button
-                key={r.row}
-                type="button"
-                role="radio"
-                aria-checked={active === i}
-                tabIndex={active === i ? 0 : -1}
-                data-sel={i}
-                className={`row-select__btn ${active === i ? "is-active" : ""}`}
-                onClick={() => select(i)}
-              >
-                {r.row}
-              </button>
-            ))}
-          </div>
-          <button type="button" className="btn btn--ghost btn--sm" onClick={() => setRun((r) => r + 1)}>
-            <span className="btn__label">↻ {uiCopy.compareAgain}</span>
-          </button>
-        </div>
-
-        {/* Desktop/tablet: two rooms */}
-        <div className="rooms" data-reveal>
-          <article className="room room--manual" aria-labelledby="room1-title">
-            <div className="room__chrome" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <span className="t-mono">room_1 · manual</span>
-            </div>
-            <header className="room__head">
-              <p className="t-mono">Room 1</p>
-              <h3 id="room1-title" className="t-h3">
-                {comparison.room1.title}
-              </h3>
-              <p className="room__tag">{comparison.room1.tagline}</p>
-            </header>
-            <div className="room__body">
-              <span className="room__rail" aria-hidden="true" />
-              <span className="room__packet" aria-hidden="true" />
-              <ol className="room__rows">
-              {rows.map((r, i) => (
-                <li key={r.row} data-i={i} className={`room__row ${active === i ? "is-active" : ""}`}>
-                  <span className="room__row-label t-mono">{r.row}</span>
-                  <span className="room__row-text">
-                    <span className="mark mark--x" aria-hidden="true">
-                      ✗
-                    </span>
-                    <span className="sr-only">Manual: </span>
-                    {r.manual}
-                  </span>
-                </li>
-              ))}
-              </ol>
-            </div>
-          </article>
-
-          <article className="room room--auto" aria-labelledby="room2-title">
-            <div className="room__chrome" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <span className="t-mono">room_2 · automated</span>
-            </div>
-            <header className="room__head">
-              <p className="t-mono">Room 2</p>
-              <h3 id="room2-title" className="t-h3">
-                {comparison.room2.title}
-              </h3>
-              <p className="room__tag">{comparison.room2.tagline}</p>
-            </header>
-            <div className="room__body">
-              <span className="room__rail" aria-hidden="true" />
-              <span className="room__packet" aria-hidden="true" />
-              <ol className="room__rows">
-              {rows.map((r, i) => (
-                <li key={r.row} data-i={i} className={`room__row px-host ${active === i ? "is-active" : ""}`}>
-                  <span className="room__row-label t-mono">{r.row}</span>
-                  <span className="room__row-text">
-                    <span className="mark mark--ok" aria-hidden="true">
-                      ✓
-                    </span>
-                    <span className="sr-only">Automated: </span>
-                    {r.automated}
-                  </span>
-                  <span className="room__row-icon" aria-hidden="true">
-                    <PixelIcon name={AUTO_STEPS[i]} size={18} />
-                  </span>
-                </li>
-              ))}
-              </ol>
-            </div>
-          </article>
-        </div>
-
-        {/* Phones: alternating per-row comparison, no tiny two-column text */}
-        <ol className="compare-stack">
-          {rows.map((r) => (
-            <li key={r.row} className="compare-stack__item">
-              <p className="t-mono compare-stack__label">{r.row}</p>
-              <p className="compare-stack__manual">
-                <span className="mark mark--x" aria-hidden="true">
-                  ✗
-                </span>
-                <span className="sr-only">{comparison.room1.title}: </span>
-                {r.manual}
-              </p>
-              <p className="compare-stack__auto">
-                <span className="mark mark--ok" aria-hidden="true">
-                  ✓
-                </span>
-                <span className="sr-only">{comparison.room2.title}: </span>
-                {r.automated}
-              </p>
+      {/* The whole comparison, for screen readers. The animated captions below repeat it visually. */}
+      <div className="sr-only">
+        <p>{S.srIntro}</p>
+        <ol>
+          {ROWS.map((r) => (
+            <li key={r.row}>
+              {r.row}. {comparison.room1.title}: {r.manual}. {comparison.room2.title}: {r.automated}.
             </li>
           ))}
         </ol>
+      </div>
 
-        <div className="compare__close" data-reveal>
-          <p className="t-h3">{comparison.closingQuestion}</p>
-          <a
-            className="text-link text-link--lg"
-            href="#scorecard"
-            onClick={(e) => {
-              e.preventDefault()
-              goTo("#scorecard")
-            }}
-          >
-            {comparison.link}
-          </a>
-        </div>
+      <LazyMotion features={domAnimation} strict>
+        <MotionConfig reducedMotion="user">
+          <div ref={rootRef} className={`rx ${story.running ? "is-running" : ""} ${verdict ? "is-verdict" : ""}`} data-reveal>
+            <div className="rx-context" aria-hidden="true">
+              <AnimatePresence mode="wait" initial={false}>
+                <m.p
+                  key={phase}
+                  className="rx-context__line"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35, ease: EASE }}
+                >
+                  <span className="rx-context__n">{String(phase + 1).padStart(2, "0")}</span>
+                  <span>{row.row}</span>
+                </m.p>
+              </AnimatePresence>
+            </div>
+
+            <div className="rx-rooms">
+              <article className={`rx-room rx-room--manual ${phase === 1 ? "is-night" : ""}`} aria-labelledby="room1-title">
+                <header className="rx-room__head">
+                  <p className="rx-room__label t-mono">{S.room1Label}</p>
+                  <h3 id="room1-title" className="rx-room__title">
+                    {comparison.room1.title}
+                  </h3>
+                  <p className="rx-room__tag">{comparison.room1.tagline}</p>
+                </header>
+                <ManualScene phase={phase} verdict={verdict} live={live} running={story.running} />
+                <Caption tone="manual" k={verdict ? "verdict" : phase} text={verdict ? S.verdict.manual : row.manual} verdict={verdict} />
+              </article>
+
+              <article className={`rx-room rx-room--auto ${phase === 1 ? "is-night" : ""}`} aria-labelledby="room2-title">
+                <header className="rx-room__head">
+                  <p className="rx-room__label t-mono">{S.room2Label}</p>
+                  <h3 id="room2-title" className="rx-room__title">
+                    {comparison.room2.title}
+                  </h3>
+                  <p className="rx-room__tag">{comparison.room2.tagline}</p>
+                </header>
+                <AutoScene phase={phase} verdict={verdict} live={live} running={story.running} />
+                <Caption tone="auto" k={verdict ? "verdict" : phase} text={verdict ? S.verdict.auto : row.automated} verdict={verdict} />
+              </article>
+            </div>
+
+            <div className="rx-timeline">
+              <ol ref={stepsRef} className="rx-steps" aria-label={S.timelineLabel}>
+                {ROWS.map((r, i) => {
+                  const state = verdict || i < story.index ? "is-done" : i === story.index ? "is-active" : ""
+                  return (
+                    <li key={r.row}>
+                      <button
+                        type="button"
+                        className={`rx-step ${state}`}
+                        aria-label={`${i + 1} of ${ROWS.length}: ${r.row}`}
+                        aria-current={i === phase ? "step" : undefined}
+                        onClick={() => story.go(i, { pause: false })}
+                      >
+                        <span className="rx-step__bar">
+                          <span className="rx-step__fill" />
+                        </span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ol>
+              <p className="rx-timeline__count t-mono" aria-hidden="true">
+                {String(phase + 1).padStart(2, "0")} / {String(ROWS.length).padStart(2, "0")}
+              </p>
+            </div>
+          </div>
+        </MotionConfig>
+      </LazyMotion>
+
+      <div className="compare__close" data-reveal>
+        <p className="t-h3">{comparison.closingQuestion}</p>
+        <a
+          className="text-link text-link--lg"
+          href="#scorecard"
+          onClick={(e) => {
+            e.preventDefault()
+            goTo("#scorecard")
+          }}
+        >
+          {comparison.link}
+        </a>
       </div>
     </SectionShell>
   )

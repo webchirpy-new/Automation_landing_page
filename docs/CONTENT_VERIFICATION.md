@@ -35,6 +35,11 @@ Source: `3-1_AI Automation Engine – Landing Page 1 Content.docx` (Oct 23, 2026
 8. The **Engine and dashboard mini-workflows** use example strings such as "Is the 6pm slot free tomorrow?" inside panels labelled "Example workflow".
 9. **Section labels (02–14)** such as "The pattern" or "Common questions" are kept in `automationContent.js` (`label` fields) but are no longer rendered, so each section opens on its approved headline. Only the hero eyebrow ("AI Automation for lead conversion") is shown.
 
+10. **Motion stories (03 Two rooms, 05 Engine, 06 Dashboard).** All approved copy is unchanged and still rendered: on screen it appears one moment / stage / part at a time, and each section also carries the complete text in screen-reader markup. New microcopy lives in `uiCopy.stories` for approval:
+    - **03:** room labels "Room 01 / Room 02"; the final beat "More work. More manual effort." / "More work. Same team." (from the redesign brief, restating the "Next month" row); scene chips "Waiting", "Till morning", "Follow up?", "Call back?", "Hiring", "Replied", "Qualified", "Booked", "24/7", "Day 1/3/7", "With customers", "Same team".
+    - **06:** the panel shows only Overview figures (112 hrs, 1,240, 142, ↑ 18%) under the existing "Illustrative view" badge, "Illustrative trend · values not shown" and the footer "Illustrative dashboard. Your real numbers will differ."; the three approved decisions appear one at a time. For "Fix what leaks" the Follow-up indicator turns red, an illustrative choice that matches the Overview decision "Add a third follow-up…". The full nine-tab dashboard (every tile, panel and decision) is unchanged behind "Explore the full dashboard".
+    - **05:** each part shows its approved promise and "Produces" line; "What it covers" opens the four "We cover" items and "Works with". Micro-demos reuse the existing illustrative strings from `automationDemos.js` and the step labels in `serviceModules.js` (e.g. "Hi, what's the price for 200 units?", "#1042 · Assigned to Priya", "Yes, let's go ahead!"). The core label "AI Automation" comes from the headline; the approved wheel centre line "8 parts, running together" is kept for screen readers.
+
 ## Approvals / verification required before launch
 
 - [ ] Sources for **7x, 60x, 23%** and the wording under them

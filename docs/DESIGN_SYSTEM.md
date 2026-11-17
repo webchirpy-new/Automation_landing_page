@@ -56,10 +56,10 @@ Radius scale: 12 / 18 / 24 / 32 / pill. Glass (`.glass`, blur 16px) appears only
 | Floating tile field | Hero first fold | Centred copy column; 13 glass app tiles (8 at ≤1024, 5 on phones) float independently around it; hover lifts with violet outline + tooltip |
 | Leak strip | Hero "Where leads leak" | Four cards, dashed coral leak line |
 | Stalled path rows | Pattern | Violet packet stalls at a coral gap |
-| Room windows | Comparison | Window chrome; grayscale, tilted rows vs violet rail |
+| Two rooms (2.5D) | Comparison | Same isometric floor and five channels in both rooms; grey person-in-the-middle vs spectral core + wires; five synced moments, then a verdict (`TwoRooms.jsx`) |
 | Assessment rows + map | Scorecard | Custom checkboxes, 4×2 map with violet route |
-| **FolderCard**, 4 variants | Engine detail | `folder` (tab + papers), `stack` (offset sheets), `sleeve` (side papers), `bento` (violet tab, tile grid) |
-| Dark control room | Dashboard | Bento KPI grid, single-series lavender charts |
+| Living engine | Engine | Eight pill nodes on a tilted orbit around one glass core that plays each part's micro-demo; 4 × 2 circuit on narrow screens (`EngineOrbit.jsx`, `EngineMicroDemos.jsx`) |
+| Data convergence | Dashboard | Eight signals wire into a core that opens (clip-path) into one compact illustrative dashboard, then one decision at a time; full tabbed dashboard behind "Explore the full dashboard" (`DataConvergence.jsx`) |
 | **Book covers** | Proof | Three proportions; cover hinges open (rotateY) |
 | Stat strip + timeline + split frame | Why | Drawn 3-stop line, founder frame |
 | 3D logo carousel + five scattered project cards | Trusted | Lift, glow and depth on hover |

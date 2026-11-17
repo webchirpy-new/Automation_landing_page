@@ -932,4 +932,49 @@ export const uiCopy = {
       ],
     },
   },
+  // Motion stories for 03 (two rooms), 05 (engine) and 06 (dashboard). New UI microcopy only:
+  // every claim on screen still comes from the approved section copy above.
+  stories: {
+    compare: {
+      room1Label: "Room 01",
+      room2Label: "Room 02",
+      // Final beat of the sequence (from the redesign brief)
+      verdict: { manual: "More work. More manual effort.", auto: "More work. Same team." },
+      timelineLabel: "Five moments, side by side",
+      srIntro: "The two rooms, moment by moment",
+      scene: {
+        waiting: "Waiting",
+        tillMorning: "Till morning",
+        followUp: "Follow up?",
+        hiring: "Hiring",
+        replied: "Replied",
+        qualified: "Qualified",
+        booked: "Booked",
+        allHours: "24/7",
+        day1: "Day 1",
+        day3: "Day 3",
+        day7: "Day 7",
+        customers: "With customers",
+        sameTeam: "Same team",
+      },
+    },
+    dashboard: {
+      stepsLabel: "Data, dashboard, decisions",
+      controlsLabel: "dashboard story",
+      decisionLabel: "Next action",
+      decisionOf: "of",
+      statusLabel: "8 parts reporting",
+      trendNote: "Illustrative trend · values not shown",
+      openFull: "Explore the full dashboard",
+      closeFull: "Hide the full dashboard",
+    },
+    engine: {
+      core: "AI Automation",
+      partsLabel: "The eight parts",
+      resultLabel: "Result",
+      detailsShow: "What it covers",
+      detailsHide: "Hide details",
+      worksWith: "Works with",
+    },
+  },
 }

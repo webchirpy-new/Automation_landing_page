@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react"
 import { whatsappHref } from "../../config/site"
 import { useSite } from "../../context/SiteContext"
+import { useIsMobile } from "../../hooks/useMediaQuery"
 
 // Pre-filled message the visitor sends. n8n (WhatsApp Trigger) matches on "free automation audit"
 // and replies with the approved template message.
 const MESSAGE = "Hi Webchirpy, I'd like to book my free automation audit."
 const LABEL = "Chat with us on WhatsApp"
-// Catchy card beside the button
+// Catchy card beside the button. Phones show only the title and the first sentence.
 const BUBBLE_TITLE = "Free automation audit 👋"
-const BUBBLE_TEXT = "Chat with us on WhatsApp. We reply fast."
+const BUBBLE_TEXT = "Chat with us on WhatsApp."
+const BUBBLE_EXTRA = " We reply fast."
 const BUBBLE_CTA = "Tap to get details"
+// Phones: the card shows while the visitor is on section 03 or 04
+const PEEK_SECTIONS = ["#compare", "#scorecard"]
 
 function WaIcon({ size = 30 }) {
   return (
@@ -27,20 +31,25 @@ function WaIcon({ size = 30 }) {
  * "Tap to get details") and the round button both open a chat with the business number and a
  * ready-to-send message. The card can be closed; the button stays. Hidden while a modal is open
  * and while the footer is on screen, so it never covers the legal line.
+ *
+ * Phones: the round button is always there. While section 03 (#compare) or 04 (#scorecard) is
+ * in the middle of the screen, a compact card (title + one line) shows beside it; scrolling away
+ * from those sections fades it out again. No timers.
  */
 export default function WhatsAppButton() {
   const { modal } = useSite()
+  const phone = useIsMobile()
   const [ready, setReady] = useState(false)
   const [atFooter, setAtFooter] = useState(false)
   const [cardOpen, setCardOpen] = useState(false)
+  const [peek, setPeek] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const href = whatsappHref(MESSAGE)
 
   useEffect(() => {
     const t1 = window.setTimeout(() => setReady(true), 1200)
+    // Desktop and tablet: the card opens shortly after load (phones use the peek below instead)
     const t2 = window.setTimeout(() => setCardOpen(true), 2200)
-    // Phones: the card covers content, so it folds back to just the button after a while
-    const t3 = window.matchMedia("(max-width: 767px)").matches ? window.setTimeout(() => setCardOpen(false), 14000) : 0
     const footer = document.querySelector(".site-footer")
     let io
     if (footer && typeof IntersectionObserver !== "undefined") {
@@ -50,14 +59,33 @@ export default function WhatsAppButton() {
     return () => {
       window.clearTimeout(t1)
       window.clearTimeout(t2)
-      window.clearTimeout(t3)
       io?.disconnect()
     }
   }, [])
 
+  // Phones: the card follows whether section 03 or 04 is the one being viewed
+  useEffect(() => {
+    if (!phone || typeof IntersectionObserver === "undefined") return undefined
+    const targets = PEEK_SECTIONS.map((s) => document.querySelector(s)).filter(Boolean)
+    if (!targets.length) return undefined
+    const inView = new Set()
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => (e.isIntersecting ? inView.add(e.target) : inView.delete(e.target)))
+        setPeek(inView.size > 0)
+      },
+      { rootMargin: "-40% 0px -40% 0px" } // the section is in the middle band of the screen
+    )
+    targets.forEach((t) => io.observe(t))
+    return () => {
+      io.disconnect()
+      setPeek(false)
+    }
+  }, [phone])
+
   if (!href) return null
   const show = ready && !modal && !atFooter
-  const showCard = show && cardOpen && !dismissed
+  const showCard = show && !dismissed && (phone ? peek : cardOpen)
 
   return (
     <div className={`wa-fab ${show ? "is-visible" : ""} ${showCard ? "has-card" : ""}`} aria-hidden={!show}>
@@ -68,7 +96,10 @@ export default function WhatsAppButton() {
           </span>
           <span className="wa-fab__card-body">
             <strong>{BUBBLE_TITLE}</strong>
-            <span>{BUBBLE_TEXT}</span>
+            <span>
+              {BUBBLE_TEXT}
+              <span className="wa-fab__card-extra">{BUBBLE_EXTRA}</span>
+            </span>
             <span className="wa-fab__card-cta">{BUBBLE_CTA} →</span>
           </span>
         </a>

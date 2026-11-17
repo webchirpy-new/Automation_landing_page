@@ -1,7 +1,7 @@
 import React from "react"
 import { engine } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
-import EngineExplorer from "../interactions/EngineExplorer"
+import EngineOrbit from "../interactions/EngineOrbit"
 import LivingWorkflow from "../interactions/LivingWorkflow"
 import { Marked } from "../ui/Highlight"
 
@@ -17,7 +17,8 @@ export default function EngineSection() {
         </p>
       </header>
 
-      <EngineExplorer />
+      {/* The eight parts as one living engine (replaces the card navigator, EngineExplorer) */}
+      <EngineOrbit />
 
       <div className="cycle">
         <header className="cycle__head">
