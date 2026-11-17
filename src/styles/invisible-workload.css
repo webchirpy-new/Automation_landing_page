@@ -151,7 +151,7 @@
 #pattern .iw-stage__chapter i { width: 4px; height: 4px; border-radius: 50%; background: #afbfeb; box-shadow: 0 0 8px #829cff66; }
 #pattern .iw-stage__label { color: #aab4c7; }
 #pattern .iw-space { height: 490px; }
-#pattern .iw-copy { gap: 8px; align-self: center; padding-top: 6px; }
+#pattern .iw-copy { gap: 0; align-self: center; padding-top: 0; }
 #pattern .iw-copy__swap { min-height: 360px; }
 #pattern .iw-line { font-size: clamp(1.7rem,2.65vw,2.55rem); line-height: 1.15; margin-top: 14px; }
 #pattern .iw-context { color: #b3bdd0; font-size: 13px; line-height: 1.7; max-width: 35ch; margin-top: 17px; }
@@ -194,10 +194,7 @@
 #pattern .iw-journey small { font-size: 9px; letter-spacing: .12em; color: #707e96; }
 #pattern .iw-journey .is-current { color: #e4eafa; }
 #pattern .iw-journey .is-current .iw-journey__icon { border-color: #afc7fc66; color: #bacdf6; background: #657ca626; box-shadow: 0 0 18px #8ea8e911; }
-#pattern .iw-journey__link { height: 1px; flex: 1; margin-left: 10px; background: linear-gradient(90deg,#9bb1df55,transparent); position: relative; overflow: hidden; }
-#pattern .iw-journey__link i { position: absolute; width: 22px; height: 1px; background: #a6b8de; animation: iw-flow-detail 3s ease-in-out infinite; }
-@keyframes iw-flow-detail { from { transform: translateX(-25px); } to { transform: translateX(180px); } }
-#pattern .iw:not(.is-running) .iw-journey__link i { animation-play-state: paused; }
+#pattern .iw-journey__link { display: flex; align-items: center; justify-content: center; flex: 1; margin-left: 10px; color: #7e91b4; }
 #pattern .iw-work { padding-top: 0; }
 #pattern .iw-work__items li { border-top: 1px solid #9fb3d51c; padding-top: 10px; }
 @media(max-width: 1100px) and (min-width: 900px) {
@@ -230,6 +227,24 @@
   #pattern .iw-journey > div > span:nth-child(2) { font-size: 9px; line-height: 1.4; }
   #pattern .iw-journey small { font-size: 8px; }
   #pattern .iw-todo-summary { font-size: 8px; }
+}
+/* Chapter progress sits above the story; workflow arrows stay still below it. */
+#pattern .iw-steps { width: 100%; max-width: 420px; gap: 16px; margin-bottom: 28px; }
+#pattern .iw-step { padding: 8px 0 12px; display: grid; gap: 10px; text-align: left; color: #8e9bb3; }
+#pattern .iw-step__label { display: flex; align-items: center; gap: 7px; font-size: 11px; line-height: 1.4; white-space: nowrap; }
+#pattern .iw-step__label > span { font-size: 9px; color: #68768e; font-variant-numeric: tabular-nums; }
+#pattern .iw-step.is-active { color: #e3eafd; }
+#pattern .iw-step.is-active .iw-step__label > span { color: #b4c5ee; }
+#pattern .iw-step__bar { height: 2px; background: #97a9cf26; }
+#pattern .iw-step.is-done .iw-step__fill { background: #7184a5; }
+@media(max-width: 899px) {
+  #pattern .iw-steps { justify-self: center; margin-bottom: 24px; }
+  #pattern .iw-copy { padding-top: 10px; gap: 0; }
+  #pattern .iw-step__label { justify-content: center; }
+}
+@media(max-width: 599px) {
+  #pattern .iw-steps { gap: 10px; }
+  #pattern .iw-step__label { font-size: 10px; gap: 5px; }
 }
 @media(prefers-reduced-motion: reduce) {
   #pattern .iw *, #pattern .iw *::before, #pattern .iw *::after { animation: none !important; transition: none !important; }

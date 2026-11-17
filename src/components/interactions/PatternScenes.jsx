@@ -1,7 +1,7 @@
 import "../../styles/invisible-workload.css"
 import React, { useCallback, useRef } from "react"
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from "motion/react"
-import { Bell, FileSpreadsheet, Moon, NotebookPen, Sun, MessageCircle, ArrowUpRight, MoreHorizontal, Paperclip, Send, Copy, Clipboard, CalendarDays, Clock3 } from "lucide-react"
+import { Bell, FileSpreadsheet, Moon, NotebookPen, Sun, MessageCircle, ArrowRight, ArrowUpRight, MoreHorizontal, Paperclip, Send, Copy, Clipboard, CalendarDays, Clock3 } from "lucide-react"
 import { siWhatsapp } from "simple-icons"
 import { pattern, uiCopy } from "../../data/automationContent"
 import { Marked } from "../ui/Highlight"
@@ -437,6 +437,24 @@ export default function PatternScenes() {
               </div>
 
               <div className="iw-copy">
+                <ol ref={stepsRef} className="iw-steps" aria-label={pattern.label}>
+                  {SCENES.map((sc, i) => (
+                    <li key={sc.id}>
+                      <button
+                        type="button"
+                        className={`iw-step ${i < scene ? "is-done" : i === scene ? "is-active" : ""}`}
+                        aria-label={`${i + 1} of ${SCENES.length}: ${sc.line}`}
+                        aria-current={i === scene ? "step" : undefined}
+                        onClick={() => story.go(i, { pause: story.reduced })}
+                      >
+                        <span className="iw-step__label"><span>0{i + 1}</span>{["Enquiry", "Reporting", "Follow-up"][i]}</span>
+                        <span className="iw-step__bar">
+                          <span className="iw-step__fill" />
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
                 <div className="iw-copy__swap" aria-hidden="true">
                   <AnimatePresence mode="wait" initial={false}>
                     <m.div key={scene} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: story.reduced ? 0 : .2, ease: EASE }}>
@@ -453,26 +471,10 @@ export default function PatternScenes() {
                     </m.div>
                   </AnimatePresence>
                 </div>
-                <ol ref={stepsRef} className="iw-steps" aria-label={pattern.label}>
-                  {SCENES.map((sc, i) => (
-                    <li key={sc.id}>
-                      <button
-                        type="button"
-                        className={`iw-step ${i < scene ? "is-done" : i === scene ? "is-active" : ""}`}
-                        aria-label={`${i + 1} of ${SCENES.length}: ${sc.line}`}
-                        aria-current={i === scene ? "step" : undefined}
-                        onClick={() => story.go(i, { pause: story.reduced })}
-                      >
-                        <span className="iw-step__bar">
-                          <span className="iw-step__fill" />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ol>
+
               </div>
               <div className="iw-journey" aria-hidden="true">
-                {SCENES.map((sc, i) => { const Icon = sc.icon; return <div key={sc.id} className={scene === i ? "is-current" : ""}><span className="iw-journey__icon"><Icon size={17} strokeWidth={1.5} /></span><span><small>0{i + 1}</small>{sc.title}</span>{i < 2 && <span className="iw-journey__link"><i /></span>}</div> })}
+                {SCENES.map((sc, i) => { const Icon = sc.icon; return <div key={sc.id} className={scene === i ? "is-current" : ""}><span className="iw-journey__icon"><Icon size={17} strokeWidth={1.5} /></span><span><small>0{i + 1}</small>{sc.title}</span>{i < 2 && <span className="iw-journey__link"><ArrowRight size={16} strokeWidth={1.3} /></span>}</div> })}
               </div>
             </div>
 
