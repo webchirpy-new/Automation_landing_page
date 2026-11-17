@@ -28,6 +28,18 @@
   --spectral-dark-neutral: var(--highlight-ink-light);
   --spectral-light-neutral: var(--highlight-ink-dark);
   --spectral-flow-duration: 16s;
+  /* HEADLINE HIGHLIGHT (.hl-flow) — warm sunset: rose · coral · amber. Deliberately warm, so a
+     highlighted word never reads like the cool blue-violet CTA buttons.
+     White sections use the same bright look as dark ones; only the lightest stops (amber, peach)
+     are deepened so every tone keeps ≥3:1 on white (headline-size text). Dark: all ≥8:1. */
+  --hl-rose-deep: #ff4f87;
+  --hl-coral-deep: #f85a35;
+  --hl-orange-deep: #ec6618;
+  --hl-amber-deep: #db7410;
+  --hl-rose: #ff6f9c;
+  --hl-coral: #ff8a6b;
+  --hl-amber: #ffbe5c;
+  --hl-peach: #ffd59a;
   --cta-border-width: 1.2px;
   --glass-corner-strength: 1;
   /* V4 presets. One palette; components vary only angle, size and phase.

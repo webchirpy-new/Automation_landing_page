@@ -1263,24 +1263,47 @@
   background: #fff;
   box-shadow: var(--shadow-1);
 }
+/* Each dot is a button: the visible dot is its ::before, and the button's transparent padding
+   (no gap between buttons) makes the whole strip of the pill tappable. */
 .bc__dots {
+  --dot: 7px;
+  --dot-on: 20px;
+  --dot-pad: 2.5px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin: 0;
+  margin: 0 calc(var(--dot-pad) * -1);
   padding: 0;
   list-style: none;
 }
 .bc__dots li {
-  width: 7px;
-  height: 7px;
+  display: flex;
+}
+.bc__dot {
+  display: grid;
+  place-items: center;
+  padding: 10px var(--dot-pad);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bc__dot::before {
+  content: "";
+  display: block;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: var(--r-pill);
   background: rgba(110, 126, 236, 0.32);
   transition: width var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
 }
-.bc__dots li.is-active {
-  width: 20px;
+.bc__dots li.is-active .bc__dot::before {
+  width: var(--dot-on);
   background: var(--neo-green);
+}
+@media (hover: hover) {
+  .bc__dots li:not(.is-active) .bc__dot:hover::before {
+    background: rgba(110, 126, 236, 0.6);
+  }
 }
 .bc__arrow {
   display: grid;
@@ -1332,14 +1355,9 @@
     cursor: grab;
   }
   .bc__dots {
-    gap: 4px;
-  }
-  .bc__dots li {
-    width: 6px;
-    height: 6px;
-  }
-  .bc__dots li.is-active {
-    width: 16px;
+    --dot: 6px;
+    --dot-on: 16px;
+    --dot-pad: 2px;
   }
 }
 /* Client video testimonials (VideoTestimonials.jsx).
@@ -2373,6 +2391,17 @@
 }
 .decision-panel__hint {
   align-self: center;
+}
+/* Phones: no empty placeholder. The panel appears only once a decision's arrow is tapped, and
+   goes again when it is closed (the arrow itself is the cue, so the hint is not needed). */
+@media (max-width: 767px) {
+  .decision-panel:not(.is-active) {
+    display: none;
+  }
+  .decision-panel.is-active {
+    scroll-margin: 20px; /* scrolled into view with room around it, not flush to the screen edge */
+    animation: faq-open 260ms var(--ease-out);
+  }
 }
 .decision-panel__title {
   display: flex;

@@ -297,9 +297,13 @@ export default function BrandCarousel() {
           <Chevron flip />
         </button>
         <div className="bc__pill">
+          {/* Tap a dot to bring that brand to the centre. A pointer shortcut only: keyboard and
+              screen-reader users already have the arrows and the cards themselves. */}
           <ol className="bc__dots" aria-hidden="true">
             {brands.map((b, i) => (
-              <li key={b.name} className={i === active ? "is-active" : undefined} />
+              <li key={b.name} className={i === active ? "is-active" : undefined}>
+                <button type="button" className="bc__dot" tabIndex={-1} title={b.name} onClick={() => engine.current?.centre(i)} />
+              </li>
             ))}
           </ol>
         </div>

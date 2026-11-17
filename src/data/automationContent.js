@@ -40,7 +40,7 @@ export const hero = {
   // not the origin of the figures above. Rendered only when siteConfig.showHeroSourceLine.
   sourceLine:
     "Source: Built by Webchirpy: The Young Reporters for the Environment 2026 portal for Taylor’s University, GGAF and RTM. One automated platform runs registration, team invites, blind judging and verified certificates, with zero spreadsheets.",
-  button: "SHOW ME WHERE MY LEADS LEAK →",
+  button: "BOOK MY FREE AUTOMATION AUDIT →",
   underButton: "Free automation audit · 15–30 minutes · No obligation",
 }
 
@@ -367,7 +367,7 @@ export const reportForm = {
     callButton: "BOOK MY 15-MINUTE CALL →",
   },
   bookLink: "Or book a free call →",
-  bookButton: "BOOK A FREE CALL →",
+  bookButton: "BOOK MY FREE AUTOMATION AUDIT →",
 }
 
 /* 05 — THE AI AUTOMATION ENGINE */
@@ -625,7 +625,7 @@ export const why = {
     },
   ],
   closingLine: "When you book the audit call, this is who picks up.",
-  button: "BOOK A CALL WITH VASANTH →",
+  button: "BOOK A FREE CALL WITH VASANTH →",
 }
 
 /* 09 — TRUSTED ACROSS INDUSTRIES */

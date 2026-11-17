@@ -565,7 +565,8 @@ const span = (v) => {
   const mins = Math.round(v / 5) * 5
   return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, "0")} m`
 }
-const label = (prefix) => (fmt) => (v) => `${prefix} · ${fmt(v)}`
+// A fixed function (not built during render): Ticker restarts whenever `format` changes
+const NO_REPLY_FMT = (v) => `${copy.noReply} · ${span(v)}`
 
 function WaGlyph() {
   return (
@@ -902,7 +903,7 @@ function ManualStory({ phase, still }) {
           </Ui>
           <Ui stops={show(AT.clockTop, 2.7)} anchor="b">
             <Tag tone="wait" icon={Clock}>
-              <Ticker from={0} to={175} t={2.9} dur={2.2} format={label(copy.noReply)(span)} still={still} />
+              <Ticker from={0} to={175} t={2.9} dur={2.2} format={NO_REPLY_FMT} still={still} />
             </Tag>
           </Ui>
           <Ui stops={show(AT.overSlot, 3.9)} anchor="b">

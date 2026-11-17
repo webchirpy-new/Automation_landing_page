@@ -136,14 +136,17 @@ function Decision({ part, text, onDo, openId, id, panelId }) {
         aria-controls={panelId}
         onClick={() => {
           onDo(isOpen ? null : id)
-          // Phones: the panel sits under the whole list, so bring it into view if it is off-screen.
+          // Phones: the panel sits under the whole list (and only appears once a decision is
+          // open), so after it has rendered, bring it into view if it is off-screen.
           if (!isOpen) {
-            const panel = document.getElementById(panelId)
-            const r = panel?.getBoundingClientRect()
-            if (r && (r.top < 0 || r.bottom > window.innerHeight)) {
-              const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-              panel.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest" })
-            }
+            window.requestAnimationFrame(() => {
+              const panel = document.getElementById(panelId)
+              const r = panel?.getBoundingClientRect()
+              if (r && r.height && (r.top < 0 || r.bottom > window.innerHeight)) {
+                const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                panel.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest" })
+              }
+            })
           }
         }}
       >

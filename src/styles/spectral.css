@@ -12,15 +12,16 @@
    ========================================================= */
 
 /* ---------- 1. Highlighted phrases ----------
-   A full spectral base fills the glyphs; four soft colour clouds drift over it, and one small
-   neutral island (white on dark, near-black on white) floats through, so about a tenth of the
-   phrase reads neutral at any moment. The phrase stays one selectable text node; nothing is
-   duplicated for screen readers. Light-ground hues are the deep tones (all ≥5.5:1 on white). */
+   A full colour base fills the glyphs and four soft colour clouds drift over it (no white or
+   black glint: every letter stays in colour). The phrase stays one selectable text node; nothing
+   is duplicated for screen readers. Light-ground hues match the dark look, kept ≥3:1 on white at headline sizes. */
+/* Colours: the warm rose · coral · amber highlight set (tokens.css, --hl-*), set apart from the
+   cool CTA buttons. Fallback colours are used where text clipping is not supported. */
 .hl-flow {
-  color: var(--accent-ink);
+  color: var(--hl-rose-deep);
 }
 .hl-flow--dark {
-  color: var(--spectral-lavender);
+  color: var(--hl-coral);
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .hl-flow {
@@ -32,27 +33,25 @@
     box-decoration-break: clone;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    /* island · 4 clouds · base */
-    background-size: 15% 150%, 48% 240%, 44% 220%, 42% 230%, 46% 250%, 320% 100%;
-    background-position: 8% 50%, 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
+    /* 4 clouds · base */
+    background-size: 48% 240%, 44% 220%, 42% 230%, 46% 250%, 320% 100%;
+    background-position: 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
   }
   .hl-flow--dark {
     background-image:
-      radial-gradient(closest-side, var(--highlight-ink-dark), rgba(247, 248, 251, 0.85) 40%, rgba(247, 248, 251, 0) 100%),
-      radial-gradient(closest-side, rgba(140, 230, 240, 1), rgba(140, 230, 240, 0.55) 55%, rgba(140, 230, 240, 0) 100%),
-      radial-gradient(closest-side, rgba(183, 154, 238, 1), rgba(183, 154, 238, 0.55) 55%, rgba(183, 154, 238, 0) 100%),
-      radial-gradient(closest-side, rgba(240, 190, 223, 1), rgba(240, 190, 223, 0.55) 55%, rgba(240, 190, 223, 0) 100%),
-      radial-gradient(closest-side, rgba(135, 186, 255, 1), rgba(135, 186, 255, 0.55) 55%, rgba(135, 186, 255, 0) 100%),
-      linear-gradient(100deg, var(--spectral-cyan), var(--spectral-blue) 18%, var(--spectral-violet) 34%, var(--spectral-lavender) 48%, var(--spectral-pink) 62%, var(--spectral-blue) 80%, var(--spectral-cyan));
+      radial-gradient(closest-side, rgba(255, 111, 156, 1), rgba(255, 111, 156, 0.55) 55%, rgba(255, 111, 156, 0) 100%),
+      radial-gradient(closest-side, rgba(255, 138, 107, 1), rgba(255, 138, 107, 0.55) 55%, rgba(255, 138, 107, 0) 100%),
+      radial-gradient(closest-side, rgba(255, 190, 92, 1), rgba(255, 190, 92, 0.55) 55%, rgba(255, 190, 92, 0) 100%),
+      radial-gradient(closest-side, rgba(255, 213, 154, 1), rgba(255, 213, 154, 0.55) 55%, rgba(255, 213, 154, 0) 100%),
+      linear-gradient(100deg, var(--hl-rose), var(--hl-coral) 18%, var(--hl-amber) 36%, var(--hl-peach) 54%, var(--hl-coral) 72%, var(--hl-rose) 86%, var(--hl-rose));
   }
   .hl-flow--light {
     background-image:
-      radial-gradient(closest-side, var(--highlight-ink-light), rgba(17, 20, 25, 0.85) 40%, rgba(17, 20, 25, 0) 100%),
-      radial-gradient(closest-side, rgba(29, 111, 150, 1), rgba(29, 111, 150, 0.55) 55%, rgba(29, 111, 150, 0) 100%),
-      radial-gradient(closest-side, rgba(100, 64, 200, 1), rgba(100, 64, 200, 0.55) 55%, rgba(100, 64, 200, 0) 100%),
-      radial-gradient(closest-side, rgba(163, 56, 127, 1), rgba(163, 56, 127, 0.55) 55%, rgba(163, 56, 127, 0) 100%),
-      radial-gradient(closest-side, rgba(47, 85, 200, 1), rgba(47, 85, 200, 0.55) 55%, rgba(47, 85, 200, 0) 100%),
-      linear-gradient(100deg, var(--spectral-cyan-deep), var(--spectral-blue-deep) 18%, var(--spectral-violet-deep) 34%, var(--spectral-lavender-deep) 48%, var(--spectral-pink-deep) 62%, var(--spectral-blue-deep) 80%, var(--spectral-cyan-deep));
+      radial-gradient(closest-side, rgba(255, 79, 135, 1), rgba(255, 79, 135, 0.55) 55%, rgba(255, 79, 135, 0) 100%),
+      radial-gradient(closest-side, rgba(248, 90, 53, 1), rgba(248, 90, 53, 0.55) 55%, rgba(248, 90, 53, 0) 100%),
+      radial-gradient(closest-side, rgba(219, 116, 16, 1), rgba(219, 116, 16, 0.55) 55%, rgba(219, 116, 16, 0) 100%),
+      radial-gradient(closest-side, rgba(236, 102, 24, 1), rgba(236, 102, 24, 0.55) 55%, rgba(236, 102, 24, 0) 100%),
+      linear-gradient(100deg, var(--hl-rose-deep), var(--hl-coral-deep) 18%, var(--hl-orange-deep) 36%, var(--hl-amber-deep) 54%, var(--hl-coral-deep) 72%, var(--hl-rose-deep) 86%, var(--hl-rose-deep));
   }
   @media (prefers-reduced-motion: no-preference) {
     .hl-flow {
@@ -76,16 +75,16 @@
 }
 @keyframes spectral-mist {
   0% {
-    background-position: 8% 50%, 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
+    background-position: 0% 40%, 62% 60%, 104% 30%, 30% 80%, 0% 0;
   }
   33% {
-    background-position: 40% 30%, 22% 70%, 90% 30%, 70% 60%, 6% 40%, 34% 0;
+    background-position: 22% 70%, 90% 30%, 70% 60%, 6% 40%, 34% 0;
   }
   66% {
-    background-position: 70% 70%, 50% 30%, 30% 70%, 100% 80%, 70% 50%, 68% 0;
+    background-position: 50% 30%, 30% 70%, 100% 80%, 70% 50%, 68% 0;
   }
   100% {
-    background-position: 96% 40%, 84% 60%, 6% 40%, 40% 30%, 100% 70%, 100% 0;
+    background-position: 84% 60%, 6% 40%, 40% 30%, 100% 70%, 100% 0;
   }
 }
 @media (forced-colors: active) {
@@ -364,12 +363,17 @@
   box-shadow: 10px 0 0 var(--spectral-pink);
 }
 .sticky-bar__dot,
-.bc__dots li.is-active,
+.bc__dots li.is-active .bc__dot::before,
 .hint-dot {
   background: var(--spectral-fill-dark);
 }
-.bc__dots li {
+.bc__dots li:not(.is-active) .bc__dot::before {
   background: rgba(183, 154, 238, 0.3);
+}
+@media (hover: hover) {
+  .bc__dots li:not(.is-active) .bc__dot:hover::before {
+    background: rgba(150, 120, 230, 0.6);
+  }
 }
 .choice__pixels i {
   background: var(--spectral-cyan-deep);

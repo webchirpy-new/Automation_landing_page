@@ -1943,11 +1943,34 @@
 .score-area__static {
   width: 100%;
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  /* minmax(0, …): the title column may shrink, so the card never grows past the screen */
+  grid-template-columns: 44px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   padding: 20px clamp(16px, 2vw, 22px) 10px;
   text-align: left;
+}
+/* Phones: the status pill moves under the title, so the title keeps the card's full width and
+   the card stays inside the screen down to 300px (side by side, they needed ~285px). */
+@media (max-width: 479px) {
+  .score-area__static {
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-areas:
+      "icon titles"
+      "icon badge";
+    gap: 8px 12px;
+  }
+  .score-area__static .score-area__icon {
+    grid-area: icon;
+    align-self: start;
+  }
+  .score-area__static .score-area__titles {
+    grid-area: titles;
+  }
+  .score-area__static .score-area__badge {
+    grid-area: badge;
+    justify-self: start;
+  }
 }
 .score-area__toggle {
   min-height: 64px;
