@@ -34,6 +34,18 @@ const LEAK = serviceModules.findIndex((p) => p.id === "follow-up")
 const EASE = [0.22, 1, 0.36, 1]
 const WIDE_Q = "(min-width: 1120px)"
 
+// Data-stage timing (s). Signal i leaves at COMET_AT + i·STEP and lights core dot i as it sinks
+// into the ring (~0.55 s later); the last dot is lit by ~2 s and the panel opens at 2.6 s
+// (STAGE_MS[0] in DashboardSection). Comet duration lives in CSS (.dc-comet, 0.8s).
+const STEP = 0.11
+const COMET_AT = 0.45
+const DOT_AT = 1.0
+
+// The core is a 100px disc (.dc-core). Wires fade out over its glow instead of being cut off by
+// its edge: fully hidden inside the ring, about a third strength just outside it, full at SINK_R.
+const CORE_R = 50
+const SINK_R = 90
+
 // Wide layout: signal anchors as fractions of the stage (left column, right column)
 const WIDE_SOURCES = [
   [0.075, 0.16],
@@ -204,24 +216,37 @@ export default function DataConvergence({ stage, decision, onDecision, running, 
               <stop offset="0.68" stopColor="#b79aee" />
               <stop offset="1" stopColor="#f0bedf" />
             </linearGradient>
+            {/* Soft sink around the core: luminance mask, black = hidden, white = shown */}
+            <radialGradient id="dc-sink" gradientUnits="userSpaceOnUse" cx={geo.cx} cy={geo.cy} r={SINK_R}>
+              <stop offset={(CORE_R - 3) / SINK_R} stopColor="#000" />
+              <stop offset={(CORE_R + 8) / SINK_R} stopColor="#5a5a5a" />
+              <stop offset="1" stopColor="#fff" />
+            </radialGradient>
+            <mask id="dc-sink-mask" maskUnits="userSpaceOnUse" x={-40} y={-40} width={geo.w + 80} height={geo.h + 80}>
+              <rect x={-40} y={-40} width={geo.w + 80} height={geo.h + 80} fill="url(#dc-sink)" />
+            </mask>
           </defs>
-          {points.map((p, i) => {
-            const d = wirePath(p, hub, wide)
-            return (
-              <g key={i} style={{ "--i": i }}>
-                <m.path
-                  key={`w${epoch}`}
-                  d={d}
-                  className="dc-wire"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ delay: 0.15 + i * 0.06, duration: 0.9, ease: "easeInOut" }}
-                />
-                {stage === 0 && <path key={`c${epoch}`} d={d} pathLength="1" className="dc-comet" stroke="url(#dc-spec)" style={{ "--delay": `${0.9 + i * 0.17}s` }} />}
-                {stage === 1 && i % 2 === 0 && <path d={d} pathLength="1" className="dc-comet dc-comet--live" stroke="url(#dc-spec)" style={{ "--delay": `${0.4 + i * 0.55}s` }} />}
-              </g>
-            )
-          })}
+          <g mask="url(#dc-sink-mask)">
+            {points.map((p, i) => {
+              const d = wirePath(p, hub, wide)
+              return (
+                <g key={i} style={{ "--i": i }}>
+                  <m.path
+                    key={`w${epoch}`}
+                    d={d}
+                    className="dc-wire"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ delay: 0.05 + i * 0.04, duration: 0.6, ease: "easeInOut" }}
+                  />
+                  {stage === 0 && (
+                    <path key={`c${epoch}`} d={d} pathLength="1" className="dc-comet" stroke="url(#dc-spec)" style={{ "--delay": `${COMET_AT + i * STEP}s` }} />
+                  )}
+                  {stage === 1 && i % 2 === 0 && <path d={d} pathLength="1" className="dc-comet dc-comet--live" stroke="url(#dc-spec)" style={{ "--delay": `${0.4 + i * 0.55}s` }} />}
+                </g>
+              )
+            })}
+          </g>
           {wide && stage === 2 && (
             <path
               className="dc-link"
@@ -314,7 +339,7 @@ export default function DataConvergence({ stage, decision, onDecision, running, 
             <Sparkles size={20} strokeWidth={1.8} />
           </span>
           {serviceModules.map((p, i) => (
-            <span key={`${p.id}${epoch}`} className="dc-core__dot" style={{ "--a": `${i * 45 - 90}deg`, "--delay": `${1.75 + i * 0.17}s` }} />
+            <span key={`${p.id}${epoch}`} className="dc-core__dot" style={{ "--a": `${i * 45 - 90}deg`, "--delay": `${DOT_AT + i * STEP}s` }} />
           ))}
         </div>
       </div>

@@ -1,8 +1,29 @@
-import React, { useEffect, useId, useRef, useState } from "react"
-import { AnimatePresence, m } from "motion/react"
-import { Bell, CalendarCheck, Check, Clock, Heart, Mail, MessageCircle, Moon, StickyNote, UserPlus, Users } from "lucide-react"
+import React, { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react"
+import { AnimatePresence, animate, m } from "motion/react"
+import {
+  BellOff,
+  CalendarCheck,
+  CalendarClock,
+  Check,
+  CheckCheck,
+  Clock,
+  FileSpreadsheet,
+  Heart,
+  Hourglass,
+  Inbox,
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Moon,
+  PenLine,
+  UserCheck,
+  UserPlus,
+  Users,
+} from "lucide-react"
+import { siWhatsapp } from "simple-icons"
 import { uiCopy } from "../../data/automationContent"
-import { P, bar, bubblePath, cylinder, face, floorCircle, planeMatrix, prism } from "../visuals/isoKit"
+import { P, bar, cylinder, face, floorCircle, planeMatrix, prism } from "../visuals/isoKit"
 
 /**
  * TWO ROOMS — premium 2.5D isometric workspaces for "Two types of businesses".
@@ -12,20 +33,32 @@ import { P, bar, bubblePath, cylinder, face, floorCircle, planeMatrix, prism } f
  *   back (phone / chat channel) · left (email inbox / email channel) · right corner (clock / bookings)
  *   centre (the person / the AI core) · right (paper stack / dashboard) · front-left (task cards / person)
  *
- * Objects are real extrusions (isoKit): lit top faces, shaded side walls, rounded edges with a rim
- * light, contact shadows. No 3D library and no blur filters: depth comes from geometry, gradients and
- * radial shadows. Words that must stay readable are HTML chips laid over the SVG at scene points.
- *
- * `phase` 0–4 follows comparison.rows; each phase mounts its own short sequence (setup → action →
- * outcome) and persistent objects tween between states, so looping never snaps. Idle loops (clock,
- * core float, pipe flow, orbit) are CSS/SMIL and pause with the story (`running`).
+ * Each stage is one short film, played in both rooms from the same clock (`runKey`):
+ *   1. the SAME customer situation arrives in both rooms (a WhatsApp message card, same words);
+ *   2. the manual room handles it by hand — it lands in one inbox, waits, gets forgotten, piles up;
+ *   3. the automated room handles it — captured by the core, answered, scheduled, done;
+ *   4. both outcomes stay on screen, labelled, until the next stage.
+ * The persistent 3D objects (isoKit extrusions) carry state between stages; the story itself is a
+ * layer of readable HTML cards and labels laid over the SVG at scene points, each following timed
+ * `stops` (appear → hold → move → leave). Changing `runKey` remounts the whole layer, so a stage
+ * picked again replays from its start and no earlier timer can leak into it.
+ * Idle loops (clock, core float, pipe flow, orbit) are CSS/SMIL and pause with the story (`running`).
  */
 
-const VIEW = { x: 28, y: 70, w: 464, h: 316 } // keep in sync with .rx-scene aspect-ratio
+// Extra headroom above the platform (y from 46) gives the story cards room to float in
+const VIEW = { x: 28, y: 46, w: 464, h: 340 } // keep in sync with .rx-scene aspect-ratio
 const VIEWBOX = `${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`
 const pct = ([x, y]) => ({ left: `${((x - VIEW.x) / VIEW.w) * 100}%`, top: `${((y - VIEW.y) / VIEW.h) * 100}%` })
 const EASE = [0.22, 1, 0.36, 1]
 const copy = uiCopy.stories.compare.scene
+
+// Reduced motion: no autoplay, and every stage shows its end state at once. Each animated piece
+// reads this and starts at its final values (Motion's `initial={false}`).
+const StillCtx = createContext(false)
+const useInit = () => {
+  const still = useContext(StillCtx)
+  return (v) => (still ? false : v)
+}
 
 /* ------------------------------------------------------------------ static geometry */
 
@@ -35,12 +68,10 @@ const DOTS_MATRIX = planeMatrix("floor", P(0, 0, 0))
 
 // Shared anchor points (screen)
 const CENTER = P(110, 110, 0) // [260, 238]
-// Slots: nothing tall sits straight behind the centre, so the hub never hides a channel
 const INBOX_TOP = P(40, 178, 18) // left corner: tray / email channel
 const PHONE_TOP = P(40, 100, 6) // back-left: phone / chat channel
 const CORNER_TOP = P(182, 38, 16) // right corner: clock / bookings channel
 const SPHERE = [CENTER[0], CENTER[1] - 66]
-const MONITOR_C = P(122, 52, 45) // back-right: paper stack / dashboard
 const FRONT_PERSON = P(120, 182, 0) // front-left
 
 // Room 1
@@ -74,7 +105,6 @@ const CARD_OFFSETS = [
   [12, -8],
 ]
 const CARDS = CARD_OFFSETS.map(([du, dv], i) => prism({ at: P(156 + du, 105 + dv, 2.4 * (i + 1)), w: 44, h: 30, r: 4, depth: 2 }))
-const NOTE_C = [334, 140]
 
 // Room 2
 const PEDESTALS = {
@@ -99,12 +129,16 @@ const MONITOR_NECK = prism({ plane: "wallL", at: P(121, 52, 21), w: 4, h: 16, r:
 const MONITOR_FOOT = P(123, 52, 0)
 const BARS = [0, 1, 2, 3].map((i) => ({ u: 148 + i * 16, v: 116 }))
 const BAR_H = [18, 28, 40, 54]
-const pipe = (from) => `M${from[0].toFixed(1)} ${from[1].toFixed(1)}L${CENTER[0]} ${CENTER[1]}`
+const line = (a, b) => `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`
 const PIPES = {
-  chat: pipe(PEDESTALS.chat.foot),
-  email: pipe(PEDESTALS.email.foot),
-  calendar: pipe(PEDESTALS.calendar.foot),
-  monitor: pipe(MONITOR_FOOT),
+  chat: line(PEDESTALS.chat.foot, CENTER),
+  email: line(PEDESTALS.email.foot, CENTER),
+  calendar: line(PEDESTALS.calendar.foot, CENTER),
+  monitor: line(MONITOR_FOOT, CENTER),
+}
+const OUT = {
+  calendar: line(CENTER, PEDESTALS.calendar.foot),
+  monitor: line(CENTER, MONITOR_FOOT),
 }
 // Orbit around the core sphere: a tilted ellipse, drawn in two halves around the sphere
 const ORBIT = { rx: 42, ry: 12, rot: -14 }
@@ -222,11 +256,15 @@ function Defs({ uid, auto }) {
           <stop key={col} offset={i / 3} stopColor={col} />
         ))}
       </linearGradient>
-      {lin("moon", [
-        [0, "#fbf8ee"],
-        [0.6, "#dfe0ea"],
-        [1, "#aab0c6"],
-      ], [0, 0, 1, 1])}
+      {lin(
+        "moon",
+        [
+          [0, "#fbf8ee"],
+          [0.6, "#dfe0ea"],
+          [1, "#aab0c6"],
+        ],
+        [0, 0, 1, 1]
+      )}
       {auto ? (
         <>
           {lin(
@@ -271,14 +309,6 @@ function Defs({ uid, auto }) {
             <stop offset="0.55" stopColor="#ec6b5f" />
             <stop offset="1" stopColor="#c8473f" />
           </radialGradient>
-          {lin(
-            "amber",
-            [
-              [0, "#fbe2a0"],
-              [1, "#f0b44a"],
-            ],
-            [0, 0, 1, 1]
-          )}
           {lin(
             "screen",
             [
@@ -348,25 +378,6 @@ function Person({ uid, at: [x, y] }) {
   )
 }
 
-/** A camera-facing 3D speech bubble, anchored at its tail tip. */
-function Bubble({ uid, at: [x, y], w = 36, h = 24, tone = "neutral", lines = true, check = false }) {
-  const bx = x - 8
-  const by = y - h - 7
-  return (
-    <g className={`rx3-bubble rx3-bubble--${tone}`}>
-      <path d={bubblePath(bx + 2.2, by + 2.8, w, h)} className="rx3-bubble__side" />
-      <path d={bubblePath(bx, by, w, h)} className="rx3-bubble__face" fill={tone === "reply" ? `url(#${uid}-vivid)` : undefined} />
-      {lines && (
-        <>
-          <rect x={bx + 7} y={by + 7} width={w - (check ? 22 : 14)} height="2.6" rx="1.3" className="rx3-bubble__line" />
-          <rect x={bx + 7} y={by + 13} width={w - (check ? 26 : 20)} height="2.6" rx="1.3" className="rx3-bubble__line" />
-        </>
-      )}
-      {check && <path d={`M${bx + w - 13} ${by + 12}l3 3l5.5 -6`} className="rx3-bubble__check" />}
-    </g>
-  )
-}
-
 /** A camera-facing card with thickness (document, invoice, task). Centre at screen point. */
 function Card({ at: [x, y], w = 20, h = 25, tone = "paper" }) {
   return (
@@ -380,7 +391,7 @@ function Card({ at: [x, y], w = 20, h = 25, tone = "paper" }) {
   )
 }
 
-/** A dimensional check coin. */
+/** A dimensional check coin ("done"). */
 function Coin({ uid, at: [x, y], r = 8 }) {
   return (
     <g>
@@ -392,12 +403,12 @@ function Coin({ uid, at: [x, y], r = 8 }) {
   )
 }
 
-/** A coral count sphere (unread items). */
+/** A coral count sphere (unread items), popping in at `delay`. */
 function Count({ uid, at: [x, y], n, delay }) {
-  if (!n) return null
+  const init = useInit()
   return (
     <g transform={`translate(${x} ${y})`}>
-      <m.g key={n} initial={{ scale: 0.2, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay, type: "spring", stiffness: 480, damping: 20 }}>
+      <m.g initial={init({ scale: 0.2, opacity: 0 })} animate={{ scale: 1, opacity: 1 }} transition={{ delay, type: "spring", stiffness: 480, damping: 20 }}>
         <circle r="9" cy="1.6" className="rx3-count__side" />
         <circle r="9" fill={`url(#${uid}-coral)`} />
         <text y="3.6" className="rx3-count__n">
@@ -408,41 +419,13 @@ function Count({ uid, at: [x, y], n, delay }) {
   )
 }
 
-/** Something arriving from above: falls in with its shadow growing beneath it. */
-function Arrive({ uid, to: [x, y], floor, delay = 0, dur = 0.9, sink = true, children }) {
-  return (
-    <>
-      {floor && (
-        <m.g initial={{ opacity: 0 }} animate={{ opacity: [0, 0.9, 0.9, 0] }} transition={{ delay, duration: dur + 0.5, times: [0, 0.6, 0.85, 1] }}>
-          <Shadow uid={uid} at={floor} r={10} />
-        </m.g>
-      )}
-      <m.g
-        initial={{ opacity: 0, x: -34, y: -74 }}
-        animate={
-          sink
-            ? { opacity: [0, 1, 1, 1, 0], x: [-34, 0, 0, 0, 0], y: [-74, 0, 0, 0, 10], scale: [0.85, 1, 1, 1, 0.55] }
-            : { opacity: [0, 1], x: [-34, 0], y: [-74, 0], scale: [0.85, 1] }
-        }
-        transition={sink ? { delay, duration: dur + 0.5, times: [0, 0.6, 0.66, 0.82, 1], ease: "easeOut" } : { delay, duration: dur, ease: EASE }}
-      >
-        <g transform={`translate(${x} ${y})`}>{children}</g>
-      </m.g>
-    </>
-  )
-}
-
 /** Moves its children from one screen point to another (with fade in/out). */
-function Travel({ from: [x1, y1], to: [x2, y2], delay = 0, dur = 0.8, scaleTo = 1, keep = false, children }) {
+function Travel({ from: [x1, y1], to: [x2, y2], delay = 0, dur = 0.8, scaleTo = 1, children }) {
+  if (useContext(StillCtx)) return null
   return (
     <m.g
       initial={{ opacity: 0, x: 0, y: 0 }}
-      animate={{
-        opacity: keep ? [0, 1, 1, 1] : [0, 1, 1, 0],
-        x: [0, 0, x2 - x1, x2 - x1],
-        y: [0, 0, y2 - y1, y2 - y1],
-        scale: [1, 1, scaleTo, scaleTo],
-      }}
+      animate={{ opacity: [0, 1, 1, 0], x: [0, 0, x2 - x1, x2 - x1], y: [0, 0, y2 - y1, y2 - y1], scale: [1, 1, scaleTo, scaleTo] }}
       transition={{ delay, duration: dur + 0.3, times: [0, 0.12, 0.88, 1], ease: "easeInOut" }}
     >
       <g transform={`translate(${x1} ${y1})`}>{children}</g>
@@ -452,18 +435,33 @@ function Travel({ from: [x1, y1], to: [x2, y2], delay = 0, dur = 0.8, scaleTo = 
 
 /** Pops in on a spring at a point. */
 function Pop({ at: [x, y], delay = 0, children }) {
+  const init = useInit()
   return (
     <g transform={`translate(${x} ${y})`}>
-      <m.g initial={{ opacity: 0, scale: 0.3 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, type: "spring", stiffness: 420, damping: 19 }}>
+      <m.g initial={init({ opacity: 0, scale: 0.3 })} animate={{ opacity: 1, scale: 1 }} transition={{ delay, type: "spring", stiffness: 420, damping: 19 }}>
         {children}
       </m.g>
     </g>
   )
 }
 
-/** A bright dash that runs once along a floor pipe (CSS, so it pauses with the story). */
+/** A bright dash that runs once along a floor pipe: something moving between two parts (CSS, pauses with the story). */
 function Comet({ d, uid, delay = 0, dur = 0.7 }) {
   return <path className="rx-comet" d={d} pathLength="1" stroke={`url(#${uid}-spec)`} style={{ "--delay": `${delay}s`, "--dur": `${dur}s` }} />
+}
+
+/** A slow amber ring on the floor: something is sitting there, waiting. */
+function WaitRing({ u, v, r, delay }) {
+  const init = useInit()
+  return (
+    <m.ellipse
+      {...floorCircle(u, v, 0, r)}
+      className="rx3-wait-ring"
+      initial={init({ opacity: 0 })}
+      animate={{ opacity: [0, 0.95, 0.4, 0.95, 0.4, 0.95] }}
+      transition={{ delay, duration: 4, ease: "easeInOut" }}
+    />
+  )
 }
 
 function NightSky({ uid, on }) {
@@ -479,65 +477,254 @@ function NightSky({ uid, on }) {
   )
 }
 
-/** HTML text chip over the SVG, anchored bottom-centre, left-middle or right-middle at a point. */
-function Chip({ at, delay = 0, tone = "auto", icon: Icon, align = "center", rot = 0, fadeTo, children }) {
-  const enter = { opacity: 1, y: 0, scale: 1 }
+/* ------------------------------------------------------------------ the story layer (HTML over the SVG) */
+
+/*
+ * Every overlay follows `stops`: [{ t, at, o, s }] — seconds after the stage starts, a scene point,
+ * opacity (default 1) and scale (default 1). Appearing, holding, flying and leaving are all stops.
+ */
+const show = (at, t, until) => [
+  { t, at, o: 0, s: 0.9 },
+  { t: t + 0.35, at },
+  ...(until ? [{ t: until - 0.3, at }, { t: until, at, o: 0, s: 0.96 }] : []),
+]
+// Appears at `from`, waits, then flies into `to` and shrinks away (a message landing in an inbox)
+const land = (from, to, t, depart, arrive, s = 0.25) => [
+  { t, at: from, o: 0, s: 0.9 },
+  { t: t + 0.35, at: from },
+  { t: depart, at: from },
+  { t: arrive - 0.12, at: to, o: 1, s },
+  { t: arrive, at: to, o: 0, s },
+]
+// Grows out of `from` and settles at `to` (a reply leaving the core)
+const emerge = (from, to, t, dur = 0.55) => [
+  { t, at: from, o: 0, s: 0.3 },
+  { t: t + dur, at: to },
+]
+// Holds, then sinks and fades (something being forgotten)
+const sink = (at, t, fade, by = 22) => [
+  { t, at, o: 0, s: 0.9 },
+  { t: t + 0.35, at },
+  { t: fade, at },
+  { t: fade + 0.7, at: [at[0], at[1] + by], o: 0.3, s: 0.92 },
+]
+
+function Ui({ stops, anchor = "c", children }) {
+  const init = useInit()
+  const t0 = stops[0].t
+  const span = Math.max(0.01, stops.at(-1).t - t0)
+  const times = stops.map((p) => (p.t - t0) / span)
+  const pos = stops.map((p) => pct(p.at))
+  const tr = { delay: t0, duration: span, times, ease: "easeInOut" }
   return (
-    <div className={`rx-chip-pos rx-chip-pos--${align}`} style={pct(at)}>
+    <m.div className={`rx-ui-pos rx-ui-pos--${anchor}`} initial={init(pos[0])} animate={{ left: pos.map((p) => p.left), top: pos.map((p) => p.top) }} transition={tr}>
       <m.div
-        className={`rx-chip rx-chip--${tone}`}
-        style={{ rotate: rot }}
-        initial={{ opacity: 0, y: 8, scale: 0.94 }}
-        animate={fadeTo ? { ...enter, opacity: [0, 1, 1, fadeTo.opacity] } : enter}
-        exit={{ opacity: 0, y: -6, transition: { duration: 0.25 } }}
-        transition={fadeTo ? { delay, duration: fadeTo.at, times: [0, 0.18, 0.75, 1], ease: EASE } : { delay, duration: 0.45, ease: EASE }}
+        className="rx-ui"
+        initial={init({ opacity: stops[0].o ?? 1, scale: stops[0].s ?? 1 })}
+        animate={{ opacity: stops.map((p) => p.o ?? 1), scale: stops.map((p) => p.s ?? 1) }}
+        transition={tr}
       >
-        {Icon && <Icon size={13} strokeWidth={2.2} aria-hidden="true" />}
-        <span>{children}</span>
+        {children}
       </m.div>
+    </m.div>
+  )
+}
+
+/** A short status label with an icon. Tones: warn (red), wait (amber), auto (brand), ok (done), plain. */
+function Tag({ tone = "auto", icon: Icon, children }) {
+  return (
+    <span className={`rx-tag rx-tag--${tone}`}>
+      {Icon && <Icon size={13} strokeWidth={2.4} aria-hidden="true" />}
+      <span>{children}</span>
+    </span>
+  )
+}
+
+/** Text that counts from one value to another (a waiting timer, a clock), straight into the DOM. */
+function Ticker({ from, to, t, dur, format, still }) {
+  const ref = useRef(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    if (still) {
+      el.textContent = format(to)
+      return undefined
+    }
+    el.textContent = format(from)
+    const ctl = animate(from, to, { delay: t, duration: dur, ease: [0.42, 0, 0.3, 1], onUpdate: (v) => (el.textContent = format(v)) })
+    return () => ctl.stop()
+  }, [from, to, t, dur, format, still])
+  return <span ref={ref} className="rx-ticker" />
+}
+const hm = (v) => {
+  const total = Math.round(v / 5) * 5
+  const h24 = Math.floor(total / 60) % 24
+  return `${h24 % 12 || 12}:${String(total % 60).padStart(2, "0")} ${h24 < 12 ? "am" : "pm"}`
+}
+const span = (v) => {
+  const mins = Math.round(v / 5) * 5
+  return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, "0")} m`
+}
+const label = (prefix) => (fmt) => (v) => `${prefix} · ${fmt(v)}`
+
+function WaGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={siWhatsapp.path} fill="currentColor" />
+    </svg>
+  )
+}
+
+/** The customer's WhatsApp message: same card, same words, in both rooms. */
+function MsgCard({ text, time, kicker = copy.newEnquiry, who = copy.customer, mini }) {
+  return (
+    <div className={`rx-msg ${mini ? "rx-msg--mini" : ""}`}>
+      <span className="rx-msg__kicker">{kicker}</span>
+      <span className="rx-msg__app">
+        <WaGlyph />
+      </span>
+      <span className="rx-msg__who">
+        <b>{who}</b>
+        {time && <time>{time}</time>}
+      </span>
+      {text && <span className="rx-msg__text">{text}</span>}
     </div>
   )
 }
 
-/** One chip whose words step through a sequence: Replied → Qualified → Booked. */
-function ChipSequence({ at, start, step, items, icon: Icon }) {
-  const [i, setI] = useState(-1)
-  const count = items.length
-  // Scheduled once per mount (the phase remounts this), never restarted by a parent re-render
-  useEffect(() => {
-    const ids = Array.from({ length: count }, (_, k) => window.setTimeout(() => setI(k), (start + k * step) * 1000))
-    return () => ids.forEach(window.clearTimeout)
-  }, [count, start, step])
+/** The automated answer, leaving the core. */
+function ReplyCard({ text, foot }) {
   return (
-    <div className="rx-chip-pos" style={pct(at)}>
-      <AnimatePresence>
-        {i >= 0 && (
-          <m.div
-            className="rx-chip rx-chip--auto rx-chip--seq"
-            initial={{ opacity: 0, y: 8, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, transition: { duration: 0.25 } }}
-            transition={{ duration: 0.4, ease: EASE }}
-          >
-            <Icon size={13} strokeWidth={2.4} aria-hidden="true" />
-            <AnimatePresence mode="wait" initial={false}>
-              <m.span key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.12 }}>
-                {items[i]}
-              </m.span>
-            </AnimatePresence>
-          </m.div>
-        )}
-      </AnimatePresence>
+    <div className="rx-reply">
+      <span className="rx-reply__text">{text}</span>
+      <span className="rx-reply__foot">
+        <CheckCheck size={13} strokeWidth={2.4} aria-hidden="true" />
+        {foot}
+      </span>
     </div>
   )
+}
+
+function BookCard() {
+  return (
+    <div className="rx-book">
+      <span className="rx-book__icon">
+        <CalendarCheck size={16} strokeWidth={2} aria-hidden="true" />
+      </span>
+      <span className="rx-book__text">
+        <b>{copy.booked}</b>
+        <small>{copy.bookedWhen}</small>
+      </span>
+      <span className="rx-book__ok">
+        <Check size={11} strokeWidth={3} aria-hidden="true" />
+      </span>
+    </div>
+  )
+}
+
+/** A paper reminder, written by hand. */
+function NoteCard() {
+  return (
+    <div className="rx-note">
+      <PenLine size={13} strokeWidth={2.2} aria-hidden="true" />
+      <span>
+        <b>{copy.noteText}</b>
+        <small>{copy.noteWhen}</small>
+      </span>
+    </div>
+  )
+}
+
+/** The report being filled in by hand: one row per paste. */
+function SheetCard({ fills }) {
+  const init = useInit()
+  return (
+    <div className="rx-sheet">
+      <span className="rx-sheet__title">
+        <FileSpreadsheet size={12} strokeWidth={2} aria-hidden="true" />
+        {copy.reportFile}
+      </span>
+      <span className="rx-sheet__grid">
+        {copy.reportRows.map((row, k) =>
+          row.map((v, j) => (
+            <m.span key={`${k}${j}`} initial={init({ opacity: 0, backgroundColor: "rgba(240, 180, 74, 0)" })} animate={{ opacity: 1, backgroundColor: ["rgba(240, 180, 74, 0.45)", "rgba(240, 180, 74, 0)"] }} transition={{ delay: fills[k], duration: 0.9, opacity: { delay: fills[k], duration: 0.12 } }}>
+              {v}
+            </m.span>
+          ))
+        )}
+        {[0, 1].map((j) => (
+          <span key={`e${j}`} className="is-empty" />
+        ))}
+      </span>
+    </div>
+  )
+}
+
+/** Admin tasks, ticked off by the system one after another. */
+function ChecklistCard({ at, doneAt }) {
+  const init = useInit()
+  return (
+    <div className="rx-check">
+      <span className="rx-check__title">{copy.adminTitle}</span>
+      {copy.adminItems.map((it, i) => (
+        <span key={it} className="rx-check__row">
+          <m.span className="rx-check__box" initial={init({ backgroundColor: "rgba(122, 76, 242, 0)", borderColor: "#cfd4ea" })} animate={{ backgroundColor: "#5b52e8", borderColor: "#5b52e8" }} transition={{ delay: at[i], duration: 0.3 }}>
+            <m.span initial={init({ opacity: 0, scale: 0.4 })} animate={{ opacity: 1, scale: 1 }} transition={{ delay: at[i] + 0.05, type: "spring", stiffness: 500, damping: 22 }}>
+              <Check size={10} strokeWidth={3.2} aria-hidden="true" />
+            </m.span>
+          </m.span>
+          {it}
+        </span>
+      ))}
+      <m.span className="rx-check__done" initial={init({ opacity: 0, y: 4 })} animate={{ opacity: 1, y: 0 }} transition={t(doneAt, 0.35)}>
+        <CheckCheck size={12} strokeWidth={2.4} aria-hidden="true" />
+        {copy.allDone}
+      </m.span>
+    </div>
+  )
+}
+function t(delay, duration = 0.45) {
+  return { delay, duration, ease: EASE }
+}
+
+/* ------------------------------------------------------------------ scene points for the story */
+
+const AT = {
+  msgIn: [136, 98], // where the customer's message appears (top-left, both rooms)
+  phone: [200, 180], // Room 1: phone screen
+  chat: [200, 172], // Room 2: chat channel
+  email: [122, 200],
+  calendar: [404, 192],
+  overSlot: [200, 150], // above the phone / chat channel
+  clockTop: [404, 170],
+  core: [260, 168],
+  overCore: [260, 134],
+  reply: [388, 94],
+  overTray: [122, 176],
+  overCalendar: [404, 172],
+  floorFront: [214, 300],
+  note: [352, 112],
+  sheet: [126, 112],
+  stack: [330, 150],
+  overSheet: [126, 140],
+  overCards: [342, 236],
+  overStack: [330, 128],
+  belowPerson: [214, 304],
+  checklist: [400, 104],
+  hiring: [280, 292],
+  overMonitor: [330, 108],
+  rightMid: [384, 282],
+  overTimeline: [260, 72],
+  exitLeft: [44, 120],
 }
 
 /* ------------------------------------------------------------------ Room 1: the manual grind */
 
 const M_SHEETS = [2, 2, 3, 7, 10]
 const M_CARDS = [2, 2, 3, 4, 6]
-const M_TRAY = [1, 1, 1, 2, 4]
-const M_PHONE = [0, 1, 1, 1, 3]
+const CLOCK_FAST = [true, true, true, true, false]
+const MSG_LAND = 1.65 // a message lands in its inbox (both rooms)
+const OTHERS = uiCopy.scenes.todo.items.map((it) => it.who) // more customers, next month
 
 function Phone({ uid, lit }) {
   return (
@@ -550,7 +737,7 @@ function Phone({ uid, lit }) {
   )
 }
 
-function Inbox({ uid }) {
+function InboxTray({ uid }) {
   return (
     <g>
       <Shadow uid={uid} at={P(40, 178, 0)} r={38} o={0.85} />
@@ -580,15 +767,7 @@ function DeskClock({ uid, fast, waiting }) {
       <circle cx={cx + 3.5} cy={cy + 2.5} r="22" className="rx3-clock__back" />
       <circle cx={cx} cy={cy} r="22" fill={`url(#${uid}-dial)`} className="rx3-clock__face" />
       <ellipse cx={cx - 8} cy={cy - 10} rx="7" ry="4" className="rx3-sheen" />
-      <m.circle
-        cx={cx}
-        cy={cy}
-        r="18"
-        className="rx3-clock__wait"
-        initial={false}
-        animate={{ opacity: waiting ? 1 : 0 }}
-        transition={{ duration: 0.4 }}
-      />
+      <m.circle cx={cx} cy={cy} r="18" className="rx3-clock__wait" initial={false} animate={{ opacity: waiting ? 1 : 0 }} transition={{ duration: 0.4 }} />
       {[0, 90, 180, 270].map((a) => (
         <rect key={a} x={cx - 0.9} y={cy - 19} width="1.8" height="3.6" className="rx3-clock__tick" transform={`rotate(${a} ${cx} ${cy})`} />
       ))}
@@ -615,7 +794,7 @@ function PaperStack({ uid, count, phase, live }) {
             initial={{ opacity: 0, y: -26 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8, transition: { duration: 0.35 } }}
-            transition={{ delay: live && i >= prev ? 0.45 + (i - prev) * 0.75 : 0, duration: 0.5, ease: EASE }}
+            transition={{ delay: live && i >= prev ? 0.45 + (i - prev) * 0.7 : 0, duration: 0.5, ease: EASE }}
           >
             <path d={s.body} className="rx3-sheet__side" />
             <path d={s.face} className={`rx3-sheet ${i % 3 === 1 ? "rx3-sheet--grid" : ""}`} />
@@ -645,7 +824,7 @@ function TaskCards({ uid, count, phase, live }) {
             initial={{ opacity: 0, y: -18 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, transition: { duration: 0.35 } }}
-            transition={{ delay: live && i >= prev ? 1.2 + (i - prev) * 0.6 : 0, duration: 0.45, ease: EASE }}
+            transition={{ delay: live && i >= prev ? 1.2 + (i - prev) * 0.55 : 0, duration: 0.45, ease: EASE }}
           >
             <path d={c.body} className="rx3-sheet__side" />
             <path d={c.face} className="rx3-taskcard" />
@@ -661,97 +840,37 @@ function TaskCards({ uid, count, phase, live }) {
   )
 }
 
-function ReminderNote({ uid }) {
-  const [x, y] = NOTE_C
-  return (
-    <m.g initial={{ opacity: 0, y: 10, scale: 0.7 }} animate={{ opacity: [0, 1, 1, 0.55], y: [10, 0, 0, 4], scale: [0.7, 1, 1, 0.96] }} transition={{ delay: 0.6, duration: 2.6, times: [0, 0.18, 0.7, 1], ease: "easeOut" }}>
-      <rect x={x - 19} y={y - 17} width="40" height="36" rx="6" className="rx3-note__side" transform="translate(2.4 3)" />
-      <rect x={x - 19} y={y - 17} width="40" height="36" rx="6" fill={`url(#${uid}-amber)`} />
-      <ellipse cx={x - 9} cy={y - 11} rx="7" ry="3" className="rx3-sheen" />
-      <Bell x={x - 8.5} y={y - 8} width={18} height={18} strokeWidth={2} className="rx3-note__icon" aria-hidden="true" />
-      {/* pending ring that stalls part-way */}
-      <circle cx={x + 21} cy={y - 17} r="7.5" className="rx3-pending__track" />
-      <m.circle
-        cx={x + 21}
-        cy={y - 17}
-        r="7.5"
-        className="rx3-pending__arc"
-        transform={`rotate(-90 ${x + 21} ${y - 17})`}
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 0.32 }}
-        transition={{ delay: 1, duration: 1.1, ease: "easeOut" }}
-      />
-      <Pop at={[x + 21, y - 17]} delay={2.5}>
-        <circle r="5.5" fill={`url(#${uid}-coral)`} />
-        <rect x="-0.9" y="-3.2" width="1.8" height="4" rx="0.9" className="rx3-missed" />
-        <circle cy="2.6" r="0.95" className="rx3-missed" />
-      </Pop>
-    </m.g>
-  )
-}
+const PHONE_BADGE = [PHONE_TOP[0] + 20, PHONE_TOP[1] - 16]
+const TRAY_BADGE = [INBOX_TOP[0] + 30, INBOX_TOP[1] - 16]
 
+/** Room 1, in the SVG: what lands, what waits, who arrives. */
 function ManualActors({ uid, phase }) {
-  const bubble = <Bubble uid={uid} at={[0, 0]} tone="neutral" />
+  const init = useInit()
   switch (phase) {
     case 0:
-      return (
-        <>
-          {/* the enquiry lands in one of the inboxes… */}
-          <Arrive uid={uid} to={[INBOX_TOP[0], INBOX_TOP[1] - 8]} floor={P(40, 178, 0)} delay={0.2}>
-            {bubble}
-          </Arrive>
-          {/* …and waits: a slow amber pulse around the tray */}
-          <m.ellipse
-            {...floorCircle(40, 178, 18, 34)}
-            className="rx3-wait-ring"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.9, 0.35, 0.9, 0.35] }}
-            transition={{ delay: 1.6, duration: 3, ease: "easeInOut" }}
-          />
-        </>
-      )
     case 1:
+      // the enquiry lands on the phone: unread, and the floor around it starts to "wait"
       return (
         <>
-          {/* after hours: it lands on the phone, waits all night, and by morning has gone elsewhere */}
-          <m.g
-            initial={{ opacity: 0, x: -34, y: -74 }}
-            animate={{ opacity: [0, 1, 1, 1, 0], x: [-34, 0, 0, 0, -150], y: [-74, 0, 0, 0, -40] }}
-            transition={{ delay: 0.6, duration: 4, times: [0, 0.22, 0.6, 0.68, 1], ease: "easeInOut" }}
-          >
-            <g transform={`translate(${PHONE_TOP[0]} ${PHONE_TOP[1] - 20})`}>{bubble}</g>
-          </m.g>
+          <Count uid={uid} at={PHONE_BADGE} n={1} delay={MSG_LAND} />
+          <WaitRing u={40} v={100} r={30} delay={MSG_LAND + 0.6} />
         </>
       )
     case 2:
-      return (
-        <>
-          <Pop at={[CENTER[0] + 30, CENTER[1] - 86]} delay={0.3}>
-            <circle cx="-14" cy="20" r="2.6" className="rx3-thought" />
-            <circle cx="-8" cy="11" r="4" className="rx3-thought" />
-            <circle r="11" className="rx3-thought" />
-            <text y="5" className="rx3-thought__q">
-              ?
-            </text>
-          </Pop>
-          <ReminderNote uid={uid} />
-        </>
-      )
-    case 3:
-      return null
+      return <WaitRing u={40} v={100} r={30} delay={MSG_LAND + 0.6} />
     case 4:
+      // more enquiries than one person can answer, and a second desk to fill
       return (
         <>
+          {[1, 2, 3].map((n, i) => (
+            <Count key={n} uid={uid} at={PHONE_BADGE} n={n} delay={0.95 + i * 0.5} />
+          ))}
+          <Count uid={uid} at={TRAY_BADGE} n={2} delay={1.9} />
           {[P(120, 188, 0), P(184, 186, 0)].map((at, i) => (
-            <m.g key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.5, type: "spring", stiffness: 220, damping: 20 }}>
+            <m.g key={i} initial={init({ opacity: 0, y: 16 })} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.4 + i * 0.45, type: "spring", stiffness: 220, damping: 20 }}>
               <Person uid={uid} at={at} />
             </m.g>
           ))}
-          {[0, 1].map((i) => (
-            <Pop key={i} at={[PHONE_TOP[0] - 12 + i * 28, PHONE_TOP[1] - 34 - i * 14]} delay={1.6 + i * 0.5}>
-              <Bubble uid={uid} at={[0, 0]} w={30} h={20} tone="neutral" />
-            </Pop>
-          ))}
         </>
       )
     default:
@@ -759,93 +878,212 @@ function ManualActors({ uid, phase }) {
   }
 }
 
-function manualChips(phase) {
+/** Room 1, in words: same message in, then a manual outcome. */
+function ManualStory({ phase, still }) {
+  const msg = (i, kicker) => (
+    <Ui stops={land(AT.msgIn, AT.phone, 0.3, 1.1, MSG_LAND)}>
+      <MsgCard text={copy.messages[i]} time={copy.times[i]} kicker={kicker} />
+    </Ui>
+  )
   switch (phase) {
     case 0:
       return (
-        <Chip at={[INBOX_TOP[0], INBOX_TOP[1] - 40]} delay={1.9} tone="warn" icon={Clock}>
-          {copy.waiting}
-        </Chip>
+        <>
+          {msg(0)}
+          <Ui stops={show(AT.overTray, 1.9)} anchor="b">
+            <Tag tone="plain" icon={Inbox}>
+              {copy.oneOfFive}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overSlot, 2.3, 3.7)} anchor="b">
+            <Tag tone="warn" icon={BellOff}>
+              {copy.unread}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.clockTop, 2.7)} anchor="b">
+            <Tag tone="wait" icon={Clock}>
+              <Ticker from={0} to={175} t={2.9} dur={2.2} format={label(copy.noReply)(span)} still={still} />
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overSlot, 3.9)} anchor="b">
+            <Tag tone="warn" icon={Hourglass}>
+              {copy.stillWaiting}
+            </Tag>
+          </Ui>
+        </>
       )
     case 1:
       return (
-        <Chip at={[PHONE_TOP[0] + 28, PHONE_TOP[1] - 40]} align="left" delay={1.7} tone="warn" icon={Moon}>
-          {copy.tillMorning}
-        </Chip>
+        <>
+          {msg(1)}
+          <Ui stops={show(AT.floorFront, 0.9)}>
+            <Tag tone="plain" icon={Moon}>
+              {copy.officeClosed}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.clockTop, 1.9)} anchor="b">
+            <Tag tone="wait" icon={Clock}>
+              <Ticker from={23 * 60 + 40} to={33 * 60} t={2} dur={2.3} format={hm} still={still} />
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overSlot, 2.4, 4.3)} anchor="b">
+            <Tag tone="warn" icon={BellOff}>
+              {copy.unreadNight}
+            </Tag>
+          </Ui>
+          {/* by morning, the customer has gone elsewhere */}
+          <Ui stops={[{ t: 4.3, at: AT.overSlot, o: 0, s: 0.9 }, { t: 4.6, at: AT.overSlot }, { t: 5.5, at: AT.exitLeft, o: 0, s: 0.9 }]}>
+            <MsgCard who={copy.customer} kicker={copy.customer} mini />
+          </Ui>
+          <Ui stops={show(AT.overSlot, 5.0)} anchor="b">
+            <Tag tone="warn" icon={LogOut}>
+              {copy.boughtElsewhere}
+            </Tag>
+          </Ui>
+        </>
       )
     case 2:
       return (
-        <Chip at={[NOTE_C[0] + 30, NOTE_C[1] + 12]} align="left" delay={1.2} tone="note" icon={StickyNote} rot={-3} fadeTo={{ opacity: 0.4, at: 2.8 }}>
-          {copy.followUp}
-        </Chip>
+        <>
+          {msg(2, copy.customerReply)}
+          {/* a reminder on paper… */}
+          <Ui stops={sink(AT.note, 1.9, 3.9)}>
+            <NoteCard />
+          </Ui>
+          <Ui stops={show(AT.clockTop, 2.7)} anchor="b">
+            <Tag tone="wait" icon={Clock}>
+              {copy.daysLater}
+            </Tag>
+          </Ui>
+          {/* …that nobody remembers */}
+          <Ui stops={show([AT.note[0], AT.note[1] - 6], 4.5)} anchor="b">
+            <Tag tone="warn" icon={BellOff}>
+              {copy.forgotten}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overSlot, 5.0)} anchor="b">
+            <Tag tone="warn" icon={Hourglass}>
+              {copy.stillWaiting}
+            </Tag>
+          </Ui>
+        </>
       )
+    case 3: {
+      // copy from the paper stack, paste into the report: by hand, row after row, all day
+      const copies = [1.2, 2.4, 3.6]
+      return (
+        <>
+          <Ui stops={show(AT.sheet, 0.5)}>
+            <SheetCard fills={copies.map((c) => c + 0.6)} />
+          </Ui>
+          {copies.map((c) => (
+            <React.Fragment key={c}>
+              <Ui stops={show(AT.stack, c, c + 0.65)} anchor="b">
+                <Tag tone="plain">{copy.copyKey}</Tag>
+              </Ui>
+              <Ui stops={show(AT.overSheet, c + 0.6, c + 1.25)}>
+                <Tag tone="plain">{copy.pasteKey}</Tag>
+              </Ui>
+            </React.Fragment>
+          ))}
+          <Ui stops={show(AT.clockTop, 1)} anchor="b">
+            <Tag tone="wait" icon={Clock}>
+              <Ticker from={9 * 60} to={18 * 60} t={1.1} dur={3.9} format={hm} still={still} />
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overCards, 5.0)} anchor="b">
+            <Tag tone="warn" icon={Hourglass}>
+              {copy.stillPending}
+            </Tag>
+          </Ui>
+        </>
+      )
+    }
     case 4:
       return (
-        <Chip at={[CENTER[0] - 50, CENTER[1] + 8]} delay={1.4} tone="warn" icon={UserPlus}>
-          {copy.hiring}
-        </Chip>
+        <>
+          {OTHERS.map((who, i) => (
+            <Ui key={who} stops={land([AT.msgIn[0] + i * 10, AT.msgIn[1] - 8 + i * 12], AT.phone, 0.2 + i * 0.5, 0.55 + i * 0.5, 0.95 + i * 0.5, 0.3)}>
+              <MsgCard who={who} mini />
+            </Ui>
+          ))}
+          <Ui stops={show(AT.overStack, 2.0)} anchor="b">
+            <Tag tone="warn" icon={Hourglass}>
+              {copy.backlog}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.hiring, 3.0)} anchor="l">
+            <Tag tone="warn" icon={UserPlus}>
+              {copy.hiring}
+            </Tag>
+          </Ui>
+        </>
       )
     default:
       return null
   }
 }
 
-export function ManualScene({ phase, verdict, live, running }) {
+export function ManualScene({ phase, verdict, live, running, runKey, still = false }) {
   const uid = `rxm${useId().replace(/[^a-zA-Z0-9]/g, "")}`
   const night = phase === 1
   const shuttle = phase === 3 && live
   return (
-    <div className={`rx-scene rx-scene--manual ${verdict ? "is-verdict" : ""} ${running ? "" : "is-paused"}`}>
-      <svg className="rx-svg" viewBox={VIEWBOX} aria-hidden="true" focusable="false">
-        <Defs uid={uid} />
-        <Platform uid={uid} />
-        <Phone uid={uid} lit={phase >= 1} />
-        <Count uid={uid} at={[PHONE_TOP[0] + 20, PHONE_TOP[1] - 16]} n={M_PHONE[phase]} delay={live ? (phase === 1 ? 1.5 : 1.2) : 0} />
-        <Inbox uid={uid} />
-        <Count uid={uid} at={[INBOX_TOP[0] + 30, INBOX_TOP[1] - 16]} n={M_TRAY[phase]} delay={live ? (phase === 0 ? 1.4 : 1.2) : 0} />
-        <DeskClock uid={uid} fast={phase === 1 || phase === 3} waiting={phase === 1} />
-        {/* drawn before the person, who walks in front of it on admin day */}
-        <PaperStack uid={uid} count={M_SHEETS[phase]} phase={phase} live={live} />
-        {/* the person in the middle of everything; gone home after hours; carrying paper on admin day */}
-        <m.g initial={false} animate={{ opacity: night ? 0 : 1, y: night ? 6 : 0 }} transition={{ duration: 0.55 }}>
-          <m.g
-            key={shuttle ? "shuttle" : "still"}
-            initial={{ x: 0, y: 0 }}
-            animate={shuttle ? { x: [0, -64, 32, -64, 32, 0], y: [0, -5, -2, -5, -2, 0] } : { x: 0, y: 0 }}
-            transition={{ duration: 4.3, ease: "easeInOut", delay: 0.2 }}
-          >
-            <Person uid={uid} at={CENTER} />
-            {phase === 3 && (
-              <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-                <Card at={[CENTER[0] + 2, CENTER[1] - 86]} w={18} h={22} />
+    <StillCtx.Provider value={still}>
+      <div className={`rx-scene rx-scene--manual ${verdict ? "is-verdict" : ""} ${running ? "" : "is-paused"}`}>
+        <svg className="rx-svg" viewBox={VIEWBOX} aria-hidden="true" focusable="false">
+          <Defs uid={uid} />
+          <Platform uid={uid} />
+          <Phone uid={uid} lit={live} />
+          <InboxTray uid={uid} />
+          <DeskClock uid={uid} fast={live && CLOCK_FAST[phase]} waiting={phase === 1} />
+          {/* drawn before the person, who walks in front of it on admin day */}
+          <PaperStack uid={uid} count={M_SHEETS[phase]} phase={phase} live={live} />
+          {/* the person in the middle of everything; gone home after hours; carrying paper on admin day */}
+          <m.g initial={false} animate={{ opacity: night ? 0 : 1, y: night ? 6 : 0 }} transition={{ duration: 0.55 }}>
+            <m.g
+              key={shuttle ? `shuttle${runKey}` : "still"}
+              initial={{ x: 0, y: 0 }}
+              animate={shuttle ? { x: [0, 52, -40, 52, -40, 52, -40, 0], y: [0, -6, -2, -6, -2, -6, -2, 0] } : { x: 0, y: 0 }}
+              transition={{ duration: 4.6, ease: "easeInOut", delay: 0.9 }}
+            >
+              <Person uid={uid} at={CENTER} />
+              {phase === 3 && (
+                <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
+                  <Card at={[CENTER[0] + 2, CENTER[1] - 86]} w={18} h={22} />
+                </m.g>
+              )}
+            </m.g>
+          </m.g>
+          <TaskCards uid={uid} count={M_CARDS[phase]} phase={phase} live={live} />
+          <NightSky uid={uid} on={night} />
+          <AnimatePresence>
+            {live && (
+              <m.g key={runKey} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
+                <ManualActors uid={uid} phase={phase} />
               </m.g>
             )}
-          </m.g>
-        </m.g>
-        <TaskCards uid={uid} count={M_CARDS[phase]} phase={phase} live={live} />
-        <NightSky uid={uid} on={night} />
+          </AnimatePresence>
+        </svg>
         <AnimatePresence>
           {live && (
-            <m.g key={phase} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-              <ManualActors uid={uid} phase={phase} />
-            </m.g>
+            <m.div key={runKey} className="rx-layer" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <ManualStory phase={phase} still={still} />
+            </m.div>
           )}
         </AnimatePresence>
-      </svg>
-      <AnimatePresence>
-        {live && (
-          <div key={phase} className="rx-chips">
-            {manualChips(phase)}
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
+      </div>
+    </StillCtx.Provider>
   )
 }
 
 /* ------------------------------------------------------------------ Room 2: the automated business */
 
 const A_LEVEL = [0, 1, 2, 3, 4]
+// Which channels light up in each stage
+const LIT = [{ chat: 1 }, { chat: 1, calendar: 1 }, { chat: 1 }, { email: 1 }, { chat: 1, email: 1, calendar: 1 }]
+// When the core lights up in each stage (seconds), to sync its pulse with arrivals
+const CORE_PULSE = [2.05, 2.05, 2.05, 1.3, 1.6]
 
 function Pipes({ uid }) {
   return (
@@ -888,7 +1126,7 @@ function Core({ uid, pulse, busy }) {
       <ellipse {...CORE_BASE.top} className="rx3-core__lip" stroke={`url(#${uid}-spec)`} />
       <ellipse cx={SPHERE[0]} cy={CORE_BASE.top.cy} rx="21" ry="8.5" fill={`url(#${uid}-sh)`} className="rx3-core__shadow" />
       <g className="rx3-core__float">
-        <m.g key={pulse} initial={{ scale: 1 }} animate={{ scale: pulse ? [1, 1.1, 1] : 1 }} transition={{ duration: 0.6, ease: "easeOut" }} style={{ originX: "50%", originY: "50%" }}>
+        <m.g key={pulse} initial={{ scale: 1 }} animate={{ scale: pulse ? [1, 1.12, 1] : 1 }} transition={{ duration: 0.6, ease: "easeOut" }} style={{ originX: "50%", originY: "50%" }}>
           <path d={ORBIT_BACK} className={`rx3-orbit rx3-orbit--back ${busy ? "is-busy" : ""}`} stroke={`url(#${uid}-spec)`} />
           <circle cx={SPHERE[0]} cy={SPHERE[1]} r="28" fill={`url(#${uid}-glass)`} />
           <circle cx={SPHERE[0]} cy={SPHERE[1]} r="19" fill={`url(#${uid}-orb)`} />
@@ -923,27 +1161,12 @@ function Monitor({ uid, level, grow }) {
         <circle cx="9" cy="9" r="1.5" className="rx3-screen__dot" />
         <circle cx="13.5" cy="9" r="1.5" className="rx3-screen__dot" />
         {hs.map((h, i) => (
-          <m.rect
-            key={i}
-            x={10 + i * 11}
-            width="7.5"
-            rx="1.5"
-            fill={`url(#${uid}-vivid)`}
-            initial={false}
-            animate={{ height: h, attrY: 40 - h }}
-            transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 120, damping: 18 }}
-          />
+          <m.rect key={i} x={10 + i * 11} width="7.5" rx="1.5" fill={`url(#${uid}-vivid)`} initial={false} animate={{ height: h, attrY: 40 - h }} transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 120, damping: 18 }} />
         ))}
         {grow && (
           <>
-            <m.path
-              d="M10 31L21 25L32 27L43 15L51 10"
-              className="rx3-screen__trend"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 1, duration: 0.9, ease: "easeInOut" }}
-            />
-            <m.path d="M45 10L51 10L51 16" className="rx3-screen__trend" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 0.3 }} />
+            <m.path d="M10 31L21 25L32 27L43 15L51 10" className="rx3-screen__trend" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.5, duration: 0.9, ease: "easeInOut" }} />
+            <m.path d="M45 10L51 10L51 16" className="rx3-screen__trend" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.3, duration: 0.3 }} />
           </>
         )}
       </g>
@@ -958,12 +1181,13 @@ function GrowthBars({ uid, on }) {
       {BARS.map((b, i) => {
         const h = on ? BAR_H[i] : 0.01
         const g = bar(b.u, b.v, 12, h)
+        const delay = on ? 2.4 + i * 0.12 : 0
         return (
-          <m.g key={i} initial={false} animate={{ opacity: on ? 1 : 0 }} transition={{ duration: 0.4, delay: on ? 0.5 + i * 0.12 : 0 }}>
+          <m.g key={i} initial={false} animate={{ opacity: on ? 1 : 0 }} transition={{ duration: 0.4, delay }}>
             <Shadow uid={uid} at={P(b.u + 6, b.v + 6, 0)} r={11} o={0.7} />
-            <m.path d={g.right} initial={false} animate={{ d: g.right }} transition={{ delay: on ? 0.55 + i * 0.12 : 0, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--r${i}`} />
-            <m.path d={g.left} initial={false} animate={{ d: g.left }} transition={{ delay: on ? 0.55 + i * 0.12 : 0, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--l${i}`} />
-            <m.path d={g.top} initial={false} animate={{ d: g.top }} transition={{ delay: on ? 0.55 + i * 0.12 : 0, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--t${i}`} />
+            <m.path d={g.right} initial={false} animate={{ d: g.right }} transition={{ delay, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--r${i}`} />
+            <m.path d={g.left} initial={false} animate={{ d: g.left }} transition={{ delay, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--l${i}`} />
+            <m.path d={g.top} initial={false} animate={{ d: g.top }} transition={{ delay, duration: 0.8, ease: EASE }} className={`rx3-bar rx3-bar--t${i}`} />
           </m.g>
         )
       })}
@@ -971,39 +1195,25 @@ function GrowthBars({ uid, on }) {
   )
 }
 
+const FOLLOW = { start: 2.1, step: 0.8 } // scheduled follow-ups go out on Day 1, 3 and 7
 function Timeline({ uid }) {
   const { y, xs } = TIMELINE
+  const { start, step } = FOLLOW
+  const init = useInit()
   return (
-    <m.g initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
+    <m.g initial={init({ opacity: 0, y: 8 })} animate={{ opacity: 1, y: 0 }} transition={{ delay: start - 0.3, duration: 0.45, ease: EASE }}>
       <rect x={xs[0] - 4} y={y - 3} width={xs[2] - xs[0] + 8} height="8" rx="4" className="rx3-track__side" transform="translate(1.5 2.4)" />
       <rect x={xs[0] - 4} y={y - 3} width={xs[2] - xs[0] + 8} height="8" rx="4" className="rx3-track" />
-      <m.rect
-        x={xs[0] - 4}
-        y={y - 3}
-        height="8"
-        rx="4"
-        fill={`url(#${uid}-vivid)`}
-        initial={{ width: 0 }}
-        animate={{ width: xs[2] - xs[0] + 8 }}
-        transition={{ delay: 0.7, duration: 2.1, ease: "easeInOut" }}
-      />
+      <m.rect x={xs[0] - 4} y={y - 3} height="8" rx="4" fill={`url(#${uid}-vivid)`} initial={init({ width: 0 })} animate={{ width: xs[2] - xs[0] + 8 }} transition={{ delay: start, duration: step * 2, ease: "linear" }} />
       {xs.map((x) => (
         <g key={x}>
           <circle cx={x} cy={y + 3.2} r="10" className="rx3-node__side" />
           <circle cx={x} cy={y + 1} r="10" className="rx3-node" />
         </g>
       ))}
-      {/* a scheduled message travelling Day 1 → Day 3 → Day 7 */}
-      <m.g
-        initial={{ opacity: 0, x: 0 }}
-        animate={{ opacity: [0, 1, 1, 1, 0], x: [0, 0, xs[1] - xs[0], xs[2] - xs[0], xs[2] - xs[0]] }}
-        transition={{ delay: 0.55, duration: 2.4, times: [0, 0.08, 0.45, 0.9, 1], ease: "easeInOut" }}
-      >
-        <circle cx={xs[0]} cy={y - 15} r="5" fill={`url(#${uid}-vivid)`} />
-        <ellipse cx={xs[0] - 1.6} cy={y - 16.8} rx="1.8" ry="1.1" className="rx3-sheen rx3-sheen--strong" />
-      </m.g>
+      {/* each scheduled message goes out on its day: sent */}
       {xs.map((x, i) => (
-        <Pop key={x} at={[x, y + 1]} delay={0.75 + i * 1.05}>
+        <Pop key={x} at={[x, y + 1]} delay={start + i * step}>
           <Coin uid={uid} at={[0, 0]} r={10} />
         </Pop>
       ))}
@@ -1011,73 +1221,51 @@ function Timeline({ uid }) {
   )
 }
 
+/** Room 2, in the SVG: what flows where. */
 function AutoActors({ uid, phase }) {
-  const reply = <Bubble uid={uid} at={[0, 0]} tone="reply" check />
   switch (phase) {
     case 0:
-      return (
-        <>
-          <Arrive uid={uid} to={[PEDESTALS.email.top[0], PEDESTALS.email.top[1] - 8]} floor={PEDESTALS.email.foot} delay={0.2}>
-            <Bubble uid={uid} at={[0, 0]} tone="neutral" />
-          </Arrive>
-          <Comet d={PIPES.email} uid={uid} delay={1.35} dur={0.6} />
-          <Travel from={[SPHERE[0] + 6, SPHERE[1] - 6]} to={[SPHERE[0] + 28, SPHERE[1] - 48]} delay={2} dur={0.6} keep>
-            {reply}
-          </Travel>
-        </>
-      )
+      return <Comet d={PIPES.chat} uid={uid} delay={MSG_LAND} dur={0.45} />
     case 1:
       return (
         <>
-          <Arrive uid={uid} to={[PEDESTALS.chat.top[0], PEDESTALS.chat.top[1] - 8]} floor={PEDESTALS.chat.foot} delay={0.6}>
-            <Bubble uid={uid} at={[0, 0]} tone="neutral" />
-          </Arrive>
-          <Comet d={PIPES.chat} uid={uid} delay={1.75} dur={0.55} />
-          {/* booked: the bookings channel confirms */}
-          <Comet d={`M${CENTER[0]} ${CENTER[1]}L${PEDESTALS.calendar.foot[0]} ${PEDESTALS.calendar.foot[1]}`} uid={uid} delay={3.3} dur={0.55} />
-          <Pop at={[PEDESTALS.calendar.top[0], PEDESTALS.calendar.top[1] - 24]} delay={3.85}>
-            <Coin uid={uid} at={[0, 0]} r={9} />
-          </Pop>
+          <Comet d={PIPES.chat} uid={uid} delay={MSG_LAND} dur={0.45} />
+          {/* the booking goes to the calendar */}
+          <Comet d={OUT.calendar} uid={uid} delay={3.5} dur={0.5} />
         </>
       )
     case 2:
       return (
         <>
+          <Comet d={PIPES.chat} uid={uid} delay={MSG_LAND} dur={0.45} />
           <Timeline uid={uid} />
-          <Arrive uid={uid} to={[TIMELINE.xs[2] + 22, TIMELINE.y - 8]} delay={2.6} sink={false}>
-            <Bubble uid={uid} at={[0, 0]} w={30} h={20} tone="neutral" />
-          </Arrive>
         </>
       )
     case 3:
       return (
         <>
+          {/* invoices and sheets come in, through the core, onto the dashboard */}
           {[0, 1, 2].map((i) => (
-            <Travel key={`in${i}`} from={[INBOX_TOP[0], INBOX_TOP[1] - 22]} to={[SPHERE[0], SPHERE[1]]} delay={0.3 + i * 0.6} dur={0.75} scaleTo={0.35}>
+            <Travel key={`in${i}`} from={[INBOX_TOP[0], INBOX_TOP[1] - 22]} to={[SPHERE[0], SPHERE[1]]} delay={0.4 + i * 0.5} dur={0.7} scaleTo={0.35}>
               <Card at={[0, 0]} w={17} h={21} tone={i === 1 ? "invoice" : "paper"} />
             </Travel>
           ))}
           {[0, 1, 2].map((i) => (
-            <Travel key={`out${i}`} from={[SPHERE[0], SPHERE[1]]} to={[MONITOR_C[0] + 2, MONITOR_C[1] - 6]} delay={1.15 + i * 0.6} dur={0.6} scaleTo={0.4}>
-              <Coin uid={uid} at={[0, 0]} r={7} />
-            </Travel>
+            <Comet key={i} d={OUT.monitor} uid={uid} delay={1.3 + i * 0.6} dur={0.55} />
           ))}
-          <Comet d={PIPES.monitor} uid={uid} delay={1.2} dur={0.6} />
-          <Comet d={PIPES.monitor} uid={uid} delay={1.8} dur={0.6} />
-          <Comet d={PIPES.monitor} uid={uid} delay={2.4} dur={0.6} />
-          <Pop at={[MONITOR_C[0] + 30, MONITOR_C[1] - 38]} delay={3.1}>
-            <Coin uid={uid} at={[0, 0]} r={9} />
-          </Pop>
         </>
       )
     case 4:
       return (
         <>
-          {Object.values(PIPES).map((d, i) => (
-            <Comet key={`a${i}`} d={d} uid={uid} delay={0.2 + i * 0.22} dur={0.65} />
+          {[PIPES.chat, PIPES.email, PIPES.calendar].map((d, i) => (
+            <Comet key={i} d={d} uid={uid} delay={0.95 + i * 0.5} dur={0.45} />
           ))}
-          {Object.values(PIPES).map((d, i) => (
-            <Comet key={`b${i}`} d={d} uid={uid} delay={1.7 + i * 0.2} dur={0.65} />
+          {/* every one of them answered */}
+          {[PEDESTALS.chat, PEDESTALS.email, PEDESTALS.calendar].map((p, i) => (
+            <Pop key={i} at={[p.top[0], p.top[1] - 26]} delay={2.0 + i * 0.2}>
+              <Coin uid={uid} at={[0, 0]} r={8} />
+            </Pop>
           ))}
         </>
       )
@@ -1086,58 +1274,125 @@ function AutoActors({ uid, phase }) {
   }
 }
 
-function autoChips(phase) {
-  const above = [SPHERE[0], SPHERE[1] - 38]
+/** Room 2, in words: the same message in, then the automated outcome. */
+function AutoStory({ phase }) {
+  const msg = (i, kicker) => (
+    <Ui stops={land(AT.msgIn, AT.chat, 0.3, 1.1, MSG_LAND)}>
+      <MsgCard text={copy.messages[i]} time={copy.times[i]} kicker={kicker} />
+    </Ui>
+  )
+  const captured = (
+    <Ui stops={show(AT.overCore, 2.0, 2.9)} anchor="b">
+      <Tag tone="auto" icon={Inbox}>
+        {copy.captured}
+      </Tag>
+    </Ui>
+  )
   switch (phase) {
     case 0:
       return (
-        <Chip at={[SPHERE[0] + 74, SPHERE[1] - 58]} align="left" delay={2.4} icon={Check}>
-          {copy.replied}
-        </Chip>
+        <>
+          {msg(0)}
+          {captured}
+          <Ui stops={emerge(AT.core, AT.reply, 2.6)}>
+            <ReplyCard text={copy.replies[0]} foot={copy.repliedFast} />
+          </Ui>
+          <Ui stops={show(AT.overCalendar, 3.7)} anchor="b">
+            <Tag tone="ok" icon={Inbox}>
+              {copy.oneInbox}
+            </Tag>
+          </Ui>
+        </>
       )
     case 1:
       return (
         <>
-          <Chip at={[SPHERE[0] - 36, SPHERE[1] - 32]} align="right" delay={0.9} tone="soft" icon={Clock}>
-            {copy.allHours}
-          </Chip>
-          <ChipSequence at={above} start={2.2} step={0.8} items={[copy.replied, copy.qualified, copy.booked]} icon={Check} />
+          {msg(1)}
+          <Ui stops={show(AT.floorFront, 0.9)}>
+            <Tag tone="auto" icon={Moon}>
+              {copy.allHours}
+            </Tag>
+          </Ui>
+          <Ui stops={emerge(AT.core, AT.reply, 2.3)}>
+            <ReplyCard text={copy.replies[1]} foot={copy.replied} />
+          </Ui>
+          <Ui stops={show(AT.overCalendar, 3.0, 3.75)} anchor="b">
+            <Tag tone="auto" icon={UserCheck}>
+              {copy.qualified}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.overCalendar, 4.0)} anchor="b">
+            <BookCard />
+          </Ui>
         </>
       )
     case 2:
       return (
         <>
+          {msg(2, copy.customerReply)}
+          <Ui stops={show(AT.overTimeline, FOLLOW.start - 0.2)} anchor="b">
+            <Tag tone="auto" icon={CalendarClock}>
+              {copy.scheduled}
+            </Tag>
+          </Ui>
           {[copy.day1, copy.day3, copy.day7].map((d, i) => (
-            <Chip key={d} at={[TIMELINE.xs[i], TIMELINE.y - 14]} delay={0.15 + i * 0.1} tone="quiet">
-              {d}
-            </Chip>
+            <Ui key={d} stops={show([TIMELINE.xs[i], TIMELINE.y - 14], FOLLOW.start - 0.2 + i * 0.1)} anchor="b">
+              <span className="rx-day">{d}</span>
+            </Ui>
           ))}
-          <Chip at={[TIMELINE.xs[2] + 54, TIMELINE.y - 22]} align="left" delay={3.1} icon={Check}>
-            {copy.replied}
-          </Chip>
+          {[0, 1, 2].map((i) => (
+            <Ui key={i} stops={show([TIMELINE.xs[i], TIMELINE.y + 26], FOLLOW.start + i * FOLLOW.step + 0.1)}>
+              <span className="rx-sent">
+                <Check size={10} strokeWidth={3} aria-hidden="true" />
+                {copy.sent}
+              </span>
+            </Ui>
+          ))}
+          {/* …until the customer answers */}
+          <Ui stops={show(AT.rightMid, 4.4)}>
+            <MsgCard text={copy.yesReply} kicker={copy.customerReply} />
+          </Ui>
         </>
       )
     case 3:
       return (
-        <Chip at={[FRONT_PERSON[0] - 24, FRONT_PERSON[1] + 2]} align="right" delay={1.2} tone="soft" icon={Heart}>
-          {copy.customers}
-        </Chip>
+        <>
+          <Ui stops={show(AT.checklist, 0.8)}>
+            <ChecklistCard at={[1.85, 2.45, 3.05]} doneAt={3.5} />
+          </Ui>
+          <Ui stops={show(AT.belowPerson, 3.9)}>
+            <Tag tone="ok" icon={Heart}>
+              {copy.customers}
+            </Tag>
+          </Ui>
+        </>
       )
     case 4:
       return (
-        <Chip at={[FRONT_PERSON[0], FRONT_PERSON[1] - 76]} delay={1.4} icon={Users}>
-          {copy.sameTeam}
-        </Chip>
+        <>
+          {OTHERS.map((who, i) => (
+            <Ui key={who} stops={land([AT.msgIn[0] + i * 10, AT.msgIn[1] - 8 + i * 12], [PEDESTALS.chat, PEDESTALS.email, PEDESTALS.calendar].map((p) => [p.top[0], p.top[1] - 8])[i], 0.2 + i * 0.5, 0.55 + i * 0.5, 0.95 + i * 0.5, 0.3)}>
+              <MsgCard who={who} mini />
+            </Ui>
+          ))}
+          <Ui stops={show(AT.overMonitor, 3.1)} anchor="b">
+            <Tag tone="ok" icon={LayoutDashboard}>
+              {copy.oneScreen}
+            </Tag>
+          </Ui>
+          <Ui stops={show(AT.belowPerson, 3.7)}>
+            <Tag tone="ok" icon={Users}>
+              {copy.sameTeam}
+            </Tag>
+          </Ui>
+        </>
       )
     default:
       return null
   }
 }
 
-// When the core lights up in each phase (seconds), to sync its pulse with arrivals
-const CORE_PULSE = [1.95, 2.3, 0, 1.05, 0.9]
-
-export function AutoScene({ phase, verdict, live, running }) {
+export function AutoScene({ phase, verdict, live, running, runKey, still = false }) {
   const uid = `rxa${useId().replace(/[^a-zA-Z0-9]/g, "")}`
   const svgRef = useRef(null)
   const night = phase === 1
@@ -1151,45 +1406,48 @@ export function AutoScene({ phase, verdict, live, running }) {
     else svg.pauseAnimations()
   }, [running])
 
-  // The core answers each arrival with one pulse, timed per phase
+  // The core answers each arrival with one pulse; a new run cancels the old timer
   useEffect(() => {
     if (!live || !CORE_PULSE[phase]) return undefined
     const id = window.setTimeout(() => setPulse((p) => p + 1), CORE_PULSE[phase] * 1000)
     return () => window.clearTimeout(id)
-  }, [phase, live])
+  }, [phase, live, runKey])
 
-  const lit = { email: phase === 0 || phase === 3, chat: phase === 1, calendar: phase === 1 }
+  const lit = live ? LIT[phase] : {}
   return (
-    <div className={`rx-scene rx-scene--auto ${verdict ? "is-verdict" : ""} ${running ? "" : "is-paused"}`}>
-      <svg ref={svgRef} className="rx-svg" viewBox={VIEWBOX} aria-hidden="true" focusable="false">
-        <Defs uid={uid} auto />
-        <Platform uid={uid} auto />
-        <Pipes uid={uid} />
-        <Pedestal uid={uid} p={PEDESTALS.chat} lit={live && lit.chat} />
-        <Pedestal uid={uid} p={PEDESTALS.email} lit={live && lit.email} />
-        <Pedestal uid={uid} p={PEDESTALS.calendar} lit={live && lit.calendar} />
-        <Core uid={uid} pulse={pulse} busy={live && (phase === 1 || phase === 3)} />
-        <Monitor uid={uid} level={A_LEVEL[phase]} grow={phase === 4} />
-        <m.g initial={false} animate={{ opacity: night ? 0 : 1, y: night ? 6 : 0 }} transition={{ duration: 0.55 }}>
-          <Person uid={uid} at={FRONT_PERSON} />
-        </m.g>
-        <GrowthBars uid={uid} on={phase === 4} />
-        <NightSky uid={uid} on={night} />
+    <StillCtx.Provider value={still}>
+      <div className={`rx-scene rx-scene--auto ${verdict ? "is-verdict" : ""} ${running ? "" : "is-paused"}`}>
+        <svg ref={svgRef} className="rx-svg" viewBox={VIEWBOX} aria-hidden="true" focusable="false">
+          <Defs uid={uid} auto />
+          <Platform uid={uid} auto />
+          <Pipes uid={uid} />
+          <Pedestal uid={uid} p={PEDESTALS.chat} lit={!!lit.chat} />
+          <Pedestal uid={uid} p={PEDESTALS.email} lit={!!lit.email} />
+          <Pedestal uid={uid} p={PEDESTALS.calendar} lit={!!lit.calendar} />
+          <Core uid={uid} pulse={pulse} busy={live && (phase === 1 || phase === 3 || phase === 4)} />
+          <Monitor uid={uid} level={A_LEVEL[phase]} grow={phase === 4} />
+          <m.g initial={false} animate={{ opacity: night ? 0 : 1, y: night ? 6 : 0 }} transition={{ duration: 0.55 }}>
+            <Person uid={uid} at={FRONT_PERSON} />
+          </m.g>
+          <GrowthBars uid={uid} on={phase === 4} />
+          <NightSky uid={uid} on={night} />
+          <AnimatePresence>
+            {live && (
+              <m.g key={runKey} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
+                <AutoActors uid={uid} phase={phase} />
+              </m.g>
+            )}
+          </AnimatePresence>
+        </svg>
         <AnimatePresence>
           {live && (
-            <m.g key={phase} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-              <AutoActors uid={uid} phase={phase} />
-            </m.g>
+            <m.div key={runKey} className="rx-layer" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <AutoStory phase={phase} />
+            </m.div>
           )}
         </AnimatePresence>
-      </svg>
-      <AnimatePresence>
-        {live && (
-          <div key={phase} className="rx-chips">
-            {autoChips(phase)}
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
+      </div>
+    </StillCtx.Provider>
   )
 }
+

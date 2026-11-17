@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from "motion/react"
-import { Check, ChevronDown, Sparkles } from "lucide-react"
+import { Check, Sparkles } from "lucide-react"
 import { engine, uiCopy } from "../../data/automationContent"
 import { serviceModules, moduleByName } from "../../data/serviceModules"
 import PixelIcon from "../visuals/PixelIcon"
@@ -24,8 +24,12 @@ import { scrollToElement } from "../../lib/smoothScroll"
  *   - keyboard: focus moves to something outside the engine
  *   - any device: the engine scrolls out of view
  * The tour only runs while the engine is on screen, and not at all under reduced motion.
- * Deep links #engine-<part-id> (hero tiles) still open a part. "What it covers" shows the approved
- * detail lists.
+ * Deep links #engine-<part-id> (hero tiles) still open a part.
+ *
+ * Layout: the progress count (03 / 08) sits top right, and the active part's "What it covers" card
+ * is always open. From 1200px the engine sits left with both in a rail on its right; below that
+ * the count sits above the engine on the right and the card sits under it. All eight cards are
+ * stacked in one cell, so the card keeps one size as the tour moves and nothing below it jumps.
  */
 const S = uiCopy.stories.engine
 const PARTS = serviceModules
@@ -50,16 +54,16 @@ function pathway(i) {
   return `M${x} ${y}Q${qx} ${qy} ${BOX.cx} ${BOX.cy}`
 }
 
-function Details({ part, onPick }) {
+/** One part's "What it covers" card. Only the active part's card is shown (the rest are stacked
+ *  under it, hidden), and only its chips can take focus. */
+function Details({ part, n, active, onPick }) {
   return (
-    <m.div
-      id="engine-details"
-      className="eg-details"
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6, transition: { duration: 0.15 } }}
-      transition={{ duration: 0.3, ease: EASE }}
-    >
+    <div className={`eg-details ${active ? "is-active" : ""}`} aria-hidden={!active}>
+      <p className="eg-details__kicker t-mono">{S.detailsShow}</p>
+      <p className="eg-details__title">
+        <span className="eg-details__num">{String(n).padStart(2, "0")}</span>
+        {part.part}
+      </p>
       <ul className="eg-details__list">
         {part.cover.map((c) => (
           <li key={c}>
@@ -73,7 +77,7 @@ function Details({ part, onPick }) {
         {part.worksWith.map((name) => {
           const target = moduleByName[name]
           return target ? (
-            <button key={name} type="button" className="eg-chip" onClick={() => onPick(target.index)}>
+            <button key={name} type="button" className="eg-chip" tabIndex={active ? 0 : -1} onClick={() => onPick(target.index)}>
               {name}
             </button>
           ) : (
@@ -83,7 +87,7 @@ function Details({ part, onPick }) {
           )
         })}
       </p>
-    </m.div>
+    </div>
   )
 }
 
@@ -92,7 +96,6 @@ export default function EngineOrbit() {
   const progressRef = useRef(null)
   const tabRefs = useRef([])
   const wide = useMediaQuery(WIDE_Q)
-  const [details, setDetails] = useState(false)
 
   const onProgress = useCallback((p) => progressRef.current?.style.setProperty("--p", p.toFixed(4)), [])
   const story = useStoryClock({ durations: DURATIONS, rootRef, onProgress, threshold: 0.3 })
@@ -168,11 +171,6 @@ export default function EngineOrbit() {
     pick(next, { focus: true })
   }
 
-  const toggleDetails = () => {
-    setDetails((d) => !d)
-    story.pause()
-  }
-
   // One-shot visuals start the first time the engine is actually seen (or used)
   const live = story.epoch > 0 || story.reduced
 
@@ -188,119 +186,8 @@ export default function EngineOrbit() {
           onPointerLeave={onPointerLeave}
           onBlur={onBlur}
         >
-          <div className="eg-stage">
-            {/* Orbit, pathways and the active pulse (wide only) */}
-            {wide && (
-              <svg className="eg-orbit" viewBox={`0 0 ${BOX.w} ${BOX.h}`} aria-hidden="true" focusable="false">
-                <defs>
-                  <linearGradient id="eg-spec" gradientUnits="userSpaceOnUse" x1="120" y1="60" x2="880" y2="640">
-                    <stop offset="0" stopColor="#1d6f96" />
-                    <stop offset="0.35" stopColor="#2f55c8" />
-                    <stop offset="0.7" stopColor="#6440c8" />
-                    <stop offset="1" stopColor="#a3387f" />
-                  </linearGradient>
-                  <radialGradient id="eg-floor">
-                    <stop offset="0" stopColor="#8f7cf0" stopOpacity="0.16" />
-                    <stop offset="1" stopColor="#87baff" stopOpacity="0" />
-                  </radialGradient>
-                </defs>
-                <ellipse cx={BOX.cx} cy={BOX.cy + 20} rx="330" ry="210" fill="url(#eg-floor)" />
-                <ellipse className="eg-ring" cx={BOX.cx} cy={BOX.cy} rx={BOX.rx} ry={BOX.ry} />
-                <ellipse className="eg-ring eg-ring--flow" cx={BOX.cx} cy={BOX.cy} rx={BOX.rx} ry={BOX.ry} pathLength="1" stroke="url(#eg-spec)" />
-                <ellipse className="eg-ring eg-ring--inner" cx={BOX.cx} cy={BOX.cy} rx="250" ry="236" />
-                {PARTS.map((p, i) => (
-                  <path key={p.id} d={pathway(i)} className={`eg-path ${i === active ? "is-active" : ""}`} />
-                ))}
-                {live && (
-                  <g key={active}>
-                    <m.path
-                      d={pathway(active)}
-                      className="eg-path__lit"
-                      stroke="url(#eg-spec)"
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: 1 }}
-                      transition={{ duration: 0.7, ease: "easeInOut" }}
-                    />
-                    <path d={pathway(active)} pathLength="1" className="eg-pulse" stroke="url(#eg-spec)" />
-                  </g>
-                )}
-              </svg>
-            )}
-
-            {/* The core: plays the active part */}
-            <section id="engine-panel" className="eg-core" role="tabpanel" aria-labelledby={`eg-tab-${part.id}`} tabIndex={-1}>
-              <span className="eg-core__halo" aria-hidden="true" />
-              <p className="eg-core__label">
-                <Sparkles size={13} strokeWidth={2} aria-hidden="true" />
-                {S.core}
-              </p>
-              <AnimatePresence mode="wait" initial={false}>
-                <m.div
-                  key={part.id}
-                  className="eg-core__body"
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.98, transition: { duration: 0.22 } }}
-                  transition={{ duration: 0.38, ease: EASE }}
-                >
-                  <h3 className="eg-core__name">
-                    <span className="eg-core__num">{num}</span>
-                    {part.part}
-                  </h3>
-                  <div className="eg-demo" aria-hidden="true">
-                    {live ? <EngineMicroDemo id={part.id} /> : null}
-                  </div>
-                  <p className="eg-core__promise">{part.promise}</p>
-                  <m.p className="eg-core__result" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: live ? 1.9 : 0, duration: 0.4, ease: EASE }}>
-                    <span className="eg-core__tick" aria-hidden="true">
-                      <Check size={11} strokeWidth={3} />
-                    </span>
-                    <span className="sr-only">{S.resultLabel}: </span>
-                    {part.produces}
-                  </m.p>
-                </m.div>
-              </AnimatePresence>
-            </section>
-
-            {/* The eight parts */}
-            <div className="eg-nodes" role="tablist" aria-label={S.partsLabel} onKeyDown={onKey}>
-              {!wide && <span className="eg-circuit" aria-hidden="true" />}
-              {PARTS.map((p, i) => {
-                const [x, y] = nodePoint(i)
-                const on = i === active
-                return (
-                  <button
-                    key={p.id}
-                    ref={(el) => (tabRefs.current[i] = el)}
-                    type="button"
-                    role="tab"
-                    id={`eg-tab-${p.id}`}
-                    aria-selected={on}
-                    aria-controls="engine-panel"
-                    tabIndex={on ? 0 : -1}
-                    className={`eg-node ${on ? "is-active" : ""}`}
-                    style={
-                      wide
-                        ? { left: `${(x / BOX.w) * 100}%`, top: `${(y / BOX.h) * 100}%` }
-                        : { "--row": i < 4 ? 1 : 2, "--col": i < 4 ? i + 1 : N - i }
-                    }
-                    onClick={() => pick(i)}
-                  >
-                    <span className="eg-node__icon">
-                      <PixelIcon name={p.icon} size={wide ? 18 : 20} />
-                    </span>
-                    <span className="eg-node__text">
-                      <span className="eg-node__num">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="eg-node__name">{p.part}</span>
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Which part is showing (updates on its own), and the part's details */}
-          <div className="eg-bar">
+          <div className="eg-main">
+            {/* Which part is showing (updates on its own): top right */}
             <span ref={progressRef} className="eg-progress" aria-hidden="true">
               <span className="eg-progress__count t-mono">
                 {num} / {String(N).padStart(2, "0")}
@@ -309,11 +196,124 @@ export default function EngineOrbit() {
                 <span className="eg-progress__fill" />
               </span>
             </span>
-            <button type="button" className="eg-more" aria-expanded={details} aria-controls="engine-details" onClick={toggleDetails}>
-              {details ? S.detailsHide : `${S.detailsShow}: ${part.part}`}
-              <ChevronDown size={16} strokeWidth={2} aria-hidden="true" className="eg-more__chev" />
-            </button>
-            <AnimatePresence initial={false}>{details && <Details key="details" part={part} onPick={(i) => pick(i)} />}</AnimatePresence>
+
+            <div className="eg-stage">
+              {/* Orbit, pathways and the active pulse (wide only) */}
+              {wide && (
+                <svg className="eg-orbit" viewBox={`0 0 ${BOX.w} ${BOX.h}`} aria-hidden="true" focusable="false">
+                  <defs>
+                    <linearGradient id="eg-spec" gradientUnits="userSpaceOnUse" x1="120" y1="60" x2="880" y2="640">
+                      <stop offset="0" stopColor="#1d6f96" />
+                      <stop offset="0.35" stopColor="#2f55c8" />
+                      <stop offset="0.7" stopColor="#6440c8" />
+                      <stop offset="1" stopColor="#a3387f" />
+                    </linearGradient>
+                    <radialGradient id="eg-floor">
+                      <stop offset="0" stopColor="#8f7cf0" stopOpacity="0.16" />
+                      <stop offset="1" stopColor="#87baff" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <ellipse cx={BOX.cx} cy={BOX.cy + 20} rx="330" ry="210" fill="url(#eg-floor)" />
+                  <ellipse className="eg-ring" cx={BOX.cx} cy={BOX.cy} rx={BOX.rx} ry={BOX.ry} />
+                  <ellipse className="eg-ring eg-ring--flow" cx={BOX.cx} cy={BOX.cy} rx={BOX.rx} ry={BOX.ry} pathLength="1" stroke="url(#eg-spec)" />
+                  <ellipse className="eg-ring eg-ring--inner" cx={BOX.cx} cy={BOX.cy} rx="250" ry="236" />
+                  {PARTS.map((p, i) => (
+                    <path key={p.id} d={pathway(i)} className={`eg-path ${i === active ? "is-active" : ""}`} />
+                  ))}
+                  {live && (
+                    <g key={active}>
+                      <m.path
+                        d={pathway(active)}
+                        className="eg-path__lit"
+                        stroke="url(#eg-spec)"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 0.7, ease: "easeInOut" }}
+                      />
+                      <path d={pathway(active)} pathLength="1" className="eg-pulse" stroke="url(#eg-spec)" />
+                    </g>
+                  )}
+                </svg>
+              )}
+
+              {/* The core: plays the active part */}
+              <section id="engine-panel" className="eg-core" role="tabpanel" aria-labelledby={`eg-tab-${part.id}`} tabIndex={-1}>
+                <span className="eg-core__halo" aria-hidden="true" />
+                <p className="eg-core__label">
+                  <Sparkles size={13} strokeWidth={2} aria-hidden="true" />
+                  {S.core}
+                </p>
+                <AnimatePresence mode="wait" initial={false}>
+                  <m.div
+                    key={part.id}
+                    className="eg-core__body"
+                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98, transition: { duration: 0.22 } }}
+                    transition={{ duration: 0.38, ease: EASE }}
+                  >
+                    <h3 className="eg-core__name">
+                      <span className="eg-core__num">{num}</span>
+                      {part.part}
+                    </h3>
+                    <div className="eg-demo" aria-hidden="true">
+                      {live ? <EngineMicroDemo id={part.id} /> : null}
+                    </div>
+                    <p className="eg-core__promise">{part.promise}</p>
+                    <m.p className="eg-core__result" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: live ? 1.9 : 0, duration: 0.4, ease: EASE }}>
+                      <span className="eg-core__tick" aria-hidden="true">
+                        <Check size={11} strokeWidth={3} />
+                      </span>
+                      <span className="sr-only">{S.resultLabel}: </span>
+                      {part.produces}
+                    </m.p>
+                  </m.div>
+                </AnimatePresence>
+              </section>
+
+              {/* The eight parts */}
+              <div className="eg-nodes" role="tablist" aria-label={S.partsLabel} onKeyDown={onKey}>
+                {!wide && <span className="eg-circuit" aria-hidden="true" />}
+                {PARTS.map((p, i) => {
+                  const [x, y] = nodePoint(i)
+                  const on = i === active
+                  return (
+                    <button
+                      key={p.id}
+                      ref={(el) => (tabRefs.current[i] = el)}
+                      type="button"
+                      role="tab"
+                      id={`eg-tab-${p.id}`}
+                      aria-selected={on}
+                      aria-controls="engine-panel"
+                      tabIndex={on ? 0 : -1}
+                      className={`eg-node ${on ? "is-active" : ""}`}
+                      style={
+                        wide
+                          ? { left: `${(x / BOX.w) * 100}%`, top: `${(y / BOX.h) * 100}%` }
+                          : { "--row": i < 4 ? 1 : 2, "--col": i < 4 ? i + 1 : N - i }
+                      }
+                      onClick={() => pick(i)}
+                    >
+                      <span className="eg-node__icon">
+                        <PixelIcon name={p.icon} size={wide ? 18 : 20} />
+                      </span>
+                      <span className="eg-node__text">
+                        <span className="eg-node__num">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="eg-node__name">{p.part}</span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* The active part's details, always open */}
+            <div className="eg-info">
+              {PARTS.map((p, i) => (
+                <Details key={p.id} part={p} n={i + 1} active={i === active} onPick={(j) => pick(j)} />
+              ))}
+            </div>
           </div>
 
           {/* The full approved part list, for assistive tech */}

@@ -12,15 +12,19 @@ import DashboardDemo from "../interactions/DashboardDemo"
 /**
  * 06 — DASHBOARD: "One screen. Eight parts. Data, Dashboard, Decisions."
  *
- * One looping motion story (~13.6 s) replaces the three text columns: data converges, the
- * dashboard opens, decisions follow. A small three-step control jumps between stages (and pauses),
- * one sentence explains the current stage, and the full tabbed illustrative dashboard is still one
+ * One looping motion story (~12 s) replaces the three text columns: data converges, the
+ * dashboard opens, decisions follow. A small three-step control jumps between stages and the loop
+ * carries on from there (Data → Dashboard → Decisions → Data …); only the pause button stops it.
+ * One sentence explains the current stage, and the full tabbed illustrative dashboard is still one
  * click away for anyone who wants every number.
+ * Data is short on purpose: the signals land by ~2 s and the dashboard opens at 2.6 s.
  */
 const S = uiCopy.stories.dashboard
 const FLOW = dashboard.flow
-const STAGE_MS = [3800, 4400, 5400]
+const STAGE_MS = [2600, 4000, 5400]
 const EASE = [0.22, 1, 0.36, 1]
+// Picking a stage or a decision never freezes the story: it jumps there and keeps looping
+const KEEP_PLAYING = { pause: false, resume: true }
 
 export default function DashboardSection() {
   const rootRef = useRef(null)
@@ -35,12 +39,11 @@ export default function DashboardSection() {
   const story = useStoryClock({ durations: STAGE_MS, rootRef, onProgress, threshold: 0.35 })
   const stage = story.index
 
-  const pickDecision = (i) => story.go(2, { at: i / 3 + 0.01 })
+  // Data picked again while it is showing replays the data flow from its first signal
+  const pickStage = (i) => story.go(i, { ...KEEP_PLAYING, replay: true })
+  const pickDecision = (i) => story.go(2, { ...KEEP_PLAYING, at: i / 3 + 0.01 })
 
-  const toggleFull = () => {
-    setOpen((o) => !o)
-    story.pause()
-  }
+  const toggleFull = () => setOpen((o) => !o)
 
   return (
     <SectionShell id="dashboard" theme="night" labelledBy="dashboard-title" className="dashboard-section">
@@ -83,7 +86,7 @@ export default function DashboardSection() {
                       type="button"
                       className={`dc-seg__btn ${i === stage ? "is-active" : ""} ${i < stage ? "is-done" : ""}`}
                       aria-pressed={i === stage}
-                      onClick={() => story.go(i)}
+                      onClick={() => pickStage(i)}
                     >
                       <span className="dc-seg__n" aria-hidden="true">
                         {String(i + 1).padStart(2, "0")}

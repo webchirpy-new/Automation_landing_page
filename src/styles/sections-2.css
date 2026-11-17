@@ -682,17 +682,23 @@
   border: 1px solid var(--line);
   box-shadow: var(--shadow-2);
   overflow: hidden;
+  transition: visibility 0s; /* opening: the pages are there the moment the cover starts to turn */
 }
 .book__inner:focus {
   outline: none;
 }
 /* While a card is closed, its hidden pages do not set its height: the cover's own content does.
    (Otherwise the taller hidden pages stretched the cover and left an empty gap mid-card.)
-   Opened, the pages are back in flow and the card grows to fit them. */
+   Opened, the pages are back in flow and the card grows to fit them.
+   Closed, the pages are also hidden: their white fill, border and shadow sat exactly under the
+   dark cover and showed through its anti-aliased curves as a grey fringe on the corners.
+   Closing hides them only once the cover has swung back over them (900ms, as .book__cover). */
 .book:not(.is-open) > .book__inner {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0s 900ms;
 }
 /* Tablet: every card opens as two pages side by side. Card 1 used to stay single-column (it was
    the narrow bento card), so its hidden pages were taller and stretched its cover. */
@@ -782,7 +788,11 @@
   transform-style: preserve-3d;
   backface-visibility: hidden;
   transition: transform 900ms var(--ease-inout), visibility 0s;
-  box-shadow: var(--shadow-3);
+  /* A fine inner hairline traces the rounded edge, so every corner reads as one clean curve */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    var(--shadow-3);
   z-index: 2;
 }
 .book--2 .book__cover {
@@ -791,14 +801,15 @@
 .book--3 .book__cover {
   background: linear-gradient(120deg, #111318 50%, #161642);
 }
+/* The spine's shade covers the whole cover and shares its radius, fading out 14px in.
+   (It was a 14px-wide strip with 24px corners: the browser shrank those corners to 14px, so the
+   strip's shade poked out past the cover's own curve at the top- and bottom-left corners.) */
 .book__spine {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 14px;
-  border-radius: var(--r-24) 0 0 var(--r-24);
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), transparent);
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), transparent 14px);
+  pointer-events: none;
 }
 .book.is-open .book__cover {
   transform: rotateY(-178deg);

@@ -73,16 +73,20 @@ export function useStoryClock({ durations, rootRef, threshold = 0.3, onProgress 
     return () => cancelAnimationFrame(raf)
   }, [running, count, markStarted])
 
-  /** Jump to a step. Pauses by default: a visitor who picks something wants to look at it. */
+  /** Jump to a step. Pauses by default: a visitor who picks something wants to look at it.
+   *  `pause: false` keeps the story playing from the chosen step; add `resume: true` to also lift
+   *  an earlier pause (back to the default: plays, unless reduced motion), and `replay: true` to
+   *  restart step 1's one-shot animations when step 1 is picked while it is already showing. */
   const go = useCallback(
-    (i, { pause = true, at = 0 } = {}) => {
+    (i, { pause = true, at = 0, resume = false, replay = false } = {}) => {
       const n = ((i % count) + count) % count
-      const restart = n === 0 && indexRef.current !== 0
+      const restart = n === 0 && (indexRef.current !== 0 || replay)
       indexRef.current = n
       elapsed.current = at * durationsRef.current[n]
       setIndex(n)
       markStarted(restart)
       if (pause) setChoice(false)
+      else if (resume && choiceRef.current === false) setChoice(null)
       progressRef.current?.(at, n)
     },
     [count, markStarted, setChoice]

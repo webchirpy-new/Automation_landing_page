@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react"
+import React, { useCallback, useRef, useState } from "react"
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from "motion/react"
 import { comparison, uiCopy } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
@@ -11,14 +11,17 @@ import { AutoScene, ManualScene } from "../interactions/TwoRooms"
  * 03 — TWO TYPES OF BUSINESSES: "Two rooms. Two realities."
  *
  * The same business in two 2.5D rooms, played through the five approved moments of the day
- * (comparison.rows) in sync, about 5 s each, then a short final beat, then back to moment 1.
- * Only the current moment's two lines are on screen; the full comparison is in the page for
- * assistive tech (sr-only list below the header).
+ * (comparison.rows) in sync, ~6.8 s each, then a short final beat, then back to moment 1. In every
+ * moment the same customer situation reaches both rooms first, then each room handles it its way
+ * and both outcomes stay on screen (TwoRooms.jsx).
+ * All five moments are named in a stepper above the rooms: the current one is highlighted and its
+ * bar fills, earlier bars stay full, the rest stay muted. Only the current moment's two lines are
+ * in the rooms; the full comparison is in the page for assistive tech (sr-only list below the header).
  * No playback buttons: it plays on its own while on screen, pauses off screen, and does not
- * auto-play under reduced motion. The five progress bars jump to a moment and keep playing.
+ * auto-play under reduced motion. Picking a moment in the stepper jumps there and keeps playing.
  */
 const EASE = [0.22, 1, 0.36, 1]
-const PHASE_MS = 5000
+const PHASE_MS = 6800 // time to see the same situation arrive, both rooms act, and both outcomes
 const VERDICT_MS = 4200
 const ROWS = comparison.rows
 const DURATIONS = [...ROWS.map(() => PHASE_MS), VERDICT_MS]
@@ -51,6 +54,15 @@ export default function Comparison() {
   const phase = Math.min(story.index, ROWS.length - 1)
   const row = ROWS[phase]
 
+  // One key for both rooms' stage animations: a new moment, a new loop, or the same moment picked
+  // again all remount them, so the picked moment plays from its start and no old timer leaks in.
+  const [picks, setPicks] = useState(0)
+  const runKey = `${phase}-${story.epoch}-${picks}`
+  const pick = (i) => {
+    setPicks((n) => n + 1)
+    story.go(i, { pause: false })
+  }
+
   return (
     <SectionShell id="compare" theme="light" labelledBy="compare-title" className="compare">
       <header className="section-head section-head--center">
@@ -77,21 +89,30 @@ export default function Comparison() {
       <LazyMotion features={domAnimation} strict>
         <MotionConfig reducedMotion="user">
           <div ref={rootRef} className={`rx ${story.running ? "is-running" : ""} ${verdict ? "is-verdict" : ""}`} data-reveal>
-            <div className="rx-context" aria-hidden="true">
-              <AnimatePresence mode="wait" initial={false}>
-                <m.p
-                  key={phase}
-                  className="rx-context__line"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35, ease: EASE }}
-                >
-                  <span className="rx-context__n">{String(phase + 1).padStart(2, "0")}</span>
-                  <span>{row.row}</span>
-                </m.p>
-              </AnimatePresence>
-            </div>
+            {/* All five moments, always named; the current one is highlighted (it stays lit through
+                the final beat, which closes moment 5) */}
+            <ol ref={stepsRef} className="rx-steps" aria-label={S.timelineLabel}>
+              {ROWS.map((r, i) => {
+                const active = i === phase
+                const done = verdict || i < story.index
+                return (
+                  <li key={r.row}>
+                    <button
+                      type="button"
+                      className={`rx-step ${active ? "is-active" : ""} ${done ? "is-done" : ""}`}
+                      aria-current={active ? "step" : undefined}
+                      onClick={() => pick(i)}
+                    >
+                      <span className="rx-step__bar" aria-hidden="true">
+                        <span className="rx-step__fill" />
+                      </span>
+                      <span className="rx-step__n t-mono">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="rx-step__label">{r.row}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ol>
 
             <div className="rx-rooms">
               <article className={`rx-room rx-room--manual ${phase === 1 ? "is-night" : ""}`} aria-labelledby="room1-title">
@@ -102,7 +123,7 @@ export default function Comparison() {
                   </h3>
                   <p className="rx-room__tag">{comparison.room1.tagline}</p>
                 </header>
-                <ManualScene phase={phase} verdict={verdict} live={live} running={story.running} />
+                <ManualScene phase={phase} verdict={verdict} live={live} running={story.running} runKey={runKey} still={story.reduced} />
                 <Caption tone="manual" k={verdict ? "verdict" : phase} text={verdict ? S.verdict.manual : row.manual} verdict={verdict} />
               </article>
 
@@ -114,35 +135,9 @@ export default function Comparison() {
                   </h3>
                   <p className="rx-room__tag">{comparison.room2.tagline}</p>
                 </header>
-                <AutoScene phase={phase} verdict={verdict} live={live} running={story.running} />
+                <AutoScene phase={phase} verdict={verdict} live={live} running={story.running} runKey={runKey} still={story.reduced} />
                 <Caption tone="auto" k={verdict ? "verdict" : phase} text={verdict ? S.verdict.auto : row.automated} verdict={verdict} />
               </article>
-            </div>
-
-            <div className="rx-timeline">
-              <ol ref={stepsRef} className="rx-steps" aria-label={S.timelineLabel}>
-                {ROWS.map((r, i) => {
-                  const state = verdict || i < story.index ? "is-done" : i === story.index ? "is-active" : ""
-                  return (
-                    <li key={r.row}>
-                      <button
-                        type="button"
-                        className={`rx-step ${state}`}
-                        aria-label={`${i + 1} of ${ROWS.length}: ${r.row}`}
-                        aria-current={i === phase ? "step" : undefined}
-                        onClick={() => story.go(i, { pause: false })}
-                      >
-                        <span className="rx-step__bar">
-                          <span className="rx-step__fill" />
-                        </span>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ol>
-              <p className="rx-timeline__count t-mono" aria-hidden="true">
-                {String(phase + 1).padStart(2, "0")} / {String(ROWS.length).padStart(2, "0")}
-              </p>
             </div>
           </div>
         </MotionConfig>
