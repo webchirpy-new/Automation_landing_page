@@ -35,15 +35,11 @@ function VideoBody({ url, title, label, caption }) {
 export default function SiteModals() {
   const { modal, openModal, closeModal, formSubmitted, summary } = useSite()
 
-  // Exit popup, in two layers. Desktop + fine pointer only, once per tab session, never over
-  // another modal or after a form was sent.
-  // 1. As the cursor heads for the tab bar (leaves the top of the page moving upward), the
-  //    checklist popup opens, so it's on screen before they reach the tab's ✕. Slow slips
-  //    over the top edge, and a cursor crossing an unfocused window, are ignored.
-  // 2. If they click ✕ (or reload / back / type a new URL) without having seen it, the
-  //    browser's own "Leave site?" box is the last check. Browsers allow nothing else at that
-  //    moment and its wording can't be changed. Cancel → the page stays and the popup opens.
-  //    Browsers only show that box after the visitor has clicked or typed on the page.
+  // Exit popup. Desktop + fine pointer only, once per tab session, never over another modal or
+  // after a form was sent. As the cursor heads for the tab bar (leaves the top of the page
+  // moving upward), the checklist popup opens, so it's on screen before they reach the tab's ✕.
+  // Slow slips over the top edge, and a cursor crossing an unfocused window, are ignored.
+  // No browser "Leave site? Changes may not be saved" box: closing or leaving is never blocked.
   const stateRef = useRef({ modal, formSubmitted })
   stateRef.current = { modal, formSubmitted }
   useEffect(() => {
@@ -75,7 +71,7 @@ export default function SiteModals() {
     }
     const canShow = () => !hasSeen() && !stateRef.current.modal && !stateRef.current.formSubmitted
 
-    // Layer 1: cursor heading up to the tab bar. Fires the instant it leaves the page.
+    // Cursor heading up to the tab bar. Fires the instant it leaves the page.
     const TRAIL_MS = 250 // look at the last ~250ms of movement before the exit
     const MIN_UP_SPEED = 0.08 // px/ms: any real upward move counts; only a resting cursor nudged over the edge doesn't
     const trail = [] // recent { t, y } pointer samples
@@ -100,38 +96,11 @@ export default function SiteModals() {
       openModal("exit")
     }
 
-    // Layer 2: the browser's "Leave site?" box, if they click ✕ without having seen the popup.
-    // Following one of the page's own links (Privacy, Terms) is not an exit attempt.
-    // New-tab links and #section links don't unload the page, so they don't count.
-    let linkClickAt = 0
-    const onClick = (e) => {
-      const a = e.target instanceof Element ? e.target.closest("a[href]") : null
-      if (!a || a.target === "_blank" || a.getAttribute("href").startsWith("#")) return
-      linkClickAt = Date.now()
-    }
-
-    const onBeforeUnload = (e) => {
-      if (!canShow()) return
-      if (Date.now() - linkClickAt < 1500) return
-      // No click or keypress on the page yet: the browser won't show the box, so don't ask.
-      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return
-      markSeen()
-      e.preventDefault()
-      e.returnValue = "" // older Chrome / Safari
-      // The box freezes the page until answered. Leave → the page is gone and this never runs.
-      // Cancel → it runs straight after and the popup appears.
-      window.setTimeout(() => openModal("exit"), 0)
-    }
-
     document.addEventListener("mousemove", onMove, { passive: true })
     document.addEventListener("mouseout", onOut)
-    document.addEventListener("click", onClick, true)
-    window.addEventListener("beforeunload", onBeforeUnload)
     return () => {
       document.removeEventListener("mousemove", onMove)
       document.removeEventListener("mouseout", onOut)
-      document.removeEventListener("click", onClick, true)
-      window.removeEventListener("beforeunload", onBeforeUnload)
     }
   }, [openModal])
 
