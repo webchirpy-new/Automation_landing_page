@@ -183,7 +183,7 @@ export default function Hero() {
   )
 
   const list = hero.list
-  const showVideo = true // shows "Asset pending" until VITE_FOUNDER_VIDEO_URL is set
+  const showVideo = false // hidden for now; set back to true to show the founder video card
   const showResults = Array.isArray(hero.results) && hero.results.length > 0
   const ListTag = list?.ordered ? "ol" : "ul"
 

@@ -543,6 +543,11 @@
   .hero__proof-grid--single {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Lone card keeps the width it has beside the video (7 of 12 cols), centred */
+  .hero__proof-grid--single > * {
+    justify-self: center;
+    width: calc((100% - 24px) * 7 / 12);
+  }
 }
 .video-card {
   position: relative;

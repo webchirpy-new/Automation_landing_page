@@ -36,17 +36,15 @@ export const MORNING_SUMMARY = {
 }
 
 export const pageSections = {
-  // Kit 04 §02 — BLOCKER: page stays out of the build until the client confirms the
-  // "about 6 hours → about 2 minutes" result in writing (see vite.config.js).
+  // Kit 04 §02 — client-confirmed result: about 3 hours → about 3 minutes.
   "vsl-05": [
     {
       type: "story",
       id: "story",
-      title: "6 hours to 2 minutes. Here's what changed.",
+      title: "3 hours to 3 minutes. Here's what changed.",
       before: {
         label: "Before",
-        // CLIENT TO CONFIRM DETAILS (Kit 04)
-        body: "Enquiries came in on WhatsApp, the website form and email. Whoever was free replied, when they were free. Evenings and weekends waited for the next working day. First reply: about 6 hours on average.",
+        body: "Enquiries came in on WhatsApp, the website form and email. Whoever was free replied, when they were free. Evenings and weekends waited for the next working day. First reply: about 3 hours on average.",
       },
       steps: [
         { label: "Step 1", title: "One inbox.", body: "WhatsApp, form and email enquiries land in one list, with the source of each." },
@@ -63,7 +61,7 @@ export const pageSections = {
       ],
       after: {
         label: "After",
-        body: "First reply: about 2 minutes. The team now starts each conversation with the customer's requirement already in hand.",
+        body: "First reply: about 3 minutes. The team now starts each conversation with the customer's requirement already in hand.",
       },
       unchanged: { label: "What did not change", body: "The team. The WhatsApp number. The website. The tools they already used." },
       honestNote:

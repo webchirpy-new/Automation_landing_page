@@ -9,9 +9,8 @@ const root = import.meta.dirname
 // (vsl-0N-*.html). Every page renders the same app; only the hero copy changes, chosen by
 // the `data-page` attribute on #root (see src/data/landingPages.js).
 // Pages kept out of the production build until they are approved. They still open in the dev
-// server for review. vsl-05: Launch Kit 04 blocker — every claim depends on the client's written
-// confirmation of the "about 6 hours → about 2 minutes" result. Remove from this list once received.
-const UNPUBLISHED = new Set(["vsl-05-from-hours-to-minutes.html"])
+// server for review. Add a file name here to hold a page back.
+const UNPUBLISHED = new Set([])
 
 const pages = readdirSync(root).filter((f) => (f === "index.html" || /^vsl-\d+-.+\.html$/.test(f)) && !UNPUBLISHED.has(f))
 

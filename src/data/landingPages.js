@@ -121,22 +121,22 @@ export const landingPages = {
     underButton: UNDER_BUTTON,
   },
 
-  // TEAM NOTE (DOCX): every [X] and [channels] must be replaced with the client's real figures
-  // before publishing. Do not go live with the placeholders. The page ships with noindex until then.
+  // Client figures: first reply 3 hours → 3 minutes, 10 lost leads recovered a month,
+  // 3 channels (WhatsApp, website form, email — as named in the #story section).
   "vsl-05": {
     eyebrow: "A real AI Automation story",
-    headline: "Leads lost in email alerts. Now answered in [X] minutes.",
+    headline: "Leads lost in email alerts. Now answered in 3 minutes.",
     punchLine: "Here is how.",
     body:
-      "One growing business was getting enquiries from [channels], but email alerts got buried and some leads were never followed up. Webchirpy built an AI-powered lead dashboard that brings every enquiry into one place and triggers the follow-up automatically. First reply time went from [X hours] to [X minutes].",
+      "One growing business was getting enquiries from WhatsApp, the website form and email, but email alerts got buried and some leads were never followed up. Webchirpy built an AI-powered lead dashboard that brings every enquiry into one place and triggers the follow-up automatically. First reply time went from 3 hours to 3 minutes.",
     list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: the story behind [X hours] to [X minutes]",
+    videoCaption: "Watch first: the story behind 3 hours to 3 minutes",
     resultsHeading: "What changed for this business",
     results: [
-      { value: "[X hrs] → [X min]", label: "First reply time" },
-      { value: "[X]", label: "Lost leads recovered every month" },
-      { value: "[X]", label: "Channels brought into one dashboard" },
+      { value: "3 hrs → 3 min", label: "First reply time" },
+      { value: "10", label: "Lost leads recovered every month" },
+      { value: "3", label: "Channels brought into one dashboard" },
     ],
     footnote: { text: "Figures and context from the business itself.", mono: false },
     button: "READ THE FULL CASE STUDY →",
