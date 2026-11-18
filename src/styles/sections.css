@@ -677,6 +677,8 @@
 }
 .results__title {
   max-width: 24ch;
+  justify-self: center;
+  text-align: center;
 }
 .results__list {
   display: grid;
