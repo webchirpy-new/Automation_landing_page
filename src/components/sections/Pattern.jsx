@@ -1,5 +1,5 @@
 import React, { useRef } from "react"
-import { pattern, persistent } from "../../data/automationContent"
+import { pattern } from "../../data/automationContent"
 import { SectionShell, CTAButton } from "../ui/primitives"
 import PatternScenes from "../interactions/PatternScenes"
 import { gsap, useGSAP } from "../../lib/gsap"
@@ -71,7 +71,7 @@ export default function Pattern() {
           </div>
           <div className="pattern__cta">
             <CTAButton onClick={goToBooking} size="lg">
-              {persistent.stickyBar.button}
+              {pattern.button}
             </CTAButton>
           </div>
         </div>

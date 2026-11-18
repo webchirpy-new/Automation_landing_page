@@ -592,6 +592,13 @@
 .video-modal__caption {
   margin-top: 12px;
 }
+/* The exit popup has to be visible before the cursor reaches the tab's ✕: open fast */
+.modal__panel.exit-modal {
+  animation-duration: 140ms;
+}
+.modal:has(> .exit-modal) .modal__scrim {
+  animation-duration: 120ms;
+}
 .exit-modal__included {
   margin-bottom: 8px;
 }

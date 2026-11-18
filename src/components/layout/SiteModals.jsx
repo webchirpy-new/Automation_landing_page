@@ -35,36 +35,104 @@ function VideoBody({ url, title, label, caption }) {
 export default function SiteModals() {
   const { modal, openModal, closeModal, formSubmitted, summary } = useSite()
 
-  // Exit-intent popup: desktop + fine pointer only, after 20s, once per session,
-  // never when another modal is open or after the form was sent.
+  // Exit popup, in two layers. Desktop + fine pointer only, once per tab session, never over
+  // another modal or after a form was sent.
+  // 1. As the cursor heads for the tab bar (leaves the top of the page moving upward), the
+  //    checklist popup opens, so it's on screen before they reach the tab's ✕. Slow slips
+  //    over the top edge, and a cursor crossing an unfocused window, are ignored.
+  // 2. If they click ✕ (or reload / back / type a new URL) without having seen it, the
+  //    browser's own "Leave site?" box is the last check. Browsers allow nothing else at that
+  //    moment and its wording can't be changed. Cancel → the page stays and the popup opens.
+  //    Browsers only show that box after the visitor has clicked or typed on the page.
   const stateRef = useRef({ modal, formSubmitted })
   stateRef.current = { modal, formSubmitted }
   useEffect(() => {
     if (!siteConfig.enableExitPopup) return undefined
     const mq = window.matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)")
     if (!mq.matches) return undefined
-    let seen = false
-    try {
-      seen = sessionStorage.getItem("wc-exit-seen") === "1"
-    } catch (e) {
-      /* ignore */
-    }
-    if (seen) return undefined
-    const armedAt = Date.now() + 20000
-    const onOut = (e) => {
-      if (e.relatedTarget || e.clientY > 0) return
-      if (Date.now() < armedAt) return
-      if (stateRef.current.modal || stateRef.current.formSubmitted) return
+
+    // Once per tab session. In development it's only remembered until the next reload,
+    // so the popup can be re-tested without opening a new tab.
+    const SEEN_KEY = "wc-exit-seen"
+    let seenThisLoad = false
+    const hasSeen = () => {
+      if (seenThisLoad) return true
+      if (import.meta.env.DEV) return false
       try {
-        sessionStorage.setItem("wc-exit-seen", "1")
-      } catch (err) {
+        return sessionStorage.getItem(SEEN_KEY) === "1"
+      } catch {
+        return false
+      }
+    }
+    const markSeen = () => {
+      seenThisLoad = true
+      if (import.meta.env.DEV) return
+      try {
+        sessionStorage.setItem(SEEN_KEY, "1")
+      } catch {
         /* ignore */
       }
-      document.removeEventListener("mouseout", onOut)
+    }
+    const canShow = () => !hasSeen() && !stateRef.current.modal && !stateRef.current.formSubmitted
+
+    // Layer 1: cursor heading up to the tab bar. Fires the instant it leaves the page.
+    const TRAIL_MS = 250 // look at the last ~250ms of movement before the exit
+    const MIN_UP_SPEED = 0.08 // px/ms: any real upward move counts; only a resting cursor nudged over the edge doesn't
+    const trail = [] // recent { t, y } pointer samples
+
+    const onMove = (e) => {
+      const t = performance.now()
+      trail.push({ t, y: e.clientY })
+      while (trail.length && t - trail[0].t > TRAIL_MS) trail.shift()
+    }
+    const headingUp = (exitY) => {
+      const now = performance.now()
+      const from = trail.find((p) => now - p.t <= TRAIL_MS)
+      if (!from) return false
+      const dt = Math.max(now - from.t, 16)
+      return (from.y - exitY) / dt >= MIN_UP_SPEED
+    }
+    const onOut = (e) => {
+      if (e.relatedTarget || e.clientY > 0) return
+      if (!document.hasFocus() || !headingUp(e.clientY)) return
+      if (!canShow()) return
+      markSeen()
       openModal("exit")
     }
+
+    // Layer 2: the browser's "Leave site?" box, if they click ✕ without having seen the popup.
+    // Following one of the page's own links (Privacy, Terms) is not an exit attempt.
+    // New-tab links and #section links don't unload the page, so they don't count.
+    let linkClickAt = 0
+    const onClick = (e) => {
+      const a = e.target instanceof Element ? e.target.closest("a[href]") : null
+      if (!a || a.target === "_blank" || a.getAttribute("href").startsWith("#")) return
+      linkClickAt = Date.now()
+    }
+
+    const onBeforeUnload = (e) => {
+      if (!canShow()) return
+      if (Date.now() - linkClickAt < 1500) return
+      // No click or keypress on the page yet: the browser won't show the box, so don't ask.
+      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return
+      markSeen()
+      e.preventDefault()
+      e.returnValue = "" // older Chrome / Safari
+      // The box freezes the page until answered. Leave → the page is gone and this never runs.
+      // Cancel → it runs straight after and the popup appears.
+      window.setTimeout(() => openModal("exit"), 0)
+    }
+
+    document.addEventListener("mousemove", onMove, { passive: true })
     document.addEventListener("mouseout", onOut)
-    return () => document.removeEventListener("mouseout", onOut)
+    document.addEventListener("click", onClick, true)
+    window.addEventListener("beforeunload", onBeforeUnload)
+    return () => {
+      document.removeEventListener("mousemove", onMove)
+      document.removeEventListener("mouseout", onOut)
+      document.removeEventListener("click", onClick, true)
+      window.removeEventListener("beforeunload", onBeforeUnload)
+    }
   }, [openModal])
 
   const ex = persistent.exitPopup

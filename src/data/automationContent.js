@@ -64,6 +64,7 @@ export const pattern = {
   closingLine:
     "It is not your team's effort, and not the number of leads. It is the work nobody should be doing by hand.",
   subLine: "Same hardworking team. Hours back every week.",
+  button: "BOOK MY FREE AUTOMATION AUDIT →",
 }
 
 /* 03 — TWO TYPES OF BUSINESSES */
@@ -770,7 +771,7 @@ export const audit = {
     },
   ],
   button: "BOOK MY FREE AUTOMATION AUDIT →",
-  underButton: "Limited slots each month. Book fast.", // VERIFY: scarcity claim needs client confirmation
+  underButton: "Limited slots each month.BOOK MY FREE AUTOMATION AUDIT → .", // VERIFY: scarcity claim needs client confirmation
 }
 
 /* 13 — WALK IN, OR WALK AWAY */
