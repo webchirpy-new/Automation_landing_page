@@ -164,7 +164,7 @@ export default function WhyWebchirpy() {
           <div className="founder">
             <div className="founder__frame">
               <div className="founder__portrait">
-                <img className="founder__photo" src="/founder-photo.jpg" alt={why.founderCard.name} width="1536" height="1024" loading="lazy" decoding="async" />
+                <img className="founder__photo" src={`${import.meta.env.BASE_URL}founder-photo.jpg`} alt={why.founderCard.name} width="1536" height="1024" loading="lazy" decoding="async" />
               </div>
               {siteConfig.founderVideoUrl && (
                 <button type="button" className="founder__play" onClick={() => openModal("video:founder")}>

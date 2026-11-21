@@ -77,7 +77,7 @@ export default function FinalCTA() {
       {/* Ad landing page: a minimal footer (logo + legal) so nothing competes with the CTA above */}
       <div className="container site-footer">
         <div className="site-footer__brand">
-          <img className="site-footer__logo" src="/logo-footer.svg" alt="Webchirpy" width="220" height="57" loading="lazy" />
+          <img className="site-footer__logo" src={`${import.meta.env.BASE_URL}logo-footer.svg`} alt="Webchirpy" width="220" height="57" loading="lazy" />
           <span className="site-footer__tag">Automation</span>
         </div>
         <p className="site-footer__legal">

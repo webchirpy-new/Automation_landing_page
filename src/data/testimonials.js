@@ -6,7 +6,7 @@
 export const TESTIMONIALS = [
   {
     id: "aditya",
-    src: "/Aditya_Video.mp4",
+    src: `${import.meta.env.BASE_URL}Aditya_Video.mp4`,
     poster: 12,
     name: "Aditya Anand",
     role: "Founder & CEO, SecureU",
@@ -14,7 +14,7 @@ export const TESTIMONIALS = [
   },
   {
     id: "bala",
-    src: "/Bala_Video.mp4",
+    src: `${import.meta.env.BASE_URL}Bala_Video.mp4`,
     poster: 12,
     name: "Balamurugan",
     role: "Chief Executive, Green Growth Asia Foundation",
@@ -22,7 +22,7 @@ export const TESTIMONIALS = [
   },
   {
     id: "gowtham",
-    src: "/Gautam_Video.mp4",
+    src: `${import.meta.env.BASE_URL}Gautam_Video.mp4`,
     poster: 12,
     name: "Gowtham Sangappa",
     role: "Proton Fitness",
@@ -30,7 +30,7 @@ export const TESTIMONIALS = [
   },
   {
     id: "preethi",
-    src: "/Preeti_Video.mp4",
+    src: `${import.meta.env.BASE_URL}Preeti_Video.mp4`,
     poster: 12,
     name: "Preethi Tavag",
     role: "Marketing Head, Shresha Museum Solutions",

@@ -39,6 +39,6 @@ export const painPoints = [
 ]
 
 export const painVideo = (i) => ({
-  src: `/pain/pain-${i + 1}.mp4`,
-  poster: `/pain/pain-${i + 1}.jpg`,
+  src: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.mp4`,
+  poster: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.jpg`,
 })
