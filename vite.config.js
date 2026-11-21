@@ -17,6 +17,8 @@ const pages = readdirSync(root).filter((f) => (f === "index.html" || /^vsl-\d+-.
 export default defineConfig({
   plugins: [react()],
   build: {
+    // Modern browsers only: skips legacy syntax transforms and polyfills (smaller JS)
+    target: "es2022",
     rollupOptions: {
       input: {
         ...Object.fromEntries(pages.map((f) => [f.replace(/\.html$/, ""), resolve(root, f)])),
