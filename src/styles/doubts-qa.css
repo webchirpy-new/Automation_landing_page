@@ -1,42 +1,45 @@
 /* Same doubts. Different outcome. — 75% question cards, 25% Manual→Automatic animation */
 .doubts__grid {
+  --p: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: 16px;
   margin-top: clamp(24px, 3.5vw, 44px);
   align-items: stretch;
 }
-@media (min-width: 1000px) {
+/* Phone / tablet: scenes first (side by side), then the six questions */
+.stage {
+  order: -1;
+}
+@media (min-width: 640px) and (max-width: 1099px) {
   .doubts__grid {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+  .stage {
+    grid-column: 1 / -1;
   }
 }
-@media (max-width: 999px) {
+/* Desktop: 3 questions | two scenes | 3 questions */
+@media (min-width: 1100px) {
+  .doubts__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr) minmax(0, 1fr);
+    gap: 24px;
+  }
   .stage {
-    order: -1;
-    max-width: 440px;
-    width: 100%;
-    margin-inline: auto;
+    order: 0;
   }
 }
 
-/* ---------- Question cards (2 columns × 3 rows) ---------- */
+/* ---------- Question cards (3 per side) ---------- */
 .qa {
-  --p: 0;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(0, 1fr);
-}
-@media (min-width: 640px) {
-  .qa {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, auto);
-    grid-auto-flow: column;
-  }
+  grid-auto-rows: 1fr;
 }
 .qa__li {
   display: flex;
@@ -142,120 +145,42 @@
   transform: scaleX(var(--p));
 }
 
-/* ---------- Animation panel ---------- */
+/* ---------- Animation panel: Manual + Automatic together, no text ---------- */
 .stage {
-  --m: 0;
-  --a: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 24px;
   background: linear-gradient(180deg, #fbfbfe, #f1f2f9);
   box-shadow: var(--shadow-2);
-  transition: background 0.5s;
 }
-.stage.is-auto {
-  background: linear-gradient(180deg, #f8f6ff, #e8f3fa);
-}
-.stage__q {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 2px 2px 0;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  min-height: 2.6em;
-}
-.stage__q b {
-  flex: none;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 0.6875rem;
-  color: #fff;
-  background: linear-gradient(135deg, #5b4bd6, #b05fd0);
-}
-
-/* two-step loader: Manual, then Automatic */
-.stage__steps {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.stage__step {
-  display: grid;
-  gap: 5px;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-}
-.stage__step.is-on {
-  opacity: 1;
-}
-.stage__step em {
-  font-style: normal;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.stage__step.is-on em {
-  color: var(--ink);
-}
-.stage__load {
-  position: relative;
-  display: block;
-  height: 4px;
-  border-radius: 4px;
-  background: rgba(17, 17, 17, 0.09);
-  overflow: hidden;
-}
-.stage__load::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform-origin: left;
-  border-radius: inherit;
-}
-.stage__load--m::after {
-  background: #2b2f3a;
-  transform: scaleX(var(--m));
-}
-.stage__load--a::after {
-  background: linear-gradient(90deg, #5b4bd6, #1d8fb0);
-  transform: scaleX(var(--a));
-}
-
 .stage__scene {
-  flex: 1;
   display: grid;
   align-content: center;
+  min-width: 0;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 16px;
   background: #fff;
   border: 1px solid var(--line);
+}
+.stage__scene--auto {
+  background: linear-gradient(180deg, #f8f6ff, #e8f3fa);
 }
 .stage__scene .rx-scene {
   margin: 0;
 }
-
-/* one-line description of the lit question, pinned to the bottom of the full-height panel */
-.stage__desc {
-  margin: 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--ink-2);
-  animation: stage-in 0.4s var(--ease-out) both;
-}
-@keyframes stage-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+@media (min-width: 1100px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
+    border-radius: 28px;
+  }
+  .stage__scene {
+    border-radius: 20px;
   }
 }
 
@@ -266,9 +191,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .qa__card,
-  .stage,
-  .stage__step {
+  .qa__card {
     transition: none;
   }
 }

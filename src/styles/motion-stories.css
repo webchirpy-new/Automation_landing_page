@@ -2976,3 +2976,22 @@ button.eg-chip:hover {
 }
 
 /* 02 — THE INVISIBLE WORKLOAD: styles live in invisible-workload.css (imported by PatternScenes.jsx) */
+
+/* "This is a sample" notice above the example dashboard */
+.dc-sample {
+  display: grid;
+  gap: 4px;
+  max-width: 640px;
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  text-align: left;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.dc-sample strong {
+  color: #fff;
+}

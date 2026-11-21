@@ -46,10 +46,10 @@ export default function App() {
         <DashboardSection />
         {/* <Proof /> hidden for now; DoubtsQA (id="proof") replaces Comparison + Proof + Walk in/away */}
         <WhyWebchirpy />
-        <TrustedIndustries />
         {/* <AudienceFit /> hidden for now ("Built for owners who are ready to work smarter") */}
-        <FAQ />
         <AuditOffer />
+        <TrustedIndustries />
+        <FAQ />
         <WalkIn />
       </main>
       <FinalCTA />

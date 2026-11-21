@@ -134,6 +134,27 @@ export default function PainShowcase({ children }) {
     }
   }
 
+  // Rewind / fast-forward: click or drag on the progress bar, or use the arrow keys
+  const seekTo = (ratio) => {
+    const v = videoRef.current
+    if (!v || !v.duration) return
+    const r = Math.min(1, Math.max(0, ratio))
+    v.currentTime = r * v.duration
+    setProgress(r)
+  }
+  const seekFromPointer = (e) => {
+    const box = e.currentTarget.getBoundingClientRect()
+    seekTo((e.clientX - box.left) / box.width)
+  }
+  const onSeekKey = (e) => {
+    const v = videoRef.current
+    if (!v || !v.duration) return
+    const step = e.key === "ArrowLeft" || e.key === "ArrowDown" ? -5 : e.key === "ArrowRight" || e.key === "ArrowUp" ? 5 : 0
+    if (!step) return
+    e.preventDefault()
+    seekTo((v.currentTime + step) / v.duration)
+  }
+
   // Unmute/mute from a click: the click is a user gesture, so play() with sound is allowed here
   const setSound = (on) => {
     const v = videoRef.current
@@ -208,9 +229,25 @@ export default function PainShowcase({ children }) {
             <button type="button" className="pain__ctl" onClick={togglePlay} aria-label={isPaused ? "Play" : "Pause"}>
               <Svg name={isPaused ? "play" : "pause"} />
             </button>
-            <span className="pain__bar" aria-hidden="true">
-              <i style={{ transform: `scaleX(${progress})` }} />
-            </span>
+            <div
+              className="pain__seek"
+              role="slider"
+              tabIndex={0}
+              aria-label="Seek video"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress * 100)}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId)
+                seekFromPointer(e)
+              }}
+              onPointerMove={(e) => e.buttons === 1 && seekFromPointer(e)}
+              onKeyDown={onSeekKey}
+            >
+              <span className="pain__bar" aria-hidden="true">
+                <i style={{ transform: `scaleX(${progress})` }} />
+              </span>
+            </div>
             <button
               type="button"
               className="pain__ctl"
@@ -227,7 +264,7 @@ export default function PainShowcase({ children }) {
       {/* ---------- 2 · Pain point ---------- */}
       <div className="pain__copy" aria-live="polite">
         <span className="pain__chip">
-          <b>{String(index + 1).padStart(2, "0")}</b> Pain point {index + 1} of {COUNT}
+          {point.tag}
         </span>
         <h3 key={index} className="pain__title">
           {point.title}

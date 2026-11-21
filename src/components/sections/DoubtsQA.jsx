@@ -10,9 +10,8 @@ import "../../styles/doubts-qa.css"
 
 /**
  * "Same doubts. Different outcome."
- * Left (75%): six question cards, all visible, one lit at a time.
- * Right (25%): one isometric scene for the lit question. Manual plays first while its loader fills,
- * then Automatic plays while its loader fills. Then the next question lights up.
+ * Left: questions 1-3. Centre: the Manual and Automatic scenes playing together (no text).
+ * Right: questions 4-6. One question is lit at a time and the scenes follow it.
  * Questions 1–5 use the five moments of the day; question 6 uses the closing beat.
  */
 const CARD_MS = 5000
@@ -22,20 +21,8 @@ const DURATIONS = ITEMS.map(() => CARD_MS)
 
 export default function DoubtsQA() {
   const rootRef = useRef(null)
-  const listRef = useRef(null)
-  const stageRef = useRef(null)
-  const sideRef = useRef("manual")
-  const [side, setSide] = useState("manual")
   const onProgress = useCallback((p) => {
-    listRef.current?.style.setProperty("--p", p.toFixed(4))
-    // two-part loader: Manual fills during the first half, Automatic during the second
-    stageRef.current?.style.setProperty("--m", Math.min(1, p * 2).toFixed(4))
-    stageRef.current?.style.setProperty("--a", Math.max(0, p * 2 - 1).toFixed(4))
-    const next = p < 0.5 ? "manual" : "auto"
-    if (next !== sideRef.current) {
-      sideRef.current = next
-      setSide(next)
-    }
+    rootRef.current?.style.setProperty("--p", p.toFixed(4))
   }, [])
   const story = useStoryClock({ durations: DURATIONS, rootRef, onProgress })
   const live = story.epoch > 0 || story.reduced
@@ -43,19 +30,51 @@ export default function DoubtsQA() {
   const [picks, setPicks] = useState(0)
   const verdict = story.index === LAST
   const phase = Math.min(story.index, LAST - 1)
-  const showAuto = side === "auto"
   const sceneProps = {
     phase,
     verdict,
     live,
     running: story.running,
     still: story.reduced,
-    runKey: `${story.index}-${story.epoch}-${picks}-${side}`,
+    runKey: `${story.index}-${story.epoch}-${picks}`,
   }
   const pick = (i) => {
     if (i === story.index) return
     setPicks((n) => n + 1)
     story.go(i, { pause: false })
+  }
+
+  const renderCard = (it, i) => {
+    const active = i === story.index
+    return (
+      <li key={it.q} className="qa__li">
+        <div className={`qa__card ${active ? "is-active" : ""}`} onClick={() => pick(i)}>
+          <h3 className="qa__h">
+            <button type="button" className="qa__q" aria-current={active ? "true" : undefined} onClick={() => pick(i)}>
+              <span className="qa__n">{String(i + 1).padStart(2, "0")}</span>
+              <span>{it.q}</span>
+            </button>
+          </h3>
+          <p className="qa__row qa__row--manual">
+            <b aria-hidden="true">✗</b>
+            <span>
+              <span className="sr-only">{doubts.manualLabel}: </span>
+              {it.manual}
+            </span>
+          </p>
+          <p className="qa__row qa__row--auto">
+            <b aria-hidden="true">✓</b>
+            <span>
+              <span className="sr-only">{doubts.autoLabel}: </span>
+              {it.auto}
+            </span>
+          </p>
+          <span className="qa__bar" aria-hidden="true">
+            <i />
+          </span>
+        </div>
+      </li>
+    )
   }
 
   return (
@@ -72,63 +91,25 @@ export default function DoubtsQA() {
       <LazyMotion features={domAnimation} strict>
         <MotionConfig reducedMotion="user">
           <div ref={rootRef} className="doubts__grid" data-reveal>
-            {/* 75%: the six questions, one lit at a time */}
-            <ol ref={listRef} className="qa">
-              {ITEMS.map((it, i) => {
-                const active = i === story.index
-                return (
-                  <li key={it.q} className="qa__li">
-                    <div className={`qa__card ${active ? "is-active" : ""}`} onClick={() => pick(i)}>
-                      <h3 className="qa__h">
-                        <button type="button" className="qa__q" aria-current={active ? "true" : undefined} onClick={() => pick(i)}>
-                          <span className="qa__n">{String(i + 1).padStart(2, "0")}</span>
-                          <span>{it.q}</span>
-                        </button>
-                      </h3>
-                      <p className="qa__row qa__row--manual">
-                        <b aria-hidden="true">✗</b>
-                        <span>
-                          <span className="sr-only">{doubts.manualLabel}: </span>
-                          {it.manual}
-                        </span>
-                      </p>
-                      <p className="qa__row qa__row--auto">
-                        <b aria-hidden="true">✓</b>
-                        <span>
-                          <span className="sr-only">{doubts.autoLabel}: </span>
-                          {it.auto}
-                        </span>
-                      </p>
-                      <span className="qa__bar" aria-hidden="true">
-                        <i />
-                      </span>
-                    </div>
-                  </li>
-                )
-              })}
+            {/* left: questions 1-3 */}
+            <ol className="qa qa--left">
+              {ITEMS.slice(0, 3).map((it, i) => renderCard(it, i))}
             </ol>
 
-            {/* 25%: Manual plays first (loading bar fills), then Automatic plays */}
-            <aside ref={stageRef} className={`stage ${showAuto ? "is-auto" : ""}`} aria-label={`${doubts.manualLabel} and ${doubts.autoLabel} animation`}>
-              <p className="stage__q" aria-hidden="true">
-                <b>{String(story.index + 1).padStart(2, "0")}</b>
-                {ITEMS[story.index].q}
-              </p>
-              <div className="stage__steps" aria-hidden="true">
-                <span className={`stage__step ${!showAuto ? "is-on" : ""}`}>
-                  <em>{doubts.manualLabel}</em>
-                  <i className="stage__load stage__load--m" />
-                </span>
-                <span className={`stage__step ${showAuto ? "is-on" : ""}`}>
-                  <em>{doubts.autoLabel}</em>
-                  <i className="stage__load stage__load--a" />
-                </span>
+            {/* centre: Manual and Automatic scenes play together, no text */}
+            <div className="stage" aria-label={`${doubts.manualLabel} and ${doubts.autoLabel} animation`}>
+              <div className="stage__scene" role="img" aria-label={doubts.manualLabel}>
+                <ManualScene {...sceneProps} />
               </div>
-              <div className="stage__scene">{showAuto ? <AutoScene {...sceneProps} /> : <ManualScene {...sceneProps} />}</div>
-              <p key={story.index} className="stage__desc">
-                {ITEMS[story.index].desc}
-              </p>
-            </aside>
+              <div className="stage__scene stage__scene--auto" role="img" aria-label={doubts.autoLabel}>
+                <AutoScene {...sceneProps} />
+              </div>
+            </div>
+
+            {/* right: questions 4-6 */}
+            <ol className="qa qa--right">
+              {ITEMS.slice(3).map((it, i) => renderCard(it, i + 3))}
+            </ol>
           </div>
         </MotionConfig>
       </LazyMotion>

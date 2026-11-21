@@ -118,6 +118,10 @@ export default function DashboardSection() {
         </button>
         {open && (
           <div id="dashboard-full" className="dc-more__panel">
+            <div className="dc-sample" role="note">
+              <strong>{dashboard.sampleTitle}</strong>
+              <span>{dashboard.sampleNote}</span>
+            </div>
             <p className="dashboard-section__try t-mono">{dashboard.tryIt}</p>
             <DashboardDemo />
           </div>

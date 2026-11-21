@@ -8,10 +8,10 @@ import { siteConfig } from "../../config/site"
 
 export default function TrustedIndustries() {
   return (
-    <SectionShell id="trusted" theme="night" labelledBy="trusted-title" className="trusted">
+    <SectionShell id="trusted" theme="light" labelledBy="trusted-title" className="trusted">
       <header className="section-head section-head--center">
         <h2 id="trusted-title" className="t-h2" data-reveal>
-          <Marked text={trusted.headline} phrase="behind the engine." tone="dark" />
+          <Marked text={trusted.headline} phrase="behind the engine." tone="light" />
         </h2>
         <p className="t-lead" data-reveal>
           {trusted.sub}

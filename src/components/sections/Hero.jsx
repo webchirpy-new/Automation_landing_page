@@ -61,18 +61,21 @@ export default function Hero() {
     const check = () => {
       const fr = fold.getBoundingClientRect()
       const keep = [...fold.querySelectorAll(".hero__center > *, .hero__meta > *")].map((el) => el.getBoundingClientRect())
-      fold.querySelectorAll(".htile").forEach((t) => {
+      // Read every box first, then write the classes, so the browser lays out once (no forced reflow per tile)
+      const pad = window.innerWidth <= 767 ? 12 : window.innerWidth <= 1024 ? 15 : 18
+      const tiles = [...fold.querySelectorAll(".htile")]
+      const results = tiles.map((t) => {
         const s = t.offsetWidth
         const left = fr.left + t.offsetLeft
         const top = fr.top + t.offsetTop
         // Clearance covers the widest idle drift at this size (14 / 10 / 6 px), so a floating
         // tile never reaches the copy
-        const pad = window.innerWidth <= 767 ? 12 : window.innerWidth <= 1024 ? 15 : 18
         const r = { left: left - pad, top: top - pad, right: left + s + pad, bottom: top + s + pad }
         const outside = r.left < fr.left || r.right > fr.right || r.top < fr.top || r.bottom > fr.bottom
         const hit = keep.some((k) => r.left < k.right && r.right > k.left && r.top < k.bottom && r.bottom > k.top)
-        t.classList.toggle("is-blocked", outside || hit)
+        return outside || hit
       })
+      tiles.forEach((t, i) => t.classList.toggle("is-blocked", results[i]))
     }
     check()
     const ro = new ResizeObserver(check)

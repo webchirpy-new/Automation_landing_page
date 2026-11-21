@@ -26,6 +26,17 @@ function VideoCard({ item, index, active, onActivate, onEnded }) {
   const [muted, setMuted] = useState(false)
   const [duration, setDuration] = useState(NaN)
   const [progress, setProgress] = useState(0)
+  const [near, setNear] = useState(false)
+  const frame = useRef(null)
+
+  // Nothing is downloaded until the card is close to the screen (these four files are ~6 MB together)
+  useEffect(() => {
+    const el = frame.current
+    if (!el || !("IntersectionObserver" in window)) return setNear(true)
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && (setNear(true), io.disconnect()), { rootMargin: "300px 0px" })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   // Another card took over: pause this one.
   useEffect(() => {
@@ -51,12 +62,12 @@ function VideoCard({ item, index, active, onActivate, onEnded }) {
 
   return (
     <li className="vt-card" data-playing={playing || undefined} data-active={active || undefined} style={{ "--k": index }}>
-      <div className="vt-frame">
+      <div className="vt-frame" ref={frame}>
         <video
           ref={video}
           className="vt-video"
-          src={`${item.src}#t=${item.poster}`}
-          preload="metadata"
+          src={near ? `${item.src}#t=${item.poster}` : undefined}
+          preload={near ? "metadata" : "none"}
           playsInline
           muted={muted}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}

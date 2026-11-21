@@ -5,34 +5,42 @@
  */
 export const painPoints = [
   {
+    tag: "Slow replies",
     title: "Paid leads that leak",
     text: "You pay for every enquiry, then reply hours later. By then the lead has already called someone faster.",
   },
   {
+    tag: "Response time",
     title: "The 5-minute lead test",
     text: "Send your own business a test enquiry and time the reply. Miss 5 minutes and the sale tends to go to a competitor.",
   },
   {
+    tag: "No visibility",
     title: "Yesterday's numbers",
     text: "Leads, follow-ups and payments sit in sheets and chats, so you learn how yesterday went by calling around.",
   },
   {
+    tag: "Manual entry",
     title: "Your best people, doing data entry",
     text: "The same details get typed into a sheet, the CRM and the invoice, all day. Your strongest team is copying, not selling.",
   },
   {
+    tag: "Hours wasted",
     title: "From 6 hours to 2 minutes",
     text: "A report that eats a morning by hand can be ready in minutes once the data moves on its own.",
   },
   {
+    tag: "Disconnected apps",
     title: "Ten apps. Zero connection.",
     text: "You pay for a CRM, accounts, WhatsApp and Sheets, yet your team still copies data between them.",
   },
   {
+    tag: "Running on memory",
     title: "Are you really running your business?",
     text: "If you can't say who replied, what's overdue and what's unpaid without calls, you're running on memory.",
   },
   {
+    tag: "AI reality check",
     title: "Using AI, or just talking about it?",
     text: "A ChatGPT caption now and then isn't adoption. Real automation reads enquiries and updates records daily.",
   },
