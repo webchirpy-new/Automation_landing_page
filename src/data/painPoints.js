@@ -46,7 +46,10 @@ export const painPoints = [
   },
 ]
 
+// Bump when a clip in public/pain is replaced: the server caches .mp4 for 30 days under the same URL
+const PAIN_VERSION = 2
+
 export const painVideo = (i) => ({
-  src: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.mp4`,
-  poster: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.jpg`,
+  src: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.mp4?v=${PAIN_VERSION}`,
+  poster: `${import.meta.env.BASE_URL}pain/pain-${i + 1}.jpg?v=${PAIN_VERSION}`,
 })
