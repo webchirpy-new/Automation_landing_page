@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Original 1080p masters (354 MB) - kept off git; compressed copies are in source-videos-small/
+source-videos/
