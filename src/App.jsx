@@ -1,31 +1,50 @@
-import React, { useEffect } from "react"
+import React, { Suspense, lazy, useEffect, useState } from "react"
 import { initSmoothScroll } from "./lib/smoothScroll"
 import { SiteProvider } from "./context/SiteContext"
 import WhatsAppButton from "./components/layout/WhatsAppButton"
 import SiteModals from "./components/layout/SiteModals"
 import Hero from "./components/sections/Hero"
-import Pattern from "./components/sections/Pattern"
 // import Comparison from "./components/sections/Comparison" // hidden: merged into DoubtsQA
-import DoubtsQA from "./components/sections/DoubtsQA"
-import ScorecardSection from "./components/sections/ScorecardSection"
-import EngineSection from "./components/sections/EngineSection"
-import DashboardSection from "./components/sections/DashboardSection"
 // import Proof from "./components/sections/Proof" // hidden: merged into DoubtsQA
-import WhyWebchirpy from "./components/sections/WhyWebchirpy"
-import TrustedIndustries from "./components/sections/TrustedIndustries"
 // import AudienceFit from "./components/sections/AudienceFit" // hidden for now
-import FAQ from "./components/sections/FAQ"
-import AuditOffer from "./components/sections/AuditOffer"
-import WalkIn from "./components/sections/WalkIn"
-import FinalCTA from "./components/sections/FinalCTA"
 import PageSections from "./components/page-sections/PageSections"
 import { landOnHash } from "./lib/scroll"
+import { ScrollTrigger } from "./lib/gsap"
+
+// Sections under the first screen are a separate chunk, fetched once the hero has painted
+const loadBelowFold = () => import("./components/sections/BelowFold")
+const Sections = lazy(() => loadBelowFold().then((m) => ({ default: m.Sections })))
+const Footer = lazy(() => loadBelowFold().then((m) => ({ default: m.Footer })))
+
+/** true once the rest of the page should load: on idle, on the first scroll/touch/key, or straight away for #deep-links */
+function useBelowFold() {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    if (window.location.hash.length > 1) return setReady(true)
+    const go = () => setReady(true)
+    const events = ["scroll", "pointerdown", "keydown", "touchstart"]
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+    const idle = window.requestIdleCallback ? window.requestIdleCallback(go, { timeout: 2500 }) : setTimeout(go, 1500)
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, go))
+      window.cancelIdleCallback ? window.cancelIdleCallback(idle) : clearTimeout(idle)
+    }
+  }, [])
+  return ready
+}
 
 /**
  * 14 sections in the exact DOCX order, alternating light chapters with
  * full-bleed dark chapters. Sections meet cleanly — no connectors between them.
  */
 export default function App() {
+  const belowFold = useBelowFold()
+  // The page grows when the lower sections arrive: re-measure scroll triggers once they have mounted
+  useEffect(() => {
+    if (!belowFold) return undefined
+    const t = setTimeout(() => ScrollTrigger.refresh(), 800)
+    return () => clearTimeout(t)
+  }, [belowFold])
   useEffect(() => initSmoothScroll(), [])
   // Ad deep links (#story, #test, #connects …) land on their section once the page has rendered
   useEffect(() => landOnHash(), [])
@@ -38,21 +57,17 @@ export default function App() {
         <Hero />
         {/* Landing pages 5–8: the page's own section(s) from Launch Kit 04 */}
         <PageSections />
-        <Pattern />
-        {/* <Comparison /> hidden for now */}
-        <DoubtsQA />
-        <ScorecardSection />
-        <EngineSection />
-        <DashboardSection />
-        {/* <Proof /> hidden for now; DoubtsQA (id="proof") replaces Comparison + Proof + Walk in/away */}
-        <WhyWebchirpy />
-        {/* <AudienceFit /> hidden for now ("Built for owners who are ready to work smarter") */}
-        <AuditOffer />
-        <TrustedIndustries />
-        <FAQ />
-        <WalkIn />
+        {belowFold && (
+          <Suspense fallback={<div aria-hidden="true" style={{ minHeight: "300vh" }} />}>
+            <Sections />
+          </Suspense>
+        )}
       </main>
-      <FinalCTA />
+      {belowFold && (
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      )}
       <WhatsAppButton />
       <SiteModals />
     </SiteProvider>
