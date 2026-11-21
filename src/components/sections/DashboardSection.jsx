@@ -21,7 +21,7 @@ import DashboardDemo from "../interactions/DashboardDemo"
  */
 const S = uiCopy.stories.dashboard
 const FLOW = dashboard.flow
-const STAGE_MS = [2600, 4000, 5400]
+const STAGE_MS = [1800, 2800, 4500]
 const EASE = [0.22, 1, 0.36, 1]
 // Picking a stage or a decision never freezes the story: it jumps there and keeps looping
 const KEEP_PLAYING = { pause: false, resume: true }

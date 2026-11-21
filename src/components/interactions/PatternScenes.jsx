@@ -26,7 +26,6 @@ import {
 import { siWhatsapp } from "simple-icons"
 import { pattern, uiCopy } from "../../data/automationContent"
 import { Marked } from "../ui/Highlight"
-import { Eyebrow } from "../ui/primitives"
 import { useStoryClock } from "../../hooks/useStoryClock"
 import { useMediaQuery } from "../../hooks/useMediaQuery"
 
@@ -790,16 +789,13 @@ export default function PatternScenes() {
     <div className="ptn">
       <header className="ptn-head">
         <div data-reveal>
-          <Eyebrow>{pattern.label}</Eyebrow>
           <h2 id="pattern-title" className="t-h2 ptn-h">
             {lead} <Marked text={question} phrase="slipping through?" tone="dark" />
           </h2>
         </div>
-        <ul className="iw-points" aria-label={s.pointsLabel} data-reveal>
-          {pattern.chips.map((c) => (
-            <li key={c}>{c}</li>
-          ))}
-        </ul>
+        <p className="iw-points" data-reveal>
+          {pattern.chips.join(", ")}
+        </p>
       </header>
 
       {/* The three moments in full, for screen readers; the motion shows them one at a time */}

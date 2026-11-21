@@ -12,7 +12,8 @@ import { Marked } from "../ui/Highlight"
 export default function WalkIn() {
   const { summary } = useSite()
   return (
-    <SectionShell id="decide" theme="light" labelledBy="walk-title" className="walk">
+    <SectionShell id="decide" theme="light" labelledBy="book-title" className="walk">
+      {/* Hidden for now (merged into DoubtsQA): "Walk in, or walk away" header + choices
       <header className="section-head section-head--center">
         <h2 id="walk-title" className="t-h2" data-reveal>
           <Marked text={walk.headline} phrase="Walk in" tone="light" />
@@ -73,6 +74,8 @@ export default function WalkIn() {
         </article>
       </div>
 
+      */}
+
       <div className="booking">
         <div className="booking__side">
           <h3 className="t-mono booking__steps-title">{walk.stepsTitle}</h3>
@@ -89,7 +92,6 @@ export default function WalkIn() {
           </ol>
           <div className="ps" data-reveal>
             <p>{walk.ps}</p>
-            <p>{walk.pps}</p>
           </div>
         </div>
 

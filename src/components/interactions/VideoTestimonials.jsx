@@ -114,7 +114,7 @@ export default function VideoTestimonials({ heading, phrase }) {
     <div className="vt">
       <header className="vt-head">
         <h3 className="t-h2 vt-title" data-reveal>
-          <Marked text={heading} phrase={phrase} tone="light" />
+          <Marked text={heading} phrase={phrase} tone="dark" />
         </h3>
         <p className="vt-sub t-mono" data-reveal>
           <span className="vt-sub__dot" aria-hidden="true" />

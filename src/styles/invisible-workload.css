@@ -44,11 +44,7 @@
   align-items: center;
   gap: clamp(24px, 3vw, 48px);
   padding: clamp(24px, 3vw, 40px) clamp(16px, 2.6vw, 40px);
-  border-block: 1px solid rgba(255, 255, 255, 0.075);
-  background:
-    radial-gradient(ellipse 50% 70% at 28% 50%, rgba(83, 102, 164, 0.12), transparent 70%),
-    radial-gradient(ellipse 40% 60% at 80% 50%, rgba(110, 80, 190, 0.05), transparent 70%),
-    #0c0d10;
+  background: none;
 }
 
 /* ---------- The 3D interface ---------- */
@@ -1083,8 +1079,8 @@
   min-height: 23.5rem;
 }
 .iw-line {
-  max-width: 15ch;
-  font-size: clamp(2rem, 1.2rem + 2vw, 3rem);
+  max-width: 18ch;
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.125rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;

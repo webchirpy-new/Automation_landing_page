@@ -954,12 +954,12 @@
 /* Lit once the line has reached it. Under reduced motion all three simply show as complete. */
 .story__icon.is-active {
   border-color: var(--accent);
-  background-color: #10142a;
+  background-color: var(--accent-wash);
 }
 @media (prefers-reduced-motion: reduce) {
   .story__icon {
     border-color: var(--accent);
-    background-color: #10142a;
+    background-color: var(--accent-wash);
   }
 }
 /* Feathered to nothing at its edge, so no hard shape shows. GSAP animates only its opacity. */
@@ -1070,9 +1070,21 @@
 }
 .why__founder-copy {
   display: grid;
+  justify-items: start;
   gap: 14px;
-  margin-top: clamp(48px, 6vw, 80px);
-  max-width: 52rem;
+  margin-top: clamp(40px, 4vw, 56px);
+  padding-top: clamp(28px, 3vw, 36px);
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.why__founder-intro {
+  max-width: 40rem;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.1875rem);
+  line-height: 1.6;
+  color: var(--muted);
+}
+.why__founder-copy > .btn {
+  margin-top: 10px;
 }
 .diffs {
   display: grid;
@@ -1297,6 +1309,21 @@
 .bc__dots li.is-active .bc__dot::before {
   width: var(--dot-on);
   background: var(--neo-green);
+}
+/* On the dark Trusted section: a dark glass pill with brighter dots and light arrows */
+.section--night .bc__pill {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+.section--night .bc__dot::before {
+  background: rgba(255, 255, 255, 0.28);
+}
+.section--night .bc__dots li.is-active .bc__dot::before {
+  background: linear-gradient(90deg, #8f9cff, #c9a4ff);
+}
+.section--night .bc__arrow {
+  color: #dfe4ff;
 }
 @media (hover: hover) {
   .bc__dots li:not(.is-active) .bc__dot:hover::before {

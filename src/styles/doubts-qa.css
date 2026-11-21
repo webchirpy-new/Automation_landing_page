@@ -1,0 +1,274 @@
+/* Same doubts. Different outcome. — 75% question cards, 25% Manual→Automatic animation */
+.doubts__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: clamp(24px, 3.5vw, 44px);
+  align-items: stretch;
+}
+@media (min-width: 1000px) {
+  .doubts__grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+@media (max-width: 999px) {
+  .stage {
+    order: -1;
+    max-width: 440px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+/* ---------- Question cards (2 columns × 3 rows) ---------- */
+.qa {
+  --p: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 640px) {
+  .qa {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+  }
+}
+.qa__li {
+  display: flex;
+}
+.qa__card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s, transform 0.3s var(--ease-out);
+}
+.qa__card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+.qa__card.is-active {
+  border-color: #b9b2f0;
+  background: linear-gradient(135deg, #f7f5ff, #eef7fb);
+  box-shadow: 0 0 0 4px rgba(91, 75, 214, 0.08), var(--shadow-2);
+}
+.qa__h {
+  margin: 0;
+}
+.qa__q {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.qa__n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: -3px;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #3d33a0;
+  background: #efecff;
+  transition: color 0.3s, background 0.3s;
+}
+.is-active .qa__n {
+  color: #fff;
+  background: linear-gradient(135deg, #5b4bd6, #b05fd0);
+}
+.qa__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding-left: 42px;
+  font-size: 0.9688rem;
+  line-height: 1.45;
+}
+.qa__row b {
+  flex: none;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.qa__row--manual {
+  color: var(--muted);
+}
+.qa__row--manual b {
+  color: #d4455a;
+}
+.qa__row--auto {
+  color: var(--ink);
+  font-weight: 600;
+}
+.qa__row--auto b {
+  color: #3d33a0;
+}
+.qa__bar {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: transparent;
+}
+.qa__bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #5b4bd6, #b05fd0);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.qa__card.is-active .qa__bar i {
+  transform: scaleX(var(--p));
+}
+
+/* ---------- Animation panel ---------- */
+.stage {
+  --m: 0;
+  --a: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fbfbfe, #f1f2f9);
+  box-shadow: var(--shadow-2);
+  transition: background 0.5s;
+}
+.stage.is-auto {
+  background: linear-gradient(180deg, #f8f6ff, #e8f3fa);
+}
+.stage__q {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 2px 2px 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  min-height: 2.6em;
+}
+.stage__q b {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  color: #fff;
+  background: linear-gradient(135deg, #5b4bd6, #b05fd0);
+}
+
+/* two-step loader: Manual, then Automatic */
+.stage__steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stage__step {
+  display: grid;
+  gap: 5px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.stage__step.is-on {
+  opacity: 1;
+}
+.stage__step em {
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stage__step.is-on em {
+  color: var(--ink);
+}
+.stage__load {
+  position: relative;
+  display: block;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(17, 17, 17, 0.09);
+  overflow: hidden;
+}
+.stage__load::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  border-radius: inherit;
+}
+.stage__load--m::after {
+  background: #2b2f3a;
+  transform: scaleX(var(--m));
+}
+.stage__load--a::after {
+  background: linear-gradient(90deg, #5b4bd6, #1d8fb0);
+  transform: scaleX(var(--a));
+}
+
+.stage__scene {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.stage__scene .rx-scene {
+  margin: 0;
+}
+
+/* one-line description of the lit question, pinned to the bottom of the full-height panel */
+.stage__desc {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  animation: stage-in 0.4s var(--ease-out) both;
+}
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.doubts__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qa__card,
+  .stage,
+  .stage__step {
+    transition: none;
+  }
+}

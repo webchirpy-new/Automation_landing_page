@@ -10,7 +10,6 @@ import { MOTION_OK } from "../../lib/motionTokens"
 import { Marked } from "../ui/Highlight"
 
 const STORY_ICONS = ["cross", "backOffice", "check"] // problem → build → tested
-const DIFF_ICONS = ["leadCapture", "check", "insights"]
 const PULSE = { scale: 1.08, rise: 0.26, hold: 0.1, fall: 0.5 } // seconds
 
 export default function WhyWebchirpy() {
@@ -105,11 +104,11 @@ export default function WhyWebchirpy() {
   )
 
   return (
-    <SectionShell id="why" theme="night" labelledBy="why-title" className="why">
+    <SectionShell id="why" theme="light" labelledBy="why-title" className="why">
       <div ref={ref}>
         <header className="section-head section-head--center">
           <h2 id="why-title" className="t-h2 why__title" data-reveal>
-            <Marked text={why.headline} phrase="Webchirpy." tone="dark" />
+            <Marked text={why.headline} phrase="Webchirpy." tone="light" />
           </h2>
           <p className="t-lead" data-reveal>
             {why.sub}
@@ -128,6 +127,7 @@ export default function WhyWebchirpy() {
         </ul>
 
         <div className="why__split">
+          <div className="why__left">
           <div className="story">
             <h3 className="t-mono story__title">{why.storyTitle}</h3>
             <span className="story__line" aria-hidden="true">
@@ -147,6 +147,18 @@ export default function WhyWebchirpy() {
                 </li>
               ))}
             </ol>
+          </div>
+
+          {/* Founder note + the booking CTA, in the left column beside the portrait */}
+          <div className="why__founder-copy" data-reveal>
+            <h3 className="t-h3">
+              You'll work directly with <Marked text="Vasanth Sampathkumar." phrase="Vasanth Sampathkumar." tone="light" />
+            </h3>
+            <p className="why__founder-intro">{why.founderIntro}</p>
+            <CTAButton size="lg" onClick={() => openModal("lead")}>
+              {why.button}
+            </CTAButton>
+          </div>
           </div>
 
           <div className="founder">
@@ -172,34 +184,6 @@ export default function WhyWebchirpy() {
           </div>
         </div>
 
-        <div className="why__founder-copy">
-          <h3 className="t-h3" data-reveal>
-            {why.founderHeadline}
-          </h3>
-          <p className="t-lead" data-reveal>
-            {why.founderIntro}
-          </p>
-        </div>
-
-        <ul className="diffs">
-          {why.differences.map((d, i) => (
-            <li key={d.title} className="diff px-host" data-reveal>
-              <span className="diff__icon">
-                <PixelIcon name={DIFF_ICONS[i]} size={22} />
-              </span>
-              <p className="t-mono diff__kicker">{d.kicker}</p>
-              <h4 className="diff__title">{d.title}</h4>
-              <p className="t-muted">{d.body}</p>
-            </li>
-          ))}
-        </ul>
-
-        <div className="why__close" data-reveal>
-          <p className="t-h3">{why.closingLine}</p>
-          <CTAButton size="lg" onClick={() => openModal("lead")}>
-            {why.button}
-          </CTAButton>
-        </div>
       </div>
     </SectionShell>
   )

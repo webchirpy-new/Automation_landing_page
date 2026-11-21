@@ -5,14 +5,15 @@ import WhatsAppButton from "./components/layout/WhatsAppButton"
 import SiteModals from "./components/layout/SiteModals"
 import Hero from "./components/sections/Hero"
 import Pattern from "./components/sections/Pattern"
-import Comparison from "./components/sections/Comparison"
+// import Comparison from "./components/sections/Comparison" // hidden: merged into DoubtsQA
+import DoubtsQA from "./components/sections/DoubtsQA"
 import ScorecardSection from "./components/sections/ScorecardSection"
 import EngineSection from "./components/sections/EngineSection"
 import DashboardSection from "./components/sections/DashboardSection"
-import Proof from "./components/sections/Proof"
+// import Proof from "./components/sections/Proof" // hidden: merged into DoubtsQA
 import WhyWebchirpy from "./components/sections/WhyWebchirpy"
 import TrustedIndustries from "./components/sections/TrustedIndustries"
-import AudienceFit from "./components/sections/AudienceFit"
+// import AudienceFit from "./components/sections/AudienceFit" // hidden for now
 import FAQ from "./components/sections/FAQ"
 import AuditOffer from "./components/sections/AuditOffer"
 import WalkIn from "./components/sections/WalkIn"
@@ -38,14 +39,15 @@ export default function App() {
         {/* Landing pages 5–8: the page's own section(s) from Launch Kit 04 */}
         <PageSections />
         <Pattern />
-        <Comparison />
+        {/* <Comparison /> hidden for now */}
+        <DoubtsQA />
         <ScorecardSection />
         <EngineSection />
         <DashboardSection />
-        <Proof />
+        {/* <Proof /> hidden for now; DoubtsQA (id="proof") replaces Comparison + Proof + Walk in/away */}
         <WhyWebchirpy />
         <TrustedIndustries />
-        <AudienceFit />
+        {/* <AudienceFit /> hidden for now ("Built for owners who are ready to work smarter") */}
         <FAQ />
         <AuditOffer />
         <WalkIn />

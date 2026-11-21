@@ -2288,15 +2288,26 @@
 .eg-details__kicker {
   color: var(--accent-ink);
 }
+.eg-details__stage {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
 .eg-details__title {
   display: flex;
   align-items: baseline;
   gap: 8px;
   margin-top: -4px;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   line-height: 1.2;
+  color: var(--accent-ink);
 }
 .eg-details__num {
   font-size: 0.8125rem;

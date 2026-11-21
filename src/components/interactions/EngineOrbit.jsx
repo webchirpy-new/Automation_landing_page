@@ -57,13 +57,16 @@ function pathway(i) {
 /** One part's "What it covers" card. Only the active part's card is shown (the rest are stacked
  *  under it, hidden), and only its chips can take focus. */
 function Details({ part, n, active, onPick }) {
+  // The workflow stage this part belongs to (e.g. Lead Capture + Instant Reply → "Answer every customer")
+  const stage = engine.stages.find((s) => s.parts.includes(part.part))
+  const stageNo = stage ? engine.stages.indexOf(stage) + 1 : 0
   return (
     <div className={`eg-details ${active ? "is-active" : ""}`} aria-hidden={!active}>
-      <p className="eg-details__kicker t-mono">{S.detailsShow}</p>
-      <p className="eg-details__title">
-        <span className="eg-details__num">{String(n).padStart(2, "0")}</span>
-        {part.part}
+      <p className="eg-details__stage">
+        {stageNo > 0 && <span className="eg-details__num">{String(stageNo).padStart(2, "0")}</span>}
+        {stage?.title ?? S.detailsShow}
       </p>
+      <p className="eg-details__title">{part.part}</p>
       <ul className="eg-details__list">
         {part.cover.map((c) => (
           <li key={c}>

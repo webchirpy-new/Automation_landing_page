@@ -2,7 +2,6 @@ import React from "react"
 import { engine } from "../../data/automationContent"
 import { SectionShell } from "../ui/primitives"
 import EngineOrbit from "../interactions/EngineOrbit"
-import LivingWorkflow from "../interactions/LivingWorkflow"
 import { Marked } from "../ui/Highlight"
 
 export default function EngineSection() {
@@ -20,16 +19,9 @@ export default function EngineSection() {
       {/* The eight parts as one living engine (replaces the card navigator, EngineExplorer) */}
       <EngineOrbit />
 
+      {/* The workflow-stage diagram (LivingWorkflow) is merged into the cards above: each part's card
+          now carries its stage heading. */}
       <div className="cycle">
-        <header className="cycle__head">
-          <h3 className="t-h3" data-reveal>
-            {engine.cycleHeading}
-          </h3>
-          <p className="t-muted" data-reveal>
-            {engine.cycleSub}
-          </p>
-        </header>
-        <LivingWorkflow />
         <p className="engine-section__closing t-h3" data-reveal>
           {engine.closing}
         </p>

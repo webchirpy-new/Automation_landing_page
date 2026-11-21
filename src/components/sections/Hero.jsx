@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react"
 import { uiCopy, trusted } from "../../data/automationContent"
-import { pageHero as hero } from "../../data/landingPages"
+import { pageHero as hero, pageId } from "../../data/landingPages"
+import PainShowcase from "./PainShowcase"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
 import SpaceAtmosphere from "../atmosphere/SpaceAtmosphere"
@@ -186,6 +187,32 @@ export default function Hero() {
   const showVideo = false // hidden for now; set back to true to show the founder video card
   const showResults = Array.isArray(hero.results) && hero.results.length > 0
   const ListTag = list?.ordered ? "ol" : "ul"
+  // Video carousel + 8 pain points + stats: page 1 only. Other pages keep their own layout.
+  const showPain = pageId === "vsl-01" && showResults
+
+  const resultsPanel = showResults ? (
+    <div className="results" aria-labelledby="results-title">
+      <h2 id="results-title" className="results__title t-h3">
+        {hero.resultsHeading}
+      </h2>
+      <ul className="results__list">
+        {hero.results.map((r, i) => {
+          const m = r.value.match(COUNTABLE)
+          return (
+            <li key={`${r.value}-${i}`}>
+              {m ? (
+                <CountUp value={parseInt(m[1], 10)} suffix={m[2] || ""} className="results__value" />
+              ) : (
+                <span className={`results__value${r.value.length >= 6 ? " results__value--text" : ""}`}>{r.value}</span>
+              )}
+              <span className="results__label">{r.label}</span>
+            </li>
+          )
+        })}
+      </ul>
+      <p className={`results__source${hero.footnote.mono ? " t-mono" : ""}`}>{hero.footnote.text}</p>
+    </div>
+  ) : null
 
   const openPart = (id) => {
     const part = toolRoutes[id]?.[0]
@@ -303,7 +330,9 @@ export default function Hero() {
           </aside>
         )}
 
-        {(showVideo || showResults) && (
+        {showPain && <PainShowcase>{resultsPanel}</PainShowcase>}
+
+        {!showPain && (showVideo || showResults) && (
         <div className={`hero__proof-grid${showVideo && showResults ? "" : " hero__proof-grid--single"}`}>
           {showVideo && (
             <button type="button" className="video-card" onClick={() => openModal("video:founder")}>
@@ -318,29 +347,7 @@ export default function Hero() {
             </button>
           )}
 
-          {showResults && (
-          <div className="results" aria-labelledby="results-title">
-            <h2 id="results-title" className="results__title t-h3">
-              {hero.resultsHeading}
-            </h2>
-            <ul className="results__list">
-              {hero.results.map((r, i) => {
-                const m = r.value.match(COUNTABLE)
-                return (
-                  <li key={`${r.value}-${i}`}>
-                    {m ? (
-                      <CountUp value={parseInt(m[1], 10)} suffix={m[2] || ""} className="results__value" />
-                    ) : (
-                      <span className={`results__value${r.value.length >= 6 ? " results__value--text" : ""}`}>{r.value}</span>
-                    )}
-                    <span className="results__label">{r.label}</span>
-                  </li>
-                )
-              })}
-            </ul>
-            <p className={`results__source${hero.footnote.mono ? " t-mono" : ""}`}>{hero.footnote.text}</p>
-          </div>
-          )}
+          {resultsPanel}
         </div>
         )}
       </div>

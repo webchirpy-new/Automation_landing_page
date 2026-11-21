@@ -20,7 +20,8 @@ export const hero = {
   headline: "You're paying for leads. Where are they going?",
   punchLine: "Find the leaks.",
   body:
-    "More leads will not fix a leaking process. Enquiries slip through late replies, forgotten follow-ups and inboxes nobody checks. The AI Automation Engine captures every lead from every channel, replies instantly and follows up until the customer responds.",
+    "More leads won't fix a leaking process. Our AI Automation Engine catches every enquiry, replies instantly and follows up until the customer responds.",
+  // "Where leads leak" list — kept for later use, currently hidden (page 1 sets `list: null` in landingPages.js)
   listTitle: "Where leads leak",
   leaks: [
     "Website forms checked once a day",
@@ -29,12 +30,12 @@ export const hero = {
     "No record of which leads became customers",
   ],
   logoStripHeading: "Businesses that trust Webchirpy",
-  videoCaption: "Watch first: Vasanth Sampathkumar on why leads leak, and how AI catches every one",
-  resultsHeading: "Why every minute decides who wins the lead",
+  videoCaption: "Watch first: Vasanth Sampathkumar on why leads leak",
+  resultsHeading: "Every minute decides who wins the lead",
   results: [
-    { value: "7x", label: "More likely to qualify a lead when you reply within an hour" },
-    { value: "60x", label: "More likely than businesses that wait a day to reply" },
-    { value: "23%", label: "Of companies never reply to an online lead at all" },
+    { value: "7x", label: "More likely to qualify a lead if you reply within an hour" },
+    { value: "60x", label: "Better odds than waiting a day to reply" },
+    { value: "23%", label: "Of companies never reply to a lead at all" },
   ],
   // REQUIRES STAT SOURCE CONFIRMATION — this line describes a Webchirpy project,
   // not the origin of the figures above. Rendered only when siteConfig.showHeroSourceLine.
@@ -46,24 +47,23 @@ export const hero = {
 
 /* 02 — THE PATTERN */
 export const pattern = {
-  headline: "You work hard every day. So why does work keep slipping through?",
+  headline: "You work hard. So why does work keep slipping through?",
   chips: [
-    "A team that works long hours",
-    "Customers who want to buy",
-    "Website, WhatsApp, sheets and software already in place",
+    "Hardworking team",
+    "Customers ready to buy",
+    "Tools in place",
   ],
   label: "The pattern",
   lines: [
-    "The enquiry waits till morning.",
-    "The report takes all of Friday.",
-    "The follow-up waits for someone to remember.",
+    "Enquiries wait till morning.",
+    "Reports eat your Friday.",
+    "Follow-ups wait on memory.",
   ],
-  sameTeam: "Same team. Same effort. And hours still disappear.",
+  sameTeam: "Same team. And hours still disappear.",
   chartTitle: "Where your team's week goes",
   chartLabels: ["Customer work", "Manual work", "Repeat replies", "Data entry", "Chasing follow-ups"],
-  closingLine:
-    "It is not your team's effort, and not the number of leads. It is the work nobody should be doing by hand.",
-  subLine: "Same hardworking team. Hours back every week.",
+  closingLine: "It's not effort. It's work nobody should be doing by hand.",
+  subLine: "Get those hours back, every week.",
   button: "BOOK MY FREE AUTOMATION AUDIT →",
 }
 
@@ -509,9 +509,8 @@ export const engine = {
 /* 06 — DASHBOARD */
 export const dashboard = {
   label: "Your automation control room",
-  headline: "One screen. Eight parts. Data, Dashboard, Decisions.",
-  sub:
-    "Every part of the engine reports to one screen. You see what is running, how much time it saved, and exactly what to do next.",
+  headline: "Your whole business. One screen.",
+  sub: "See what's running, the time saved and your next move.",
   flow: [
     {
       title: "Data",
@@ -570,6 +569,53 @@ export const proof = {
   lineUnder: "Built and tested by Webchirpy on real business workflows.",
 }
 
+/* 07b — SAME DOUBTS, DIFFERENT OUTCOME (merged Q&A: replaces Comparison, Proof and Walk in/away) */
+export const doubts = {
+  headline: "Same doubts. Different outcome.",
+  sub: "Six questions every business asks. Watch both rooms answer each one.",
+  manualLabel: "Manual",
+  autoLabel: "Automatic",
+  items: [
+    {
+      q: "Can we reply to every customer fast enough?",
+      manual: "Enquiries land in five inboxes and wait.",
+      auto: "Captured in one place, answered in seconds.",
+      desc: "Enquiries from ads, forms and WhatsApp land in one place and get an instant reply.",
+    },
+    {
+      q: "What happens to enquiries after hours?",
+      manual: "They wait till morning, and buy elsewhere.",
+      auto: "The AI assistant replies, qualifies and books, 24/7.",
+      desc: "Leads that arrive at midnight are answered, qualified and booked while you sleep.",
+    },
+    {
+      q: "Who follows up after \"I'll think about it\"?",
+      manual: "Whoever remembers.",
+      auto: "Follow-ups go out on time until they respond.",
+      desc: "Every lead gets follow-ups on a schedule, so ad spend never goes cold.",
+    },
+    {
+      q: "How many hours go on copy-paste and data entry?",
+      manual: "Hours of copy-paste, invoices and reports.",
+      auto: "Routine work runs itself.",
+      desc: "Reports, invoices and data entry fill themselves. No more Friday copy-paste.",
+    },
+    {
+      q: "Do we need another hire to grow?",
+      manual: "More work means hiring more people.",
+      auto: "More work, same team, clear numbers on one screen.",
+      desc: "Take on more leads and clients with the same team, with the numbers on one screen.",
+    },
+    {
+      q: "What does it cost to find out?",
+      manual: "Another month of work a machine could do.",
+      auto: "One free call: 15–30 minutes, no obligation.",
+      desc: "A free 15–30 minute call shows exactly what to automate first.",
+    },
+  ],
+  button: "BOOK MY FREE AUTOMATION AUDIT →",
+}
+
 /* 08 — WHY WEBCHIRPY */
 export const why = {
   label: "Why businesses work with us",
@@ -606,7 +652,7 @@ export const why = {
   },
   founderHeadline: "You'll work directly with Vasanth Sampathkumar.",
   founderIntro:
-    "Not a salesperson reading from a script. The person who has spent 13+ years building digital systems for businesses, and now builds the automation behind them.",
+    "Not a salesperson reading from a script. A founder with 13+ years of building digital systems for businesses, who now builds the automation behind them.",
   differences: [
     {
       kicker: "Business first, tech second",
@@ -809,9 +855,9 @@ export const walk = {
     { title: "Decide", body: "Do it yourself, or with us" },
   ],
   form: {
-    tag: "Free · no obligation · Limited slots",
-    heading: "Limited slots this month. Book fast.",
-    sub: "15–30 minute call. Automation checklist included.",
+    tag: "Free · No obligation",
+    heading: "Find out what to automate first.",
+    sub: "One 15–30 minute call. You leave with a clear plan and our 8-area automation checklist.",
     fields: {
       name: "Full name",
       business: "Business name",
@@ -822,8 +868,7 @@ export const walk = {
     button: "BOOK MY FREE AUDIT →",
     privacy: "Your details are only used to book your call.",
   },
-  ps: "P.S. The call is free and the audit is yours. The only thing you can lose is another month of work a machine could do.",
-  pps: "P.P.S. We take on only a limited number of automation projects each month, so each one gets proper attention. Slots fill fast. If you are serious, book today.",
+  ps: "The call is free and the audit is yours to keep. We take on only a few projects each month, so book your slot today. The only thing you risk is another month of work a machine could do.",
 }
 
 /* 14 — FINAL CTA + FOOTER */
@@ -901,9 +946,9 @@ export const uiCopy = {
   scenes: {
     // One supporting line under each approved headline (pattern.lines), in the same order
     support: [
-      "A customer asks. Nobody replies in time.",
-      "Hours disappear into copy-paste work.",
-      "Interested customers are left waiting.",
+      "A buyer asks. Nobody answers in time.",
+      "Hours vanish into copy-paste.",
+      "Warm leads go cold.",
     ],
     stepsLabel: "Three everyday moments",
     // Small label above each headline, and the three things that happen in each scene
@@ -915,7 +960,7 @@ export const uiCopy = {
     ],
     flowLabel: "What happens",
     // The one visual under the story: chasing work grows, customer time shrinks (no figures)
-    balance: { chasing: "More time spent chasing work.", serving: "Less time serving customers." },
+    balance: { chasing: "More time chasing work.", serving: "Less time serving customers." },
     // Status words inside the animated interfaces
     today: "Today",
     unread: "Unread",

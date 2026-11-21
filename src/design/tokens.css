@@ -126,7 +126,7 @@
   /* Dark chapters — full-bleed charcoal panels with rounded top and bottom corners */
   --dark-panel: #0a0b0f;
   --panel-gap: clamp(8px, 1.2vw, 16px); /* vertical breathing room so the curves read against the canvas */
-  --panel-r: clamp(24px, 5vw, 80px); /* 24 phone · ~38 tablet · 64 at 1280 · 80 wide */
+  --panel-r: 0; /* 24 phone · ~38 tablet · 64 at 1280 · 80 wide */
 
   /* Radius */
   --r-12: 12px;

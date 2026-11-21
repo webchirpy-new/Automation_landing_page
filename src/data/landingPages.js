@@ -12,7 +12,8 @@
  *   results     [{ value, label }] — values that are not a plain number render as text
  *   footnote    { text, mono } — the line under the results panel
  *
- * Do not edit these strings without client approval.
+ * Copy tightened Nov 2026 for scannability (hero body, lists, stat labels). CTA buttons and
+ * under-button lines are unchanged. Do not edit these strings without client approval.
  */
 import { hero as heroPage1, uiCopy } from "./automationContent"
 import { siteConfig } from "../config/site"
@@ -21,7 +22,9 @@ const UNDER_BUTTON = "Free automation audit · 15–30 minutes · No obligation"
 
 const page1 = {
   ...heroPage1,
-  list: { title: heroPage1.listTitle, ordered: false, items: heroPage1.leaks, icons: ["form", "chat", "clock", "chart"] },
+  // "Where leads leak" list hidden for now. Restore the line below to bring it back.
+  // list: { title: heroPage1.listTitle, ordered: false, items: heroPage1.leaks, icons: ["form", "chat", "clock", "chart"] },
+  list: null,
   // The 7x / 60x / 23% figures show with a "citation pending confirmation" note until the client
   // confirms a source and turns VITE_SHOW_HERO_SOURCE_LINE on.
   results: heroPage1.results,
@@ -36,23 +39,23 @@ export const landingPages = {
     headline: "The 5-minute lead test.",
     punchLine: "Time your own reply.",
     body:
-      "The business that replies first usually wins the customer. If your reply takes hours, a competitor has already called them. The AI Automation Engine replies in seconds, day or night, and passes the lead to the right person with the details already filled in.",
+      "Reply in hours and a competitor has already called them. Our AI Automation Engine replies in seconds, day or night, and hands the lead to the right person.",
     list: {
       ordered: true,
       items: [
-        "Send a test enquiry to your own business",
-        "Check who sees it and where it is recorded",
-        "Compare the reply time with 5 minutes",
+        "Send your business a test enquiry",
+        "See who gets it, and where it's logged",
+        "Did the reply beat 5 minutes?",
       ],
       icons: ["form", "people", "clock"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: Vasanth Sampathkumar on why the first reply wins the customer",
-    resultsHeading: "Why 5 minutes decides who wins the customer",
+    videoCaption: "Watch first: Vasanth Sampathkumar on why the first reply wins",
+    resultsHeading: "Why 5 minutes decides the sale",
     results: [
-      { value: "21x", label: "More likely to qualify a lead when you reply within 5 minutes, not 30" },
-      { value: "7x", label: "More likely to qualify a lead when you reply within the hour" },
-      { value: "42 hrs", label: "Average time businesses take to reply to an online lead" },
+      { value: "21x", label: "More likely to qualify a lead replying in 5 minutes vs 30" },
+      { value: "7x", label: "More likely to qualify a lead replying within the hour" },
+      { value: "42 hrs", label: "Average reply time to an online lead" },
     ],
     footnote: {
       text: "Sources: Lead Response Management Study (Dr. James Oldroyd, MIT and InsideSales); Harvard Business Review, \"The Short Life of Online Sales Leads\".",
@@ -64,26 +67,26 @@ export const landingPages = {
 
   "vsl-03": {
     eyebrow: "AI Automation for data-driven decisions",
-    headline: "Can you tell how your business did yesterday, without calling anyone?",
+    headline: "How did your business do yesterday?",
     punchLine: "One screen. Every morning.",
     body:
-      "Your numbers sit in Excel, Tally, the CRM and WhatsApp, so every report means chasing people. The AI Automation Engine pulls them into one live dashboard on your phone, so your decisions come from data, not guesswork.",
+      "Know without calling anyone. Our AI Automation Engine pulls Excel, Tally, CRM and WhatsApp into one live dashboard on your phone.",
     list: {
       ordered: false,
       items: [
-        "Leads: how many came in, and from where",
-        "Follow-ups: what got a reply, what is overdue",
-        "Payments: received, pending and due this week",
+        "Leads: how many, from where",
+        "Follow-ups: replied or overdue",
+        "Payments: received or pending",
       ],
       icons: ["form", "chat", "invoice"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: Vasanth Sampathkumar on running a business from one screen",
-    resultsHeading: "What one live dashboard gives you",
+    videoCaption: "Watch first: Vasanth Sampathkumar on running it from one screen",
+    resultsHeading: "What one dashboard gives you",
     results: [
       { value: "1", label: "Screen for sales, follow-ups and payments" },
-      { value: "0", label: "Calls to find out how yesterday went" },
-      { value: "Daily", label: "Business summary on your phone every morning" },
+      { value: "0", label: "Calls to know how yesterday went" },
+      { value: "Daily", label: "Summary on your phone each morning" },
     ],
     footnote: { text: "How the AI Automation Engine works for every business.", mono: false },
     button: "SHOW ME MY BUSINESS ON ONE SCREEN →",
@@ -91,30 +94,30 @@ export const landingPages = {
   },
 
   "vsl-04": {
-    eyebrow: "Automate your workflows, cut the manual work",
+    eyebrow: "Automate workflows, cut manual work",
     headline: "Your best people are doing data entry.",
     punchLine: "Give them their day back.",
     body:
-      "The same customer details get typed into a sheet, then the CRM, then the invoice, twenty times a day. The AI Automation Engine moves data between your tools and sends the routine reminders, so your team spends its time on customers, not copy-paste.",
+      "The same details get typed into a sheet, the CRM and the invoice, twenty times a day. Our AI Automation Engine moves the data and sends the reminders, so your team focuses on customers.",
     list: {
-      title: "Still done by hand today",
+      title: "Still done by hand",
       ordered: false,
       items: [
-        "Copying details between apps",
-        "Sending payment reminders",
-        "Updating status sheets",
-        "Chasing approvals on WhatsApp",
-        "Building reports every week",
+        "Copying data between apps",
+        "Payment reminders",
+        "Status sheet updates",
+        "Chasing approvals",
+        "Weekly reports",
       ],
       icons: ["branch", "invoice", "crm", "chat", "chart"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: Vasanth Sampathkumar on the hours your team loses to copy-paste",
+    videoCaption: "Watch first: Vasanth Sampathkumar on the hours lost to copy-paste",
     resultsHeading: "How much of the day could run itself",
     results: [
-      { value: "Up to 30%", label: "Of hours worked could be automated by 2030" },
-      { value: "60–70%", label: "Of employees' time goes to tasks today's AI could automate" },
-      { value: "0", label: "Details typed twice once your tools are connected" },
+      { value: "Up to 30%", label: "Of work hours automatable by 2030" },
+      { value: "60–70%", label: "Of staff time is on tasks AI could automate" },
+      { value: "0", label: "Details typed twice once tools connect" },
     ],
     footnote: { text: "Source: McKinsey Global Institute research on generative AI and the future of work.", mono: false },
     button: "GIVE MY TEAM ITS DAY BACK →",
@@ -126,9 +129,9 @@ export const landingPages = {
   "vsl-05": {
     eyebrow: "A real AI Automation story",
     headline: "Leads lost in email alerts. Now answered in 3 minutes.",
-    punchLine: "Here is how.",
+    punchLine: "Here's how.",
     body:
-      "One growing business was getting enquiries from WhatsApp, the website form and email, but email alerts got buried and some leads were never followed up. Webchirpy built an AI-powered lead dashboard that brings every enquiry into one place and triggers the follow-up automatically. First reply time went from 3 hours to 3 minutes.",
+      "Enquiries came in on WhatsApp, web forms and email, and buried alerts meant lost leads. Webchirpy built one AI lead dashboard that follows up automatically.",
     list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: the story behind 3 hours to 3 minutes",
@@ -144,23 +147,23 @@ export const landingPages = {
   },
 
   "vsl-06": {
-    eyebrow: "Automate your workflows across every tool you use",
+    eyebrow: "Automate workflows across every tool",
     headline: "Ten apps. Zero connection.",
     punchLine: "Make them work as one.",
     body:
-      "You pay for a CRM, accounting software, WhatsApp Business and Google Sheets, yet your team still copies data between them by hand. The AI Automation Engine connects the tools you already use, so information moves on its own and nothing gets typed twice.",
+      "You pay for a CRM, accounts, WhatsApp and Sheets, yet your team still copies data by hand. Our AI Automation Engine connects them, so nothing is typed twice.",
     list: {
       ordered: true,
-      items: ["Website and forms", "WhatsApp and email", "CRM", "Accounts", "One connected, automated workflow"],
+      items: ["Website and forms", "WhatsApp and email", "CRM", "Accounts", "One automated workflow"],
       icons: ["form", "mail", "crm", "invoice", "operations"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on making your tools work as one",
     resultsHeading: "What connected tools give you",
     results: [
-      { value: "1", label: "Automated workflow across every app" },
+      { value: "1", label: "Workflow across every app" },
       { value: "0", label: "Details typed twice" },
-      { value: "Every", label: "Tool you already pay for, kept and connected" },
+      { value: "Every", label: "Tool you already pay for, connected" },
     ],
     footnote: { text: "How the AI Automation Engine works for every business.", mono: false },
     button: "CONNECT MY TOOLS →",
@@ -168,27 +171,27 @@ export const landingPages = {
   },
 
   "vsl-07": {
-    eyebrow: "Three uncomfortable questions before you automate your workflows",
+    eyebrow: "Three uncomfortable questions",
     headline: "Are you really running your business?",
     punchLine: "Answer these three.",
     body:
-      "If you cannot answer without making calls or scrolling through chats, your business is running on memory. The AI Automation Engine tracks every lead, follow-up and payment, and shows you what needs attention before it becomes a problem.",
+      "Can't answer without calls or scrolling chats? You're running on memory. Our AI Automation Engine tracks every lead, follow-up and payment, and flags problems early.",
     list: {
       ordered: true,
       items: [
-        "How many leads got a reply within an hour yesterday?",
-        "Which follow-ups are overdue today?",
-        "Which payments are still pending this week?",
+        "Leads replied to within an hour yesterday?",
+        "Follow-ups overdue today?",
+        "Payments pending this week?",
       ],
       icons: ["clock", "help", "invoice"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: Vasanth Sampathkumar on running a business on systems, not memory",
+    videoCaption: "Watch first: Vasanth Sampathkumar on systems, not memory",
     resultsHeading: "What running on systems looks like",
     results: [
-      { value: "24/7", label: "Tracking of every lead, follow-up and payment" },
+      { value: "24/7", label: "Tracking of leads, follow-ups, payments" },
       { value: "0", label: "Follow-ups left to memory" },
-      { value: "1", label: "Screen that flags what needs attention today" },
+      { value: "1", label: "Screen that flags what needs you today" },
     ],
     footnote: { text: "How the AI Automation Engine works for every business.", mono: false },
     button: "SHOW ME WHAT NEEDS ATTENTION →",
@@ -200,26 +203,26 @@ export const landingPages = {
     headline: "Using AI, or just talking about it?",
     punchLine: "Put AI to work.",
     body:
-      "Asking ChatGPT for a caption now and then is not AI adoption. The AI Automation Engine works inside your inbox, CRM and WhatsApp every day: reading enquiries, drafting replies, updating records and flagging what needs a person.",
+      "A ChatGPT caption now and then isn't AI adoption. Our AI Automation Engine works daily in your inbox, CRM and WhatsApp: reading enquiries, drafting replies, updating records.",
     list: {
       title: "Still done by hand?",
       ordered: false,
       items: [
-        "Replying to the same questions",
-        "Sorting new enquiries",
+        "Answering repeat questions",
+        "Sorting enquiries",
         "Updating records",
-        "Writing follow-up messages",
-        "Summarising weekly reports",
+        "Writing follow-ups",
+        "Weekly reports",
       ],
       icons: ["chat", "form", "crm", "mail", "chart"],
     },
     logoStripHeading: "Businesses that trust Webchirpy",
-    videoCaption: "Watch first: Vasanth Sampathkumar on putting AI to real work every day",
-    resultsHeading: "Everyone is using AI. Few are putting it to work.",
+    videoCaption: "Watch first: Vasanth Sampathkumar on putting AI to real work",
+    resultsHeading: "Everyone uses AI. Few put it to work.",
     results: [
-      { value: "88%", label: "Of organisations now use AI in at least one part of the business" },
-      { value: "1 in 3", label: "Have scaled AI beyond small pilots" },
-      { value: "39%", label: "See any real impact on their earnings from AI" },
+      { value: "88%", label: "Of organisations use AI somewhere in the business" },
+      { value: "1 in 3", label: "Have scaled AI beyond pilots" },
+      { value: "39%", label: "See real earnings impact from AI" },
     ],
     footnote: { text: "Source: McKinsey, \"The State of AI in 2025\".", mono: false },
     button: "PUT AI TO WORK IN MY BUSINESS →",

@@ -1,0 +1,478 @@
+/* Pain-point video carousel: video | pain point | stats. Mobile first. */
+.pain {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+/* ---------- Video (9:16) ---------- */
+.pain__video {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+}
+.pain__frame {
+  position: relative;
+  width: min(100%, 280px);
+  aspect-ratio: 9 / 16;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #0a0b0f;
+  box-shadow: 0 24px 60px -20px rgba(30, 24, 80, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  isolation: isolate;
+}
+.pain__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+/* soft scrims so badges and controls always read on any footage */
+.pain__frame::before,
+.pain__frame::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 96px;
+  z-index: 1;
+  pointer-events: none;
+}
+.pain__frame::before {
+  top: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), transparent);
+}
+.pain__frame::after {
+  bottom: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.62));
+}
+
+.pain__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: rgba(15, 16, 24, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.pain__badge i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ef0a6;
+  box-shadow: 0 0 0 0 rgba(94, 240, 166, 0.6);
+}
+
+/* "Tap to unmute" — the first thing a viewer sees on the video */
+.pain__unmute {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 13px 6px 11px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #17142b;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.pain__eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.pain__eq i {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: #5b4bd6;
+  transform-origin: bottom;
+}
+
+.pain__bigplay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  z-index: 3;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #17142b;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+.pain__bigplay svg {
+  width: 28px;
+  height: 28px;
+}
+
+.pain__controls {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pain__ctl {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(15, 16, 24, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+.pain__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+.pain__bar i {
+  display: block;
+  height: 100%;
+  background: #fff;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ---------- Pain point card ---------- */
+.pain__copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: 28px;
+  background:
+    radial-gradient(60% 40% at 100% 0%, rgba(183, 154, 238, 0.12), transparent 70%),
+    radial-gradient(50% 40% at 0% 100%, rgba(140, 230, 240, 0.1), transparent 70%),
+    linear-gradient(180deg, #fff, var(--paper, #f7f7fb));
+  border: 1px solid var(--line, #e6e6ef);
+  box-shadow: var(--shadow-1);
+  text-align: left;
+}
+.pain__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 13px 5px 5px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3d33a0;
+  background: #efecff;
+}
+.pain__chip b {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  color: #fff;
+  background: linear-gradient(135deg, #5b4bd6, #b05fd0);
+}
+.pain__title {
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  text-wrap: balance;
+  /* Colour: the page's warm highlight gradient (rose, coral, orange), light-ground tones */
+  color: var(--hl-coral-deep, #e8501f);
+  background: linear-gradient(100deg, var(--hl-rose-deep, #e63f7a) 0%, var(--hl-coral-deep, #e8501f) 45%, var(--hl-orange-deep, #db7410) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.pain__text {
+  color: var(--muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  max-width: 42ch;
+}
+
+/* preview of the next pain point, pinned to the bottom of the card */
+.pain__next {
+  margin-top: auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "label arrow" "name arrow";
+  align-items: center;
+  column-gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line, #e6e6ef);
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.pain__next:hover {
+  border-color: #b9b2f0;
+  transform: translateY(-1px);
+}
+.pain__next span {
+  grid-area: label;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pain__next strong {
+  grid-area: name;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.pain__next em {
+  grid-area: arrow;
+  font-style: normal;
+  font-size: 1.25rem;
+  color: #5b4bd6;
+}
+
+.pain__nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.pain__arrow {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line, #e6e6ef);
+  background: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.pain__dots {
+  display: flex;
+  align-items: center;
+}
+.pain__dots button {
+  position: relative;
+  width: 22px;
+  height: 44px;
+  cursor: pointer;
+}
+.pain__dots button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 8px;
+  background: #d6d3ec;
+  transition: width 0.25s, margin 0.25s, background 0.25s;
+}
+.pain__dots button.is-on::after {
+  width: 22px;
+  margin-left: -11px;
+  background: linear-gradient(90deg, #5b4bd6, #b05fd0);
+}
+
+/* ---------- Stats column ---------- */
+.pain .results {
+  min-width: 0;
+  gap: 14px;
+}
+.pain .results__list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.pain .results__list li {
+  padding: 14px 18px;
+  gap: 4px;
+}
+.pain .results__value {
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+}
+.pain .results__label {
+  font-size: 0.9375rem;
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .pain__title,
+  .pain__text {
+    animation: pain-in 0.45s var(--ease-out, ease-out) both;
+  }
+  .pain__text {
+    animation-delay: 0.06s;
+  }
+  .pain__badge i {
+    animation: pain-live 1.8s infinite;
+  }
+  .pain__unmute {
+    animation: pain-pulse 2.4s ease-in-out infinite;
+  }
+  .pain__eq i {
+    animation: pain-eq 0.9s ease-in-out infinite;
+  }
+  .pain__eq i:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .pain__eq i:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+@keyframes pain-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes pain-live {
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px rgba(94, 240, 166, 0);
+  }
+}
+@keyframes pain-pulse {
+  50% {
+    transform: scale(1.06);
+  }
+}
+@keyframes pain-eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* ---------- Tablet: video + pain point, stats below ---------- */
+@media (min-width: 640px) {
+  .pain {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .pain .results {
+    grid-column: 1 / -1;
+  }
+  .pain .results__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Desktop: three equal-height columns, wider video ---------- */
+@media (min-width: 1100px) {
+  .pain {
+    grid-template-columns: minmax(340px, 1.05fr) minmax(0, 1.1fr) minmax(0, 1.05fr);
+    gap: 28px;
+    min-height: 600px;
+  }
+  .pain__video {
+    align-content: stretch;
+    justify-items: stretch;
+  }
+  .pain__frame {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    aspect-ratio: auto;
+  }
+  .pain__media {
+    object-position: 50% 35%;
+  }
+  .pain__copy {
+    gap: 20px;
+    padding: 40px 36px;
+  }
+  .pain__title {
+    font-size: clamp(2.25rem, 1.2rem + 1.8vw, 3rem);
+  }
+  .pain__text {
+    max-width: none;
+    font-size: 1.25rem;
+    line-height: 1.65;
+  }
+  .pain__next {
+    padding: 16px 20px;
+  }
+  .pain__next strong {
+    font-size: 1.125rem;
+  }
+  .pain .results {
+    grid-column: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+  }
+  .pain .results__list {
+    grid-template-columns: minmax(0, 1fr);
+    flex: 1;
+    grid-auto-rows: 1fr;
+    gap: 14px;
+  }
+  .pain .results__list li {
+    justify-content: center;
+  }
+}
+
+/* ---------- Phone ---------- */
+@media (max-width: 639px) {
+  .pain__frame {
+    width: min(100%, 300px);
+  }
+  .pain__copy {
+    align-items: center;
+    text-align: center;
+  }
+  .pain__text {
+    max-width: none;
+  }
+  .pain__next {
+    margin-top: 4px;
+  }
+}

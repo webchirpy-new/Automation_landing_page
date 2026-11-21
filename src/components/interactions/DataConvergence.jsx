@@ -37,9 +37,9 @@ const WIDE_Q = "(min-width: 1120px)"
 // Data-stage timing (s). Signal i leaves at COMET_AT + i·STEP and lights core dot i as it sinks
 // into the ring (~0.55 s later); the last dot is lit by ~2 s and the panel opens at 2.6 s
 // (STAGE_MS[0] in DashboardSection). Comet duration lives in CSS (.dc-comet, 0.8s).
-const STEP = 0.11
-const COMET_AT = 0.45
-const DOT_AT = 1.0
+const STEP = 0.08
+const COMET_AT = 0.25
+const DOT_AT = 0.7
 
 // The core is a 100px disc (.dc-core). Wires fade out over its glow instead of being cut off by
 // its edge: fully hidden inside the ring, about a third strength just outside it, full at SINK_R.
@@ -111,7 +111,7 @@ function useGeometry(stageRef, boardRef) {
 }
 
 /** Counts up to `value` each time `play` turns on; shows the final value otherwise. */
-function Ticker({ value, suffix = "", play, delay = 0, duration = 1.4 }) {
+function Ticker({ value, suffix = "", play, delay = 0, duration = 0.9 }) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
@@ -154,7 +154,7 @@ function Trend({ stage, epoch, focus }) {
         {[16, 32, 48].map((y) => (
           <line key={y} className="dc-chart__grid" x1="0" x2="300" y1={y} y2={y} />
         ))}
-        <m.path key={`a${epoch}`} d={area} fill="url(#dc-area)" initial={{ opacity: 0 }} animate={{ opacity: stage >= 1 ? 1 : 0 }} transition={{ delay: stage >= 1 ? 1.7 : 0, duration: 0.7 }} />
+        <m.path key={`a${epoch}`} d={area} fill="url(#dc-area)" initial={{ opacity: 0 }} animate={{ opacity: stage >= 1 ? 1 : 0 }} transition={{ delay: stage >= 1 ? 1.0 : 0, duration: 0.5 }} />
         <m.path
           key={`l${epoch}`}
           d={line}
@@ -162,7 +162,7 @@ function Trend({ stage, epoch, focus }) {
           stroke="url(#dc-line)"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: stage >= 1 ? 1 : 0 }}
-          transition={{ delay: stage >= 1 ? 0.75 : 0, duration: 1.2, ease: "easeInOut" }}
+          transition={{ delay: stage >= 1 ? 0.3 : 0, duration: 0.8, ease: "easeInOut" }}
         />
         {/* next month's target, shown with the third decision */}
         <line className={`dc-chart__target ${focus === "hours" ? "is-on" : ""}`} x1="0" x2="300" y1="3" y2="3" />
@@ -296,7 +296,7 @@ export default function DataConvergence({ stage, decision, onDecision, running, 
               <span className="dc-label">{OV.main.label}</span>
               <div className="dc-hours__row">
                 <span className="dc-hours__value">
-                  <Ticker key={`h${epoch}`} value={OV.main.value} suffix={OV.main.suffix} play={counting} delay={0.5} />
+                  <Ticker key={`h${epoch}`} value={OV.main.value} suffix={OV.main.suffix} play={counting} delay={0.2} />
                 </span>
                 <span className="dc-hours__delta">{OV.main.delta}</span>
               </div>
@@ -306,7 +306,7 @@ export default function DataConvergence({ stage, decision, onDecision, running, 
               {OV.stats.slice(0, 2).map((st, i) => (
                 <div key={st.label} className="dc-stat">
                   <span className="dc-stat__value">
-                    <Ticker key={`s${i}${epoch}`} value={st.value} play={counting} delay={0.65 + i * 0.12} />
+                    <Ticker key={`s${i}${epoch}`} value={st.value} play={counting} delay={0.3 + i * 0.08} />
                   </span>
                   <span className="dc-stat__label">{st.label}</span>
                 </div>
