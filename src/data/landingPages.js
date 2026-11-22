@@ -179,9 +179,9 @@ export const landingPages = {
   },
 
   "vsl-07": {
-    eyebrow: "Three uncomfortable questions",
+    eyebrow: "One uncomfortable question",
     headline: "Are you really running your business?",
-    punchLine: "Answer these three.",
+    punchLine: "Or just keeping up with it?",
     body:
       "Can't answer without calls or scrolling chats? You're running on memory. Our AI Automation Engine tracks every lead, follow-up and payment, and flags problems early.",
     // List hidden. Restore the block below to bring it back.
