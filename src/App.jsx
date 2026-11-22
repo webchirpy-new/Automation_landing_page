@@ -7,7 +7,7 @@ import Hero from "./components/sections/Hero"
 // import Comparison from "./components/sections/Comparison" // hidden: merged into DoubtsQA
 // import Proof from "./components/sections/Proof" // hidden: merged into DoubtsQA
 // import AudienceFit from "./components/sections/AudienceFit" // hidden for now
-import PageSections from "./components/page-sections/PageSections"
+// import PageSections from "./components/page-sections/PageSections" // hidden: only the hero changes per page
 import { landOnHash } from "./lib/scroll"
 import { ScrollTrigger } from "./lib/gsap"
 
@@ -55,8 +55,9 @@ export default function App() {
       </a>
       <main id="main">
         <Hero />
-        {/* Landing pages 5–8: the page's own section(s) from Launch Kit 04 */}
-        <PageSections />
+        {/* Landing pages 5–8 own sections (Launch Kit 04) hidden: only the hero changes per page,
+            everything below it matches page 1. Restore the import and this line to bring them back. */}
+        {/* <PageSections /> */}
         {belowFold && (
           <Suspense fallback={<div aria-hidden="true" style={{ minHeight: "300vh" }} />}>
             <Sections />

@@ -40,15 +40,17 @@ export const landingPages = {
     punchLine: "Time your own reply.",
     body:
       "Reply in hours and a competitor has already called them. Our AI Automation Engine replies in seconds, day or night, and hands the lead to the right person.",
-    list: {
-      ordered: true,
-      items: [
-        "Send your business a test enquiry",
-        "See who gets it, and where it's logged",
-        "Did the reply beat 5 minutes?",
-      ],
-      icons: ["form", "people", "clock"],
-    },
+    // 3-step list hidden. Restore the block below to bring it back.
+    // list: {
+    //   ordered: true,
+    //   items: [
+    //     "Send your business a test enquiry",
+    //     "See who gets it, and where it's logged",
+    //     "Did the reply beat 5 minutes?",
+    //   ],
+    //   icons: ["form", "people", "clock"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on why the first reply wins",
     resultsHeading: "Why 5 minutes decides the sale",
@@ -71,15 +73,17 @@ export const landingPages = {
     punchLine: "One screen. Every morning.",
     body:
       "Know without calling anyone. Our AI Automation Engine pulls Excel, Tally, CRM and WhatsApp into one live dashboard on your phone.",
-    list: {
-      ordered: false,
-      items: [
-        "Leads: how many, from where",
-        "Follow-ups: replied or overdue",
-        "Payments: received or pending",
-      ],
-      icons: ["form", "chat", "invoice"],
-    },
+    // List hidden. Restore the block below to bring it back.
+    // list: {
+    //   ordered: false,
+    //   items: [
+    //     "Leads: how many, from where",
+    //     "Follow-ups: replied or overdue",
+    //     "Payments: received or pending",
+    //   ],
+    //   icons: ["form", "chat", "invoice"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on running it from one screen",
     resultsHeading: "What one dashboard gives you",
@@ -99,18 +103,20 @@ export const landingPages = {
     punchLine: "Give them their day back.",
     body:
       "The same details get typed into a sheet, the CRM and the invoice, twenty times a day. Our AI Automation Engine moves the data and sends the reminders, so your team focuses on customers.",
-    list: {
-      title: "Still done by hand",
-      ordered: false,
-      items: [
-        "Copying data between apps",
-        "Payment reminders",
-        "Status sheet updates",
-        "Chasing approvals",
-        "Weekly reports",
-      ],
-      icons: ["branch", "invoice", "crm", "chat", "chart"],
-    },
+    // List hidden. Restore the block below to bring it back.
+    // list: {
+    //   title: "Still done by hand",
+    //   ordered: false,
+    //   items: [
+    //     "Copying data between apps",
+    //     "Payment reminders",
+    //     "Status sheet updates",
+    //     "Chasing approvals",
+    //     "Weekly reports",
+    //   ],
+    //   icons: ["branch", "invoice", "crm", "chat", "chart"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on the hours lost to copy-paste",
     resultsHeading: "How much of the day could run itself",
@@ -152,11 +158,13 @@ export const landingPages = {
     punchLine: "Make them work as one.",
     body:
       "You pay for a CRM, accounts, WhatsApp and Sheets, yet your team still copies data by hand. Our AI Automation Engine connects them, so nothing is typed twice.",
-    list: {
-      ordered: true,
-      items: ["Website and forms", "WhatsApp and email", "CRM", "Accounts", "One automated workflow"],
-      icons: ["form", "mail", "crm", "invoice", "operations"],
-    },
+    // List hidden. Restore the block below to bring it back.
+    // list: {
+    //   ordered: true,
+    //   items: ["Website and forms", "WhatsApp and email", "CRM", "Accounts", "One automated workflow"],
+    //   icons: ["form", "mail", "crm", "invoice", "operations"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on making your tools work as one",
     resultsHeading: "What connected tools give you",
@@ -176,15 +184,17 @@ export const landingPages = {
     punchLine: "Answer these three.",
     body:
       "Can't answer without calls or scrolling chats? You're running on memory. Our AI Automation Engine tracks every lead, follow-up and payment, and flags problems early.",
-    list: {
-      ordered: true,
-      items: [
-        "Leads replied to within an hour yesterday?",
-        "Follow-ups overdue today?",
-        "Payments pending this week?",
-      ],
-      icons: ["clock", "help", "invoice"],
-    },
+    // List hidden. Restore the block below to bring it back.
+    // list: {
+    //   ordered: true,
+    //   items: [
+    //     "Leads replied to within an hour yesterday?",
+    //     "Follow-ups overdue today?",
+    //     "Payments pending this week?",
+    //   ],
+    //   icons: ["clock", "help", "invoice"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on systems, not memory",
     resultsHeading: "What running on systems looks like",
@@ -204,18 +214,20 @@ export const landingPages = {
     punchLine: "Put AI to work.",
     body:
       "A ChatGPT caption now and then isn't AI adoption. Our AI Automation Engine works daily in your inbox, CRM and WhatsApp: reading enquiries, drafting replies, updating records.",
-    list: {
-      title: "Still done by hand?",
-      ordered: false,
-      items: [
-        "Answering repeat questions",
-        "Sorting enquiries",
-        "Updating records",
-        "Writing follow-ups",
-        "Weekly reports",
-      ],
-      icons: ["chat", "form", "crm", "mail", "chart"],
-    },
+    // List hidden. Restore the block below to bring it back.
+    // list: {
+    //   title: "Still done by hand?",
+    //   ordered: false,
+    //   items: [
+    //     "Answering repeat questions",
+    //     "Sorting enquiries",
+    //     "Updating records",
+    //     "Writing follow-ups",
+    //     "Weekly reports",
+    //   ],
+    //   icons: ["chat", "form", "crm", "mail", "chart"],
+    // },
+    list: null,
     logoStripHeading: "Businesses that trust Webchirpy",
     videoCaption: "Watch first: Vasanth Sampathkumar on putting AI to real work",
     resultsHeading: "Everyone uses AI. Few put it to work.",

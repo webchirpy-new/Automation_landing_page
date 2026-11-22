@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { uiCopy, trusted } from "../../data/automationContent"
-import { pageHero as hero, pageId } from "../../data/landingPages"
+import { pageHero as hero, landingPages } from "../../data/landingPages"
 import PainShowcase from "./PainShowcase"
 import { tools, toolRoutes, moduleByName } from "../../data/serviceModules"
 import { siteConfig } from "../../config/site"
@@ -188,18 +188,20 @@ export default function Hero() {
 
   const list = hero.list
   const showVideo = false // hidden for now; set back to true to show the founder video card
-  const showResults = Array.isArray(hero.results) && hero.results.length > 0
   const ListTag = list?.ordered ? "ol" : "ul"
-  // Video carousel + 8 pain points + stats: page 1 only. Other pages keep their own layout.
-  const showPain = pageId === "vsl-01" && showResults
+  // Only the hero changes per page. Everything under it (video carousel, pain points and the
+  // stats beside them) is page 1's, identical on every landing page.
+  const proof = landingPages["vsl-01"]
+  const showResults = Array.isArray(proof.results) && proof.results.length > 0
+  const showPain = showResults
 
   const resultsPanel = showResults ? (
     <div className="results" aria-labelledby="results-title">
       <h2 id="results-title" className="results__title t-h3">
-        {hero.resultsHeading}
+        {proof.resultsHeading}
       </h2>
       <ul className="results__list">
-        {hero.results.map((r, i) => {
+        {proof.results.map((r, i) => {
           const m = r.value.match(COUNTABLE)
           return (
             <li key={`${r.value}-${i}`}>
@@ -213,7 +215,7 @@ export default function Hero() {
           )
         })}
       </ul>
-      <p className={`results__source${hero.footnote.mono ? " t-mono" : ""}`}>{hero.footnote.text}</p>
+      <p className={`results__source${proof.footnote.mono ? " t-mono" : ""}`}>{proof.footnote.text}</p>
     </div>
   ) : null
 
