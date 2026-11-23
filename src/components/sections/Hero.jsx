@@ -14,7 +14,7 @@ import { CTAButton, Eyebrow } from "../ui/primitives"
 import { FlowText } from "../ui/Highlight"
 import { gsap, useGSAP } from "../../lib/gsap"
 import { MOTION_OK } from "../../lib/motionTokens"
-import { goTo } from "../../lib/scroll"
+import { goToBooking } from "../../lib/scroll"
 import { useSite } from "../../context/SiteContext"
 
 /**
@@ -299,7 +299,7 @@ export default function Hero() {
           </p>
           <p className="hero__body">{hero.body}</p>
           <div className="hero__cta">
-            <CTAButton id="hero-cta" className="hero-cta" href="#scorecard" size="lg" onClick={() => goTo("#scorecard", { focusSelector: ".score-area__toggle, input" })}>
+            <CTAButton id="hero-cta" className="hero-cta" href="#book" size="lg" onClick={goToBooking}>
               {hero.button}
             </CTAButton>
             <p className="hero__micro">{hero.underButton}</p>

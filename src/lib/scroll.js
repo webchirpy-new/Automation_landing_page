@@ -17,6 +17,7 @@ export function goTo(hash, { focusSelector } = {}) {
   if (window.history?.replaceState) window.history.replaceState(null, "", hash)
 }
 
+// Every booking CTA scrolls down to the booking form (#book).
 export const goToBooking = () => goTo("#book", { focusSelector: "input" })
 
 /**

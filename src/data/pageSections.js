@@ -12,7 +12,8 @@
  * Do not edit these strings without client approval.
  */
 
-const SCORE_BUTTON = "SCORE THE REST OF MY BUSINESS →"
+// Section CTAs open the booking form (was "SCORE THE REST OF MY BUSINESS →" to #scorecard).
+const SCORE_BUTTON = "BOOK MY FREE AUTOMATION AUDIT →"
 
 /**
  * What clients actually get for Insights: a WhatsApp summary every morning (Kit 04 §04, vsl-07).
@@ -104,7 +105,7 @@ export const pageSections = {
       prompt: "Tap every place:",
       options: ["WhatsApp", "Lead sheet", "CRM", "Quote", "Invoice", "Delivery note", "Accounts software"],
       result: (n) => `Typed ${n} ${n === 1 ? "time" : "times"}. ${n - 1} of them could happen on their own.`,
-      button: { label: SCORE_BUTTON, href: "#scorecard" },
+      button: { label: SCORE_BUTTON, href: "#book" },
     },
   ],
 
@@ -135,7 +136,7 @@ export const pageSections = {
           body: "Your business runs on memory. That is exactly what a morning summary fixes: all three answers on your phone before 9 am.",
         },
       ],
-      button: { label: SCORE_BUTTON, href: "#scorecard" },
+      button: { label: SCORE_BUTTON, href: "#book" },
     },
     MORNING_SUMMARY,
   ],
