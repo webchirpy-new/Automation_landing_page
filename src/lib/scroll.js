@@ -17,8 +17,13 @@ export function goTo(hash, { focusSelector } = {}) {
   if (window.history?.replaceState) window.history.replaceState(null, "", hash)
 }
 
-// Every booking CTA scrolls down to the booking form (#book).
-export const goToBooking = () => goTo("#book", { focusSelector: "input" })
+// Every booking CTA opens the booking form in a pop-up (no long scroll). SiteProvider registers the
+// opener; before it mounts (or if it ever unmounts) the CTA falls back to scrolling to #book.
+let openBookingModal = null
+export const setBookingOpener = (fn) => {
+  openBookingModal = fn
+}
+export const goToBooking = () => (openBookingModal ? openBookingModal() : goTo("#book", { focusSelector: "input" }))
 
 /**
  * Deep links from ads (e.g. `vsl-07-…html#test`): the browser tries to jump to the hash before

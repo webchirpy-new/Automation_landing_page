@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { summarise } from "../lib/scoring"
+import { setBookingOpener } from "../lib/scroll"
 
 const SiteContext = createContext(null)
 // v2: adds the two context answers. A new key means an old saved shape can never be misread.
@@ -69,6 +70,12 @@ export function SiteProvider({ children }) {
   /** One-tap context answer; tapping the chosen option again clears it. */
   const setContext = useCallback((questionId, optionId) => {
     setScore((s) => ({ ...s, context: { ...s.context, [questionId]: s.context[questionId] === optionId ? null : optionId } }))
+  }, [])
+
+  // Lets goToBooking() (a plain function used by every CTA) open the booking form pop-up.
+  useEffect(() => {
+    setBookingOpener(() => setModal("lead"))
+    return () => setBookingOpener(null)
   }, [])
 
   const resetScore = useCallback(() => setScore(emptyScore()), [])
